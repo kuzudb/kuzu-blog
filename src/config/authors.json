@@ -1,0 +1,30 @@
+{
+    "team:": {
+      "name": "Kùzu Team",
+      "image": "https://kuzudb.com/img/blog/team.jpg"
+    },
+    "semih": {
+      "name": "Semih Salihoğlu",
+      "image": "https://kuzudb.com/img/blog/semih.jpg"
+    },
+    "chang": {
+      "name": "Chang Liu",
+      "image": "https://kuzudb.com/img/blog/chang.gif"
+    },
+    "guodong": {
+      "name": "Guodong Jin",
+      "image": "https://kuzudb.com/img/blog/guodong.jpg"
+    },
+    "xiyang": {
+      "name": "Xiyang Feng",
+      "image": "https://kuzudb.com/img/blog/xiyang.jpg"
+    },
+    "ziyi": {
+      "name": "Ziyi Chen",
+      "image": "https://kuzudb.com/img/blog/ziyi.jpg"
+    },
+    "prashanth": {
+      "name": "Prashanth Rao",
+      "image": "https://kuzudb.com/img/blog/prashanth.png"
+    }
+}

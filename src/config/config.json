@@ -1,0 +1,30 @@
+{
+  "site": {
+    "title": "Blog - Kùzu",
+    "base_url": "blog.kuzudb.com",
+    "base_path": "/",
+    "favicon": "/favicon.ico",
+    "logoLight": "/logoLight.png",
+    "logoDark": "/logoDark.png",
+    "lang": "en",
+    "description": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database",
+    "pageSize": 6
+  },
+  "features": {
+    "youtube": false,
+    "dark_mode": true
+  },
+  "metadata": {
+    "meta_author": "Kùzu Inc.",
+    "meta_description": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database"
+  },
+  "blog_description": {
+    "heading": "Welcome to the Kùzu blog",
+    "bio": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database."
+  },
+  "author": {
+    "name": "Kùzu Team",
+    "title": "Kùzu Team",
+    "avatar": "/default.png"
+  }
+}
