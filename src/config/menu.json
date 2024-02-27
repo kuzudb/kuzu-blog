@@ -1,0 +1,20 @@
+{
+  "main": [
+    {
+      "name": "Home",
+      "url": "/"
+    },
+    {
+      "name": "Docs",
+      "url": "https://kuzudb.com/docusaurus"
+    },
+    {
+      "name": "Tags",
+      "url": "/tags"
+    },
+    {
+      "name": "Categories",
+      "url": "/categories"
+    }
+  ]
+}
