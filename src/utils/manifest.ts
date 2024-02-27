@@ -10,7 +10,7 @@ export const manifest: Partial<ManifestOptions> = {
   display: 'minimal-ui',
   start_url: '/',
   scope: '/',
-  lang: 'ES',
+  lang: 'EN',
   icons: [
     {
       src: '/favicons/favicon-192x192.png',
@@ -29,5 +29,5 @@ export const manifest: Partial<ManifestOptions> = {
       purpose: 'any maskable',
     },
   ],
-  categories: ['blog'],
+  categories: ['post'],
 };

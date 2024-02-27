@@ -7,9 +7,9 @@ import CategoryIcon from "@icons/CategoryIcon.astro";
 import { Image } from "astro:assets";
 import config from "@config/config.json";
 import { slugify } from "@utils/slug";
-import authors from '../config/authors.json'
+import authors from '../config/authors.json';
 
-type Props = CollectionEntry<"blog">["data"];
+type Props = CollectionEntry<"post">["data"];
 
 const { title, description, pubDate, heroImage, categories, tags } =
   Astro.props;
