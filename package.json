@@ -65,6 +65,8 @@
     "astro-compress/sharp": "0.33.1"
   },
   "dependencies": {
-    "astro-compressor": "^0.4.1"
+    "astro-compressor": "^0.4.1",
+    "rehype-katex": "^7.0.0",
+    "remark-math": "^6.0.0"
   }
 }
