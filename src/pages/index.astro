@@ -4,7 +4,7 @@ import HomePagination from "@components/HomePagination.astro";
 import Base from "@layouts/Base.astro";
 import Posts from "@layouts/Posts.astro";
 
-const posts = (await getCollection("blog")).sort(
+const posts = (await getCollection("post")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 ---
