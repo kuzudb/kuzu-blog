@@ -10,6 +10,8 @@ import { manifest } from './src/utils/manifest';
 
 // https://astro.build/config
 export default defineConfig({
+// Resolves to the "./foo" directory in your current working directory
+  root: '.',
   site: 'http://localhost:4322/',
   image: {
     remotePatterns: [{ protocol: 'https' }],

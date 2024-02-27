@@ -3,7 +3,7 @@ title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kù
 description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 pubDate: "Jan 12 2023"
 heroImage: "/default.png"
-categories: ['general']
+categories: ["concepts"]
 authors: ["semih"]
 tags: ["vision"]
 ---
@@ -74,8 +74,8 @@ enterprise applications.
 I want to start a 3-part blog post to cover the contents of our CIDR paper in a less academic language: 
 
 - __Post 1__: Kùzu's goals and vision as a system 
-- __Post 2__: [Factorization technique for compression](../2023-01-20-factorization/index.md)
-- __Post 3__: [Worst-case optimal join algorithms](../2023-02-22-wcoj/index.md)
+- __Post 2__: [Factorization technique for compression](../2023-01-20-factorization)
+- __Post 3__: [Worst-case optimal join algorithms](../2023-02-22-wcoj)
 
 In this Post 1, I discuss the following: 
    (i)   [an overview of GDBMSs](#overview-of-gdbms-and-a-bit-of-history).
@@ -282,15 +282,15 @@ triples that represent facts about a domain. A great application is when modelin
 querying encyclopedic facts, such as those extracted from Wikipedia data.
 For example, the following triple stores the fact
 that Justin Trudeau is married to Sophie Trudeau:
-(http://dbpedia.org/resource/Justin_Trudeau, http://dbpedia.org/ontology/spouse,	
-http://dbpedia.org/resource/Sophie_Grégoire_Trudeau). 
+`(http://dbpedia.org/resource/Justin_Trudeau`, `http://dbpedia.org/ontology/spouse`,
+`http://dbpedia.org/resource/Sophie_Grégoire_Trudeau)`. 
 There are 2 immediate challenges for a DBMS to manage 
 such data: 
 1. Structuring such datasets is very difficult. Structuring here
 refers to designing a relational schema for the data.
 Entities can have many types, e.g., Justin Trudeau is both a "rdf:type" 
-http://dbpedia.org/ontology/Person as well as
-http://dbpedia.org/ontology/Politician. Further, within a single type, entities can have many different
+`http://dbpedia.org/ontology/Person` as well as
+`http://dbpedia.org/ontology/Politician`. Further, within a single type, entities can have many different
 and distinct properties, so good luck coming up with and maintaining a relational 
 schema for all that. 
 This is a direct result of
