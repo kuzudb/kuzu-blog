@@ -2,7 +2,7 @@
 title: "Why (Graph) DBMSs Need New Join Algorithms"
 description: "Why (Graph) DBMSs Need New Join Algorithms: The Story of Worst-case Optimal Join Algorithms"
 pubDate: "Feb 22 2023"
-heroImage: "/default.png"
+heroImage: "/src/content/post/2023-02-22-wcoj/wcoj-4-clique.png"
 categories: ["concepts"]
 authors: ["semih"]
 tags: ["internals", "wcoj", "joins"]
