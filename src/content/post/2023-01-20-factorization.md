@@ -2,7 +2,7 @@
 title: "Factorization and great ideas from database theory"
 description: "Factorization and great ideas from database theory"
 pubDate: "Jan 20 2023"
-heroImage: "/src/content/post/2023-01-20-factorization/factorization-banner.png"
+heroImage: "/img/2023-01-20-factorization/factorization-banner.png"
 categories: ["concepts"]
 authors: ["semih"]
 tags: ["internals", "factorization"]
@@ -89,7 +89,7 @@ Consider a database of Account node and Transfer edge records below.
 The two Accounts with `accID` fields L1 and L2 are owned by Liz and 
 each have 100 incoming and 100 outgoing Transfer edges.
 
-![](./2-hop-data.png)
+![](/img/2023-01-20-factorization/2-hop-data.png)
 
 Now consider a 2-hop path query in Cypher returning the accID's of source
 and destinations of money flows Liz's accounts are facilitating:
@@ -117,7 +117,7 @@ scanned from a join index) and some hash join operators to perform the joins, an
 a final projection operator.
 In some GDBMSs, you might see "linear plans" that look as in Fig. 3.
 
-![](./2-hop-query-plan-combined.png)
+![](/img/2023-01-20-factorization/2-hop-query-plan-combined.png)
 
 The linear plan is from our previous GraphflowDB system. Here
 you are seeing an operator called Extend, which joins node records with their Transfer relationships to 
@@ -136,7 +136,7 @@ leads to many data repetitions, which one way or another leads to repeated
 computation in the operators. For example,
 the final projection operator in our example would take the table shown in Figure 4 (left).
 
-![](./flat-vs-factorized.png)
+![](/img/2023-01-20-factorization/flat-vs-factorized.png)
 
 There are 20K tuples in the flat representation because both L1 and L2 are part of 
 100 incoming x 100 outgoing=10K many 2-paths. Notice the many repetitions in this relation:
@@ -282,7 +282,7 @@ When designing the query processor of Kùzu, we had 3 design goals:
 Kùzu has a vectorized query processor, which is the common wisdom
 in analytical read-optimized systems. 
 
-![](./factorized-vectors.png)
+![](/img/2023-01-20-factorization/factorized-vectors.png)
 
 Vectorization, in the context of DBMS query processors 
 refers to the design where operators pass a set of tuples, 1024 or 2048, 
@@ -368,7 +368,7 @@ the computation that will be performed and the data that will be passed between 
 For this simulation, I am assuming that the record/nodeIDs of Accounts are as in 
 Figure 1a above.
 
-![](./factorized-execution-simulation.png)
+![](/img/2023-01-20-factorization/factorized-execution-simulation.png)
 
 1. A Scan operator will scan the accId column and find the records of
 nodes with `accID=L1`. There is only 1 tuple `(199, Liz)` that will be output.

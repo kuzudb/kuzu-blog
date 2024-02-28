@@ -2,7 +2,7 @@
 title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 pubDate: "Jan 12 2023"
-heroImage: "/src/content/post/2023-01-12-what-every-gdbms-should-do/bachmann.png"
+heroImage: "/img/2023-01-12-what-every-gdbms-should-do/bachmann.png"
 categories: ["concepts"]
 authors: ["semih"]
 tags: ["vision"]
@@ -116,7 +116,7 @@ _always_ exist: graphs and tables are the two most natural and generic abstract 
 to model application data. It's no surprise they were the first two proposed data models
 when the field of DBMSs were born.
 
-![](./bachmann.png)
+![](/img/2023-01-12-what-every-gdbms-should-do/bachmann.png)
 <center><i>Charles William Bachmann, creator of IDS, the world's first DBMS</i></center>
 
 Back to property GDBMSs. What about their query languages? They support SQL-like high-level 
@@ -188,7 +188,7 @@ So GDBMSs universally exploit this and optimize for these types of joins. For ex
 almost universally they all create a **join index** (aka an adjacency list index)[^5].
 Here's a demonstrative example showing a "forward", i.e., from src to dst, join index:
 
-![](./ex-fwd-join-index.png)
+![](/img/2023-01-12-what-every-gdbms-should-do/ex-fwd-join-index.png)
 
 
 Note that the join index does not store the actual data values, which
@@ -208,7 +208,7 @@ A classic example we like using is a Twitter friend recommendation engine that i
 the following rule: If a user A follows two users B and C, who both follow D, recommend
 D to A. This is the pattern:
 
-![](./diamond-pattern.png)
+![](/img/2023-01-12-what-every-gdbms-should-do/diamond-pattern.png)
 
 The whitepapers of existing GDBMSs are full of these patterns, e.g., branching trees, money laundering circles,
 cliques of customers who buy similar items, etc. These correspond to complex
@@ -323,7 +323,7 @@ a particular application domain we are currently excited
 about and we want to see Kùzu used in: graph data science in the python ecosystem!
 This figure from my CIDR slides describes this vision pictorially:
 
-![Kùzu as a GDBMS for Graph Data Science Pipelines](./kuzu-as-gdbms-of-gds.png)
+![Kùzu as a GDBMS for Graph Data Science Pipelines](/img/2023-01-12-what-every-gdbms-should-do/kuzu-as-gdbms-of-gds.png)
 
 Suppose you are building a graph analytics, machine learning, or visualization
 pipeline from raw record files on disk. You will want to model your raw records 
