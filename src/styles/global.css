@@ -40,7 +40,7 @@
     @apply hover:text-orange-600;
   }
   img {
-    @apply rounded-md w-full md:w-full lg:w-3/4 hover:w-full;
+    @apply rounded-md w-full md:w-full lg:w-3/4;
   }
   th {
     @apply bg-zinc-100 bg-zinc-200 dark:bg-zinc-300;

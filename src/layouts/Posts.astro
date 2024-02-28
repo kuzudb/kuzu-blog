@@ -32,16 +32,18 @@ type PostType = {
         <div class="rounded-lg block overflow-hidden mb-4">
           {post.data.heroImage && (
             <a href={`/post/${post.slug}/`}>
-            <figure class="max-w-48 mx-24 mx-auto flex">
-              <Image
-                src={post.data.heroImage}
-                alt={post.data.title}
-                width={960}
-                height={480}
-                decoding="async"
-                loading="lazy"
-              />
-            </figure>
+            <center>
+                <figure class="max-w-96 h-36 mx-2">
+                <Image
+                    src={post.data.heroImage}
+                    alt={post.data.title}
+                    width={960}
+                    height={480}
+                    decoding="async"
+                    loading="lazy"
+                />
+                </figure>
+            </center>
             </a>
           )}
         </div>

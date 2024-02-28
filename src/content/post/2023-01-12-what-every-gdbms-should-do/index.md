@@ -2,7 +2,7 @@
 title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 pubDate: "Jan 12 2023"
-heroImage: "/default.png"
+heroImage: "/src/content/post/2023-01-12-what-every-gdbms-should-do/bachmann.png"
 categories: ["concepts"]
 authors: ["semih"]
 tags: ["vision"]

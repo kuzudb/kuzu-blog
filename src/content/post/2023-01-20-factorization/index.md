@@ -2,7 +2,7 @@
 title: "Factorization and great ideas from database theory"
 description: "Factorization and great ideas from database theory"
 pubDate: "Jan 20 2023"
-heroImage: "/default.png"
+heroImage: "/src/content/post/2023-01-20-factorization/factorization-banner.png"
 categories: ["concepts"]
 authors: ["semih"]
 tags: ["internals", "factorization"]
