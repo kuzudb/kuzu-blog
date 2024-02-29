@@ -35,8 +35,8 @@ module.exports = {
               color: 'rgb(var(--color-code-text))',
               padding: '0.1rem 0.1rem',
               'border-radius': '0.25rem',
-              'font-size': '0.875rem',
-              'line-height': '1.5',
+              'font-size': '1.0em',
+              'line-height': '1.2',
               'font-family': "Consolas, Menlo, 'Andale Mono', 'Ubuntu Mono', monospace",
             },
             'ol > li::before': {
