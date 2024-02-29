@@ -236,7 +236,7 @@ with your questions and ideas!
 
 ---
 
-[^1]: If you read our [v0.0.3 blog post](../2023-04-06-kuzu-v-0.0.3),
+[^1]: If you read our [v0.0.3 blog post](../kuzu-0.0.3-release),
 which had a shorter section about PyG interface, you will notice that we used a much larger batch size there (48000),
 which was the size that saturated GPU memory. Although the example there was also on the `ogbn-papers100M` dataset, we used a much smaller model with ~200K parameters
 and sampled subgraphs from 2 degree neighbors of these batches. Now we use a much larger model with 5.6 million parameters and samples from 3-degree neighbors.

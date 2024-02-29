@@ -42,7 +42,7 @@ in a well-designed GDBMS like Kùzu contain [specialized syntaxes](https://en.wi
 and operators for these types of query workloads.
 
 For a much more detailed description on the benefits of graph modeling and GDBMSs, see our earlier
-[blog post](../2023-01-12-what-every-gdbms-should-do).
+[blog post](../what-every-gdbms-should-do-and-vision).
 
 ---
 
@@ -373,7 +373,7 @@ as patterns and paths (possibly recursive ones), with an intuitive syntax.
 
 Running Cypher queries in a shell editor is great during initial testing, but on completion, obtaining visual
 feedback is very useful in refining the data model. In a recent blog post, we introduced
-[Kùzu Explorer](../2023-10-25-kuzuexplorer), a browser-based frontend that allows
+[Kùzu Explorer](../kuzuexplorer), a browser-based frontend that allows
 users to visualize their graph data and run queries interactively.
 
 The explorer is currently only accessible via Docker, but a standalone application is on the way. To visualize

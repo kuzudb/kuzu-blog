@@ -56,7 +56,7 @@ In contrast, you can't use factorization to compress your raw database files.
 Factorization has a very unique property:
 it is designed to compress the intermediate 
 data that are generated when query processors of DBMSs evaluate 
-many-to-many (m-n) growing joins. If you have read [my previous blog](../2023-01-12-what-every-gdbms-should-do),
+many-to-many (m-n) growing joins. If you have read [my previous blog](../what-every-gdbms-should-do-and-vision),
 efficiently handling m-n joins was one of the items on my list of properties 
 that competent GDBMSs should excel in. This is because 
 the workloads of GDBMSs commonly contain m-n joins
@@ -472,7 +472,7 @@ in mind is called
 for another time. For now, I invite you to check our performance out on large queries 
 and let us know if we are slow on some queries! The Kùzu team says hi (👋 🙋‍♀️ 🙋🏽) and 
 is at your service to fix all performance bugs as we continue implementing the system! 
-My next post will be about the novel [worst-case optimal join algorithms](../2023-02-22-wcoj), which emerged
+My next post will be about the novel [worst-case optimal join algorithms](../wcoj), which emerged
 from another theoretical insight on m-n joins! Take care until then!
 
 ---
@@ -481,6 +481,6 @@ from another theoretical insight on m-n joins! Take care until then!
 
 [^2]: Vectorization emerged as a design in the context of columnar RDBMSs, which are analytical systems, about 15-20 years old. It is still a very good idea. The prior design was to pass a single tuple between operators called Volcano-style tuple-at-a-time processing, which is quite easy to implement, but quite inefficient on modern CPUs. If you have access to the following link, you can read all about it from the pioneers of [columnar RDBMSs](https://www.nowpublishers.com/article/Details/DBS-024).
 
-[^3]: Note that GDBMSs are able to avoid scans of entire files because notice that they do the join on internal record/node IDs, which mean something very specific. If a system needs to scan the name property of node with record/node ID 75, it can often arithmetically compute the disk page and offset where this is stored, because record IDs are dense, i.e., start from 0, 1, 2..., and so can serve as  pointers if the system's storage design exploits this. This is what I was referring to as "Predefined/pointer-based joins" in my [previous blog post](../2023-01-12-what-every-gdbms-should-do). This is a good feature of GDBMSs that allows them to efficiently evaluate the joins of node records that are happening along the "predefined" edges in the database. I don't know of a mechanism where RDBMSs can do something similar, unless they develop a mechanism to convert value-based joins to pointer-based joins. See my student [Guodong's work last year in VLDB](https://www.vldb.org/pvldb/vol15/p1011-jin.pdf) of how this can be done. In Kùzu, our sideways information passing technique follows Guodong's design in this work.
+[^3]: Note that GDBMSs are able to avoid scans of entire files because notice that they do the join on internal record/node IDs, which mean something very specific. If a system needs to scan the name property of node with record/node ID 75, it can often arithmetically compute the disk page and offset where this is stored, because record IDs are dense, i.e., start from 0, 1, 2..., and so can serve as  pointers if the system's storage design exploits this. This is what I was referring to as "Predefined/pointer-based joins" in my [previous blog post](../what-every-gdbms-should-do-and-vision). This is a good feature of GDBMSs that allows them to efficiently evaluate the joins of node records that are happening along the "predefined" edges in the database. I don't know of a mechanism where RDBMSs can do something similar, unless they develop a mechanism to convert value-based joins to pointer-based joins. See my student [Guodong's work last year in VLDB](https://www.vldb.org/pvldb/vol15/p1011-jin.pdf) of how this can be done. In Kùzu, our sideways information passing technique follows Guodong's design in this work.
 
 [^4]: Umbra is being developed by [Thomas Neumann](https://www.professoren.tum.de/en/neumann-thomas) and his group. If Thomas's name does not ring a bell let me explain his weight in the field like this. As the joke goes, in the field of DBMSs: there are gods at the top, then there is Thomas Neumann, and then other holy people, and then we mere mortals. 

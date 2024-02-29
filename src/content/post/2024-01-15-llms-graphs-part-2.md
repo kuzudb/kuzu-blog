@@ -9,7 +9,7 @@ authors: ["team"]
 tags: ["vision", "overview", "llm", "rag"]
 ---
 
-[In my previous post](../2024-01-04-llms-graphs-part-1), 
+[In my previous post](../llms-graphs-part-1), 
 I gave an overview of question answering (Q&A) systems that use LLMs
 over private enterprise data. I covered the architectures of these systems, the common tools
 developers use to build these systems when the enterprise data used is structured, 

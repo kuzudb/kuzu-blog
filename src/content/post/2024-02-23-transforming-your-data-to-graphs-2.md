@@ -9,7 +9,7 @@ authors: ["team"]
 tags: ["data-science", "networkx", "graph-algorithms", "analysis"]
 ---
 
-In the [previous post](../2024-01-24-transforming-your-data-1), we showed how to transform a
+In the [previous post](../transforming-your-data-to-graphs-1), we showed how to transform a
 typical relational data model to a graph data model and load it into a Kùzu database that could
 then be queried via Cypher to answer path-related questions about the data. The aim of this post is
 to show how Kùzu offers numerous tools that allow users to
