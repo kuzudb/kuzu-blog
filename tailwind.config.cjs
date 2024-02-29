@@ -45,7 +45,7 @@ module.exports = {
             li: {
               'margin-bottom': '0.5rem',
               color: 'rgb(var(--color-text-heading))',
-              'font-size': '1.1rem',
+              'font-size': '1.0em',
               'line-height': '1.75',
             },
             'code::before': {
@@ -60,19 +60,14 @@ module.exports = {
               width: '96%',
               margin: '0 auto',
               'font-size': '1.0625em',
-              'padding-top': '1.5rem',
-              'padding-bottom': '0.5rem',
-              'padding-left': '1.5rem',
-              'padding-right': '1.5rem',
+              'padding-left': '1.1rem',
+              'padding-right': '1.1rem',
             },
             'blockquote::before': {
               'font-family': 'Arial',
-              content: "'“'",
-              'font-size': '4em',
+              'font-size': '2em',
               color: 'rgb(var(--color-text-bold))',
               position: 'absolute',
-              left: '-10px',
-              top: '-10px',
             },
             'blockquote::after': {
               content: '',
