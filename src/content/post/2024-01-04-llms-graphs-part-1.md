@@ -1,55 +1,55 @@
 ---
-slug: llms-graphs-part-1
-authors: 
-  - semih
-tags: [llms]
+title: "RAG using structured data: Overview & important questions"
+description: "An overview of the area of retrieval augmented generation (RAG) using structured data"
+pubDate: "January 04 2024"
+heroImage: "/img/2024-01-04-llms-graphs-part-1/rag-using-structured-data.png"
+categories: ["concept"]
+authors: ["team"]
+tags: ["vision", "overview", "llm", "rag"]
 ---
-
-import QAOverEnterpriseData from './qa-over-enterprise-data.png';
-import RAGUsingStructuredData from './rag-using-structured-data.png';
-import TwoSQLGenerationApproaches from './two-sql-generation-approaches.png';
-
-
-# RAG Using Structured Data: Overview & Important Questions
 
 During the holiday season, I did some reading on
 LLMs and specifically on the techniques that use LLMs together with graph databases and knowledge graphs.
 If you are new to the area like me, the amount of activity on this topic on social
 media as well as in research publications may have intimidated you. 
 If so, you're exactly my target audience for this new blog post series I am starting.
-My goals are two-fold: 
+
+My goals are two-fold:
+
 1. *Overview the area*: I want to present what I learned with a simple and consistent terminology and at
 a more technical depth than you might find in other blog posts. I am aiming a depth similar to what I aim when preparing
 a lecture. I will link to many quality and technically satisfying pieces of content (mainly papers since the area is very researchy).
-2. *Overview important future work*: I want to cover several important future works in the space. I don't
+
+1. *Overview important future work*: I want to cover several important future works in the space. I don't
 necessarily mean work for research contributions but also simple approaches to experiment with if you are
 building question answering (Q&A) applications using LLMs and graph technology.
-
 
 This post covers the topic of retrieval augmented generation (RAG) using structured data. Then, in a follow up post, 
 I will cover RAG using unstructured data, where
 I will also mention a few ways people are building RAG-based Q&A systems that use both structured and unstructured data.
 
-<!-- truncate -->
+---
 
-:::tip TL;DR: The key takeaways from this post are:
+### TL;DR: The key takeaways from this post are:
+
 - **RAG overview**: RAG is a technique to fill the knowledge gap of LLMs using private data. RAG systems
-  use  private structured records stored in a database and/or unstructured data in text files. 
+use  private structured records stored in a database and/or unstructured data in text files. 
 - **Impressive simplicity and effectiveness of developing a natural language interface over your database using LLMs**: In the pre-LLM era, the amount of engineering effort
-  to develop a pipeline that delivered a natural language interface over your database was *immense*. The
-  hard problem was to teach a model to *speak* SQL, Cypher, or SPARQL.
-  This contrasts sharply with the simplicity of developing similar pipelines now because LLMs already "speak" these languages. 
-  The hard task now is for *developers to learn how to prompt LLMs* to get correct database queries. Furthermore, there is
-  evidence that LLMs, if prompted correctly, will generate a decent proportion of queries with impressive accuracy.  
+to develop a pipeline that delivered a natural language interface over your database was *immense*. The
+hard problem was to teach a model to *speak* SQL, Cypher, or SPARQL.
+This contrasts sharply with the simplicity of developing similar pipelines now because LLMs already "speak" these languages. 
+The hard task now is for *developers to learn how to prompt LLMs* to get correct database queries. Furthermore, there is
+evidence that LLMs, if prompted correctly, will generate a decent proportion of queries with impressive accuracy.  
 - **Lack of work that studies LLMs' ability to generate Cypher or SPARQL:** Most technically-deep work on understanding
-  LLMs' ability to generate accurate high-level query languages is on SQL. We need more
-  work understanding the behavior of LLMs on the query languages of GDBMSs (like Cypher or SPARQL), specifically on recursive and union-of-join queries.
+LLMs' ability to generate accurate high-level query languages is on SQL. We need more
+work understanding the behavior of LLMs on the query languages of GDBMSs (like Cypher or SPARQL), specifically on recursive and union-of-join queries.
 - **Studying the effects of data modeling (normalization, views, graph modeling) on the accuracy of LLM-generated queries is important:**
-  Many people are studying heuristics for prompting LLMs to increase their efficiency focusing on the syntax and the structure of providing
-  the schema and selection of examples in the prompt. An important and under-studied
-  problem is the effects of data modeling choices on the accuracy of the queries generated by LLMs. I point to [one interesting paper](https://arxiv.org/pdf/2311.07509.pdf) in this space and raise several questions related to
-  normalizations and use of views in relational modeling and comparisons with graph modeling approaches. 
-:::
+Many people are studying heuristics for prompting LLMs to increase their efficiency focusing on the syntax and the structure of providing
+the schema and selection of examples in the prompt. An important and under-studied
+problem is the effects of data modeling choices on the accuracy of the queries generated by LLMs. I point to [one interesting paper](https://arxiv.org/pdf/2311.07509.pdf) in this space and raise several questions related to
+normalizations and use of views in relational modeling and comparisons with graph modeling approaches.
+
+---
 
 ## Killer App: Retrieval Augmented Generation
 
@@ -82,9 +82,7 @@ are called "RAG systems" in some documentations. I will use the term in this bro
 You can build RAG-based Q&A systems by using structured and/or unstructured
 data. The high-level views of these systems look like this:
 
-<div class="img-center">
-<img src={QAOverEnterpriseData} width="600"/>
-</div>
+![](/img/2024-01-04-llms-graphs-part-1/qa-over-enterprise-data.png)
 
 ## RAG Using Structured Data: Text-to-High-level-Query
 *Note: If you are familiar with how to develop RAG systems with LangChain and LlamaIndex, you can directly skip
@@ -96,9 +94,7 @@ Many blog posts and several papers concern Q&A systems that simply convert
 $Q_{NL}$ to a high-level query languge, such as SQL, Cypher, or SPARQL, using an LLM.
 The figure below describes the overall approach:
 
-<div class="img-center">
-<img src={RAGUsingStructuredData} width="600"/>
-</div>
+![](/img/2024-01-04-llms-graphs-part-1/rag-using-structured-data.png)
 
 $Q_{NL}$, the schema of a database, and optionally
 some example natural language question and high-level query examples, are given
@@ -154,7 +150,7 @@ chain.run("Who played in The Godfather: Part II?")
 I am following the example application in this [documentation](https://python.langchain.com/docs/use_cases/graph/graph_kuzu_qa), 
 which uses a database of movies, actors, and directors. 
 
-```bash
+```
 Output:
 > Entering new  chain...
 Generated Cypher:
@@ -279,9 +275,7 @@ Policy, Account, Claims, Insurable Object, among others, and their relationships
 The paper has a benchmark of 43 natural language questions and compares 2 approaches to generate the SQL query.
 The below figure shows an overview of these approaches for reference:
 
-<div class="img-center">
-<img src={TwoSQLGenerationApproaches} width="600"/>
-</div>
+![](/img/2024-01-04-llms-graphs-part-1/two-sql-generation-approaches.png)
 
 1. Direct SQL Generation: In this approach, $Q_{NL}$ and the relational schema of the OMG database is given
    to GPT-4. The schema is given in terms of `CREATE TABLE` statements, such as:
@@ -311,7 +305,7 @@ The below figure shows an overview of these approaches for reference:
    database is modeled as an *[OWL ontology](https://www.w3.org/OWL/)* (OWL is short for Web Ontology Language).
    Ontology is another term for schema when modeling data as a graph of classes and relationships between them. OWL is a W3C standard
    and part of the RDF technology stack so OWL ontologies are expressed as a set RDF triples, such as:
-   ```
+   ```sparql
    ...
    in:Claim rdf:type owl:Class ;
          rdfs:isDefinedBy <http://data.world/schema/insurance/> ;
@@ -351,9 +345,9 @@ relational modeling.
 
 The results are even more interesting. The authors categorize their 43 questions into
 4 quadrants based on 2 dimensions: 
-- Low vs high **question** complexity: Questions that require only simple projections
+- Low vs. high **question** complexity: Questions that require only simple projections
 are low complexity. Those that require aggregations or math functions are high complexity.
-- Low vs high **schema** complexity: Questions whose SQL queries require up to 4 tables are low schema complexity. Those that
+- Low vs. high **schema** complexity: Questions whose SQL queries require up to 4 tables are low schema complexity. Those that
   require 5 or more joins are high schema complexity. 
 
 The accuracy results are shown below. Accuracy here is "execution accuracy" meaning that  only the answers of the queries
@@ -385,13 +379,13 @@ asked to generate a SPARQL query. I can hypothesize about a few possible reasons
   of GDBMSs often have is that certain equality conditions are implicit in the syntax, which
   means their `WHERE` clauses are simpler for some queries. For example if you wanted to return
   the names of the Catastrophe that Claim with ID Claim1 has, in SPARQL you can write it as:
-  ```
+  ```sparql
   SELECT ?name
   WHERE { <in:Claim1> in:hasCatastrophe ?catastrophe,
-          ?catastophe in:catastropheName ?name}
+          ?catastrophe in:catastropheName ?name}
   ``` 
   In SQL you would write:
-  ```
+  ```sparql
   SELECT Catastrophe_Name
   FROM Claim, Catastrophe
   WHERE Claim.Catastrophe_Identifier = Catastrophe.Catastrophe_Identifier AND
@@ -407,12 +401,12 @@ asked to generate a SPARQL query. I can hypothesize about a few possible reasons
 
   **Side note**: On the flip side, SPARQL can be more verbose in projections. For example, if you wanted to return the number, open and close
   dates of every claim, you'd write the following SQL query:
-  ```
+  ```sparql
   SELECT Claim_Number, Claim_Open_Date, Claim_Close_Date
   FROM Claim
   ```
   In SPARQL, you'd have to write both the names of the property you want to project and give it an additional variable as follows:
-  ```
+  ```sparql
   SELECT ?number, ?open_date, ?close_date
   WHERE { ?claim in:claimNumber ?number,
           ?claim in:claimOpenDate ?open_date,
@@ -445,7 +439,7 @@ Let me next raise several high-level questions that I think are important:
 I think the higher-level question of studying the effects of data modeling in more depth is a very good direction. 
 As LLMs get smarter, I would expect that the presence/absence of a pound sign or the style of English 
 should matter less. These look more like syntactic differences that can be automatically detected over time. 
-Modeling choices are more fundamental and relate to the clarity and understandibility of the records that will be queried by the LLM. 
+Modeling choices are more fundamental and relate to the clarity and understandability of the records that will be queried by the LLM. 
 So identifying some rules of thumb here looks like the promising path forward. Let me list a few immediate questions one can study:
 
 *Important Future Work 2.1: Effects of normalization/denormalization.* If the shortcoming of GPT-4 is 
