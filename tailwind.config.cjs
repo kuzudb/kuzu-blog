@@ -8,6 +8,10 @@ module.exports = {
       typography: (theme) => ({
         DEFAULT: {
           css: {
+            p: {
+                'font-size': '1.0em',
+                'line-height': '1.675',
+            },
             a: {
               'text-decoration': 'none',
               'background-repeat': 'no-repeat',
@@ -46,7 +50,6 @@ module.exports = {
               'margin-bottom': '0.5rem',
               color: 'rgb(var(--color-text-heading))',
               'font-size': '1.0em',
-              'line-height': '1.75',
             },
             'code::before': {
               content: 'none',
