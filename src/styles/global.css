@@ -8,7 +8,7 @@
     /* ... */
   }
   .prose code {
-    @apply text-base overflow-auto;
+    @apply overflow-auto;
   }
   h1,
   h2,
@@ -40,6 +40,9 @@
   }
   img {
     @apply rounded-md w-full md:w-full lg:w-3/4;
+  }
+  article img {
+    @apply hover:w-full transition-all;
   }
   th {
     @apply bg-zinc-100 bg-zinc-200 dark:bg-zinc-300;

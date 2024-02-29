@@ -214,7 +214,7 @@ number of clients instead.
 When viewed visually, these results can be quite powerful. The following image shows result from
 above, as seen in Kùzu Explorer.
 
-![](/img/2024-02-23-transforming-your-data-2/disputed_graph_viz.png)
+![](/img/2024-02-23-transforming-your-data-2/dispute_graph_viz.png)
 
 If we simply look at aggregates based on the company and merchant, we see that the clients Olivia,
 Jennifer and Cynthia from the previous query each reported disputed transactions in _different_

@@ -8,6 +8,10 @@ module.exports = {
       typography: (theme) => ({
         DEFAULT: {
           css: {
+            p: {
+                'font-size': '1.0em',
+                'line-height': '1.675',
+            },
             a: {
               'text-decoration': 'none',
               'background-repeat': 'no-repeat',
@@ -35,8 +39,8 @@ module.exports = {
               color: 'rgb(var(--color-code-text))',
               padding: '0.1rem 0.1rem',
               'border-radius': '0.25rem',
-              'font-size': '0.875rem',
-              'line-height': '1.5',
+              'font-size': '1.0em',
+              'line-height': '1.2',
               'font-family': "Consolas, Menlo, 'Andale Mono', 'Ubuntu Mono', monospace",
             },
             'ol > li::before': {
@@ -46,7 +50,6 @@ module.exports = {
               'margin-bottom': '0.5rem',
               color: 'rgb(var(--color-text-heading))',
               'font-size': '1.0em',
-              'line-height': '1.75',
             },
             'code::before': {
               content: 'none',
