@@ -66,9 +66,13 @@ The menu is configured in the `src/config/menu.json` file. This file contains th
     "url": "/"
   },
   {
-    "name": "Blog",
-    "url": "/blog"
+    "name": "Tags",
+    "url": "/tags"
   },
+  {
+    "name": "Categories",
+    "url": "/categories"
+  }
 ]
 ```
 
