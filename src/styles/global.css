@@ -26,7 +26,6 @@
   i {
     @apply text-zinc-700 dark:text-zinc-200 !important;
   }
-  blockquote,
   table * {
     @apply text-zinc-800 dark:text-zinc-200;
   }

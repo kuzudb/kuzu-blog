@@ -1,9 +1,10 @@
 ---
+slug: "what-every-gdbms-should-do-and-vision"
 title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 pubDate: "Jan 12 2023"
 heroImage: "/img/2023-01-12-what-every-gdbms-should-do/bachmann.png"
-categories: ["concepts"]
+categories: ["concept"]
 authors: ["semih"]
 tags: ["vision"]
 ---
@@ -73,9 +74,9 @@ enterprise applications.
 
 I want to start a 3-part blog post to cover the contents of our CIDR paper in a less academic language: 
 
-- __Post 1__: Kùzu's goals and vision as a system 
-- __Post 2__: [Factorization technique for compression](../2023-01-20-factorization)
-- __Post 3__: [Worst-case optimal join algorithms](../2023-02-22-wcoj)
+- __Post 1__: Kùzu's goals and vision as a system (this post)
+- __Post 2__: [Factorization technique for compression](../factorization)
+- __Post 3__: [Worst-case optimal join algorithms](../wcoj)
 
 In this Post 1, I discuss the following: 
    (i)   [an overview of GDBMSs](#overview-of-gdbms-and-a-bit-of-history).

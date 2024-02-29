@@ -7,18 +7,23 @@ The site is built on top of the [EV0](https://github.com/gndx/ev0-astro-theme) O
 
 Clone this repository to your local machine using Git.
 
-| Command           | Action                                       |
-| :---------------- | :------------------------------------------- |
-| `npm install`     | Installs dependencies                        |
-| `npm run dev`     | Starts local dev server at `localhost:4321`  |
-| `npm run build`   | Build your production site to `./dist/`      |
-| `npm run preview` | Preview your build locally, before deploying |
-| `npm run youtube` | Fetches the Latest YouTube Channel Videos    |
-| `npm run newpost` | Generate a New Blogpost Markdown Entry       |
+| Command           | Action                                             |
+| :---------------- | :------------------------------------------------- |
+| `npm install`     | Installs dependencies                              |
+| `npm start`       | Builds & runs local dev server at `localhost:4321` |
+| `npm run dev`     | Starts local dev server at `localhost:4321`        |
+| `npm run build`   | Build your production site to `./dist/`            |
+| `npm run preview` | Preview your build locally, before deploying       |
+| `npm run youtube` | Fetches the Latest YouTube Channel Videos          |
 
 * Edit the `.astro` files in the `src/pages` directory to add blog, category, tag and other information.
 * The blog layout can be modified from the `src/layouts` directory.
 * Global CSS is located in the `src/styles` directory.
+
+> [!NOTE]
+> For any URL-related changes such as custom slugs or internal navigation between pages, make
+> sure to run `npm run build` first, or simply run `npm start` to watch the local directory for such
+> changes and to build the site before preview.
 
 ## 📝 Configuration Blog
 
@@ -61,9 +66,13 @@ The menu is configured in the `src/config/menu.json` file. This file contains th
     "url": "/"
   },
   {
-    "name": "Blog",
-    "url": "/blog"
+    "name": "Tags",
+    "url": "/tags"
   },
+  {
+    "name": "Categories",
+    "url": "/categories"
+  }
 ]
 ```
 
