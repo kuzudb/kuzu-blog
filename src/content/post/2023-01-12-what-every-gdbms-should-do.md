@@ -1,4 +1,5 @@
 ---
+slug: "what-every-gdbms-should-do-and-vision"
 title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
 pubDate: "Jan 12 2023"

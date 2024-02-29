@@ -1,4 +1,5 @@
 ---
+slug: "llms-graphs-part-2"
 title: "RAG using unstructured data and the role of knowledge graphs"
 description: "Uncovering the design space of RAG systems that use unstructured data and future work directions that are important."
 pubDate: "January 15 2024"

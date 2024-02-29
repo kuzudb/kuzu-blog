@@ -1,4 +1,5 @@
 ---
+slug: "iamgraphviz"
 title: "IAMGraphViz: Visualizing AWS IAM Permissions with Kùzu"
 description: "An example of using graph visualizations for infrastructure engineers to analyze the 
 IAM network of an enterprise"

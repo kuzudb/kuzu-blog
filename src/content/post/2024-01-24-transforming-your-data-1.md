@@ -1,4 +1,5 @@
 ---
+slug: "transforming-your-data-to-graphs-1"
 title: "Transforming your data to graphs - Part 1"
 description: "Graph thinking for relational data, and the ETL workflow in Kùzu"
 pubDate: "January 24 2024"

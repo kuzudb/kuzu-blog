@@ -1,4 +1,5 @@
 ---
+slug: "kuzuexplorer"
 title: "KùzuExplorer: An interactive tool to visualize graph query results and schemas"
 description: "A browser-based frontend to visualize and explore graph database schemas and
 Cypher query results during prototyping phase."

@@ -1,4 +1,5 @@
 ---
+slug: "llms-graphs-part-1"
 title: "RAG using structured data: Overview & important questions"
 description: "An overview of the area of retrieval augmented generation (RAG) using structured data"
 pubDate: "January 04 2024"

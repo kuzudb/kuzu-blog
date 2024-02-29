@@ -1,4 +1,5 @@
 ---
+slug: "transforming-your-data-to-graphs-2"
 title: "Transforming your data to graphs - Part 2"
 description: "Analyzing a transaction network using a combination of Cypher queries, graph visualization and network analysis"
 pubDate: "February 23 2024"

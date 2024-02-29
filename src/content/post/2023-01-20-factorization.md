@@ -1,4 +1,5 @@
 ---
+slug: "factorization"
 title: "Factorization and great ideas from database theory"
 description: "Factorization and great ideas from database theory"
 pubDate: "Jan 20 2023"

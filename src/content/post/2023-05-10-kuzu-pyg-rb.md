@@ -1,4 +1,5 @@
 ---
+slug: "kuzu-pyg-remote-backend"
 title: "Scaling Pytorch Geometric GNNs With Kùzu"
 description: "A walkthrough on how to use Kùzu as a Pytorch Geometric (PyG) remote backend"
 pubDate: "May 10 2023"
