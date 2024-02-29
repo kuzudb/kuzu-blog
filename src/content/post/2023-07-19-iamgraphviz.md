@@ -1,24 +1,17 @@
 ---
-slug: iamgraphviz
-authors: 
-  - name: Chris Norman
-    title: Common Fate
-    url: https://www.linkedin.com/in/chrnorm/?originalSubdomain=uk
-    image_url: https://www.commonfate.io/_next/image?url=%2Fheadshots%2Fchris.jpg&w=3840&q=75
-  - chang
-tags: [use-case]
+title: "IAMGraphViz: Visualizing AWS IAM Permissions with Kùzu"
+description: "An example of using graph visualizations for infrastructure engineers to analyze the 
+IAM network of an enterprise"
+pubDate: "July 19 2023"
+heroImage: "/img/2024-01-04-llms-graphs-part-1/rag-using-structured-data.png"
+categories: ["example"]
+authors: ["team"]
+tags: ["visualization"]
 ---
-import SchemaImage from './schema.png';
-import ReadOnlyVizImage from './readonlyviz.png';
-import AdminVizImage from './adminviz.png';
-
-# IAMGraphViz: Visualizing AWS IAM Permissions with Kùzu
 
 ## IAMGraphViz Overview
 
 [Common Fate](https://www.commonfate.io/)  is a framework for managing complex cloud permissions. They provide tools to simplify access at scale to AWS, Azure, and Google Cloud accounts. You can learn about what you can do with Common Fate on [their website](https://www.commonfate.io/). Here, we will talk about a recent proof of concept graph visualization tool called IAMGraphViz that [Chang Liu](https://www.linkedin.com/in/mewim/) (who is coauthoring this post) and I developed using Kùzu! IAMGraphViz is intended for infrastructure engineers to dig deep into the permission assignments in AWS IAM Identity Center using graph visualization. Using IAMGraphViz, one can easily visualize who has what type of access to different accounts on AWS as well as how they have access to these accounts. This is all done by analyzing the paths from users to accounts in a graph visualization, where the nodes and edges model users, accounts, groups, group memberships, permission sets and other entities in the AWS IAM Identity Center system.
-
-<!--truncate-->
 
 The IAMGraphViz project is designed and implemented as a web application using a graph DBMS (GDBMS) to store and retrieve data. Before landing on Kùzu, we surveyed using several other GDBMSs, such as Neo4j, but they were all harder to use. Neo4j, for example, requires hosting a separate database. We then discovered Kùzu, which only required a `pip install` and import statement and we could simply embed it into our application. In this project our datasets could fit entirely onto a single compute node,and so Kùzu was far simpler for us to work with than alternatives. Kùzu is also far cheaper and more serverless-friendly than running a separate database.
 
@@ -34,9 +27,7 @@ of which will be modeled as nodes in Kùzu, as a background.
 We will provide as simple definitions as we can to keep the post short and provide links
 to necessary AWS IAM documentation: 
 
-<div class="img-center">
-<img src={SchemaImage} width="600"/>
-</div>
+![](/img/2023-07-19-iamgraphviz/schema.png)
 
 1. **[User](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html)** represents a 
 user, e.g., an actual human user, who can get access to AWS accounts (and through accounts to AWS resources).
@@ -69,8 +60,8 @@ other nodes according to our schema.
 In our first query, we are given a particular account we would like to investigate and find
 all users who have `ReadOnlyAccess` to the resources of this account. Let's assume
 the account's name is "account-db2071".
- 
-``` cypher
+
+```cypher
 MATCH (u:User)<-[l*1..3]-(aa:AccountAssignment)-[l5]-(a:Account),
 (aa:AccountAssignment)-[aaps]->(ps:PermissionSet)<-[psmpa]-(mpa:ManagedPolicyAttachment)-[mpap]->(p:ManagedPolicy)
 WHERE p.id = "arn:aws:iam::aws:policy/ReadOnlyAccess" AND a.sid = "account-db2071"
@@ -85,9 +76,7 @@ both the direct connections from a `User` to an `AccountAssignment` (that is fur
 `ManagedPolicy`) as well as 
 indirect connections through a `Group` node. The visualization we generate is shown below:
 
-<div class="img-center">
-<img src={ReadOnlyVizImage}/>
-</div>
+![](/img/2023-07-19-iamgraphviz/readonlyviz.png)
 
 Note the presence of both directly and indirectly connected users to the account.
 The visualization in both the actual implementation and the [Colab notebook](https://colab.research.google.com/drive/1fotlNnOj1FGad6skBG7MRrHVdHd3jIl6) is generated simply 
@@ -100,7 +89,7 @@ In our second query, we are given a particular user we would like to investigate
 
 To retrive the accounts, we define a Cypher query very similar to the previous one. The only difference is that, instead of using the account as query predicate, we now use the user. The query is as follows:
 
-``` cypher
+```cypher
 MATCH (u:User)<-[l*1..3]-(aa:AccountAssignment)-[l5]-(a:Account),
 (aa:AccountAssignment)-[aaps]->(ps:PermissionSet)<-[psmpa]-(mpa:ManagedPolicyAttachment)-[mpap]->(p:ManagedPolicy)
 WHERE p.id = "arn:aws:iam::aws:policy/AdministratorAccess" AND u.name = "Steven Rose"
@@ -109,9 +98,7 @@ RETURN *;
 
 The visualization we generate is shown below:
 
-<div class="img-center">
-<img src={AdminVizImage}/>
-</div>
+![](/img/2023-07-19-iamgraphviz/adminviz.png)
 
 ## Closing Words
 Many other graph visualizations can be helpful for infrastructure engineers to analyze the 
