@@ -103,11 +103,10 @@ on strongly-typed values in columns and uses primary key constraints on tables t
 The only difference is that Kùzu uses separate node and edge tables, which we'll show how to
 create below.
 
-:::info Note
-As such, Kùzu can be viewed as a relational system that provides graph
-modeling capabilities over your tables, allowing you to express graph-based paths and patterns very
-efficiently in Cypher, the query language implemented by Kùzu.
-:::
+> As such, Kùzu can be viewed as a relational system that provides graph
+> modeling capabilities over your tables, allowing you to express graph-based paths and patterns very
+> efficiently in Cypher, the query language implemented by Kùzu.
+
 
 In this post, for simplicity, we'll assume that the tables we showed in the relational schema are available
 as CSV files in the `data` directory. The `load_data.py` script will transform and load the
