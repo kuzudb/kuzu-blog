@@ -7,7 +7,6 @@ import robotsTxt from 'astro-robots-txt';
 import { VitePWA } from 'vite-plugin-pwa';
 import rehypeKatex from 'rehype-katex'; // relevant
 import remarkMath from 'remark-math'; // relevant
-import remarkToc from 'remark-toc';
 
 import { manifest } from './src/utils/manifest';
 
@@ -24,7 +23,7 @@ export default defineConfig({
       theme: 'material-theme-palenight',
       wrap: false,
     },
-    remarkPlugins: [remarkMath, remarkToc],
+    remarkPlugins: [remarkMath],
     rehypePlugins: [
       [
         rehypeKatex,
