@@ -97,3 +97,7 @@ input#nav-toggle:checked ~ #nav-menu {
 .dark #themeToggle:hover .moon {
   @apply stroke-zinc-200;
 }
+
+div.author-info__container:first-child {
+  margin-left: 0;
+}

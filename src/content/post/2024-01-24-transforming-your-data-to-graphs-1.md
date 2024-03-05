@@ -5,7 +5,7 @@ description: "Graph thinking for relational data, and the ETL workflow in Kùzu"
 pubDate: "January 24 2024"
 heroImage: "/img/2024-01-24-transforming-your-data-1/edge_tables.png"
 categories: ["tutorial"]
-authors: ["team"]
+authors: ["prashanth"]
 tags: ["data-engineering", "etl"]
 ---
 

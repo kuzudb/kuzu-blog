@@ -5,7 +5,7 @@ description: "Analyzing a transaction network using a combination of Cypher quer
 pubDate: "February 23 2024"
 heroImage: "/img/2024-02-23-transforming-your-data-2/query_disputed_transactions_vicinity.png"
 categories: ["tutorial"]
-authors: ["team"]
+authors: ["prashanth"]
 tags: ["data-science", "networkx", "graph-algorithms", "analysis"]
 ---
 

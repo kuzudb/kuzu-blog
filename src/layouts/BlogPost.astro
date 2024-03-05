@@ -1,51 +1,50 @@
 ---
-import Base from "@layouts/Base.astro";
-import type { CollectionEntry } from "astro:content";
-import FormattedDate from "@components/FormattedDate.astro";
-import CalendarIcon from "@icons/CalendarIcon.astro";
-import CategoryIcon from "@icons/CategoryIcon.astro";
-import { Image } from "astro:assets";
-import config from "@config/config.json";
-import { slugify } from "@utils/slug";
-import authors from '../config/authors.json';
+import Base from '@layouts/Base.astro';
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from '@components/FormattedDate.astro';
+import CalendarIcon from '@icons/CalendarIcon.astro';
+import CategoryIcon from '@icons/CategoryIcon.astro';
+import { Image } from 'astro:assets';
+import { slugify } from '@utils/slug';
+import allAuthors from '../config/allAuthors.json';
 
-type Props = CollectionEntry<"post">["data"];
+type Props = CollectionEntry<'post'>['data'];
 
-const { title, description, pubDate, heroImage, categories, tags } =
-  Astro.props;
+const { title, description, pubDate, heroImage, categories, tags, authors } = Astro.props;
 ---
 
 <Base meta_title={title} description={description} image={heroImage} blogpost>
   <article>
     <div class="md:col-10 mb-12">
-      <h1 class="text-2xl md:text-4xl font-bold">{title}</h1>
-      <div class="mt-4 flex flex-wrap text-text text-zinc-800 dark:text-zinc-200">
-        <div class="flex flex-wrap font-medium mt-2">
-          <figure>
-            <Image
-              alt={config.author.title}
-              class="mr-2 h-6 w-6 rounded-full"
-              width={25}
-              height={250}
-              src={config.author.avatar}
-              decoding="async"
-              loading="lazy"
-            />
-          </figure>
-          <span>{config.author.name}</span>
-        </div>
-        <div class="mx-3 flex items-center flex-wrap font-medium mt-2">
+      <div class="text-text mt-4 flex flex-wrap text-zinc-800 dark:text-zinc-200">
+        {
+          authors?.map((author) => (
+            <div class="mx-3 mt-2 flex flex-wrap font-medium author-info__container">
+              <figure>
+                <Image
+                  alt={typeof author === 'string' ? allAuthors[author].name : author.name}
+                  class="mr-2 h-6 w-6 rounded-full"
+                  width={250}
+                  height={250}
+                  src={typeof author === 'string' ? allAuthors[author].image : author.image}
+                  decoding="async"
+                  loading="lazy"
+                />
+              </figure>
+              <span>{typeof author === 'string' ? allAuthors[author].name : author.name}</span>
+            </div>
+          ))
+        }
+
+        <div class="mx-3 mt-2 flex flex-wrap items-center font-medium">
           <CalendarIcon />
           <FormattedDate date={pubDate} />
         </div>
-        <div class="mx-3 flex items-center flex-wrap font-medium mt-2">
+        <div class="mx-3 mt-2 flex flex-wrap items-center font-medium">
           <CategoryIcon />
           {
             categories?.slice(0, 1).map((category) => (
-              <a
-                href={`/categories/${slugify(category)}`}
-                class="mr-2 hover:text-primary font-medium capitalize"
-              >
+              <a href={`/categories/${slugify(category)}`} class="hover:text-primary mr-2 font-medium capitalize">
                 {category}
               </a>
             ))
@@ -54,14 +53,14 @@ const { title, description, pubDate, heroImage, categories, tags } =
       </div>
     </div>
     <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
-          integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
-          crossorigin="anonymous"
-        >
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+        crossorigin="anonymous"
+      />
     </head>
-    <div class="prose prose-orange prose-md md:prose-lg lg:prose-xl min-w-full">
+    <div class="prose-md prose prose-orange min-w-full md:prose-lg lg:prose-xl">
       <slot />
     </div>
     <div class="mt-8">
@@ -69,7 +68,7 @@ const { title, description, pubDate, heroImage, categories, tags } =
         tags?.map((tag) => (
           <a
             href={`/tags/${slugify(tag)}`}
-            class="capitalize inline-block bg-zinc-200 rounded-full px-3 py-1 text-sm font-semibold text-zinc-700 mr-2 mb-2 dark:bg-zinc-900 dark:text-zinc-400"
+            class="mb-2 mr-2 inline-block rounded-full bg-zinc-200 px-3 py-1 text-sm font-semibold capitalize text-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
           >
             #{tag}
           </a>
