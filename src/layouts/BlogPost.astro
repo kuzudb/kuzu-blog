@@ -16,6 +16,7 @@ const { title, description, pubDate, heroImage, categories, tags, authors } = As
 <Base meta_title={title} description={description} image={heroImage} blogpost>
   <article>
     <div class="md:col-10 mb-12">
+      <h1 class="text-2xl md:text-4xl font-bold">{title}</h1>
       <div class="text-text mt-4 flex flex-wrap text-zinc-800 dark:text-zinc-200">
         {
           authors?.map((author) => (
