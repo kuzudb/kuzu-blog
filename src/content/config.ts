@@ -9,7 +9,7 @@ const post = defineCollection({
     heroImage: z.string().optional(),
     categories: z.array(z.string()).default(['others']),
     tags: z.array(z.string()).default(['others']),
-    authors: z.array(z.string()).default(['gndx']),
+    authors: z.array(z.any()).default(['team']),
   }),
 });
 

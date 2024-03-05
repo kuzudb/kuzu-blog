@@ -6,7 +6,7 @@ Cypher query results during prototyping phase."
 pubDate: "October 25 2023"
 heroImage: "/img/2023-10-25-kuzuexplorer/query-result-node-link-view.png"
 categories: ["example"]
-authors: ["tutorial"]
+authors: ["chang"]
 tags: ["visualization"]
 ---
 

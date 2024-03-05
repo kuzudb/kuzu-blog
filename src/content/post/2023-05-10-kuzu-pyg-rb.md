@@ -5,7 +5,7 @@ description: "A walkthrough on how to use Kùzu as a Pytorch Geometric (PyG) rem
 pubDate: "May 10 2023"
 heroImage: "/img/default.png"
 categories: ["tutorial"]
-authors: ["team"]
+authors: ["chang", "semih"]
 tags: ["pytorch-geometric", "gnn"]
 ---
 

@@ -5,7 +5,7 @@ description: "An overview of the area of retrieval augmented generation (RAG) us
 pubDate: "January 04 2024"
 heroImage: "/img/2024-01-04-llms-graphs-part-1/rag-using-structured-data.png"
 categories: ["concept"]
-authors: ["team"]
+authors: ["semih"]
 tags: ["vision", "overview", "llm", "rag"]
 ---
 

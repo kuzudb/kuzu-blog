@@ -5,7 +5,7 @@ description: "Uncovering the design space of RAG systems that use unstructured d
 pubDate: "January 15 2024"
 heroImage: "/img/2024-01-15-llms-graphs-part-2/triples-based-rag-overview.png"
 categories: ["concept"]
-authors: ["team"]
+authors: ["semih"]
 tags: ["vision", "overview", "llm", "rag"]
 ---
 

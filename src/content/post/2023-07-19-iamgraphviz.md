@@ -6,7 +6,7 @@ IAM network of an enterprise"
 pubDate: "July 19 2023"
 heroImage: "/img/2024-01-04-llms-graphs-part-1/rag-using-structured-data.png"
 categories: ["example"]
-authors: ["team"]
+authors: ["chang", {"name": "Chris Norman", "image": "https://www.commonfate.io/_next/image?url=%2Fheadshots%2Fchris.jpg&w=3840&q=75"}]
 tags: ["visualization"]
 ---
 
