@@ -4,7 +4,7 @@ title: "IAMGraphViz: Visualizing AWS IAM Permissions with Kùzu"
 description: "An example of using graph visualizations for infrastructure engineers to analyze the 
 IAM network of an enterprise"
 pubDate: "July 19 2023"
-heroImage: "/img/2024-01-04-llms-graphs-part-1/rag-using-structured-data.png"
+heroImage: "/img/2023-07-19-iamgraphviz/readonlyviz.png"
 categories: ["example"]
 authors: ["chang", {"name": "Chris Norman", "image": "https://www.commonfate.io/_next/image?url=%2Fheadshots%2Fchris.jpg&w=3840&q=75"}]
 tags: ["visualization"]
