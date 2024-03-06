@@ -1,7 +1,7 @@
 {
   "site": {
     "title": "Blog - Kùzu",
-    "base_url": "blog.kuzudb.com",
+    "base_url": "https://blog.kuzudb.com",
     "base_path": "/",
     "favicon": "/favicon.ico",
     "logoLight": "/logoLight.png",
