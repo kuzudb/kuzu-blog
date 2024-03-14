@@ -108,7 +108,11 @@ You can disable the youtube integration by modifying the `src/config/config.json
 
 ## 📝 Adding New Posts
 
-Add conventional markdown files to the `src/content/post` directory to add the post content. If using a directory structure, name the markdown file `index.md`.
+* Add conventional markdown files (`.md`) to the `src/content/post` directory
+  * The file name should be in the format `YYYY-MM-DD-title.md` to retain the display order
+* Images can be added to the `/public/img/title` directory and referenced in the markdown files via relative paths
+  * For an image in `/public/img/title` directory, it can be referenced in the blog using the following path:
+  * `![](/img/title/image.png)`
 
 ## 📂 Project Structure
 
