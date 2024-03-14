@@ -47,12 +47,8 @@
     @apply hover:text-orange-600;
   }
 
-  img {
-    @apply rounded-md w-full md:w-full lg:w-3/4;
-  }
-
   article img {
-    @apply hover:w-full transition-all;
+    @apply rounded w-full;
   }
 
   th {
@@ -60,7 +56,7 @@
   }
 
   hr {
-    @apply h-0.5 border-solid bg-zinc-500 dark:bg-zinc-400;
+    @apply h-0.5 border-solid bg-zinc-300 dark:bg-zinc-600;
   }
 }
 

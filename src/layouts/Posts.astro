@@ -29,11 +29,11 @@ type PostType = {
   {
     posts?.slice(0, config.site.pageSize).map((post: PostType) => (
       <article class="flex w-full flex-col items-start">
-        <div class="rounded-lg block overflow-hidden mb-4">
+        <div class="rounded overflow-hidden isolate mb-4">
           {post.data.heroImage && (
             <a href={`/post/${post.slug}/`}>
             <center>
-                <figure class="max-w-96 h-36 block bg-white border-2">
+                <figure class="max-w-96 h-36 block bg-white border-2 border-zinc-200">
                 <Image
                     src={post.data.heroImage}
                     alt={post.data.title}
