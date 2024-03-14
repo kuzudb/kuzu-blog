@@ -40,7 +40,7 @@ such approaches would fall under RAG using structured data, since KGs are struct
 - **Standard RAG-U**: A common design point, which I will call the standard RAG-U, is to add chunks of documents as additional data and store them in a vector index. I found some of the most technically deep and interesting future work directions in this space, e.g., extending vectors to matrices.
 - **An envisioned role for KGs in a RAG-U system is as a means to link chunks of text:** If chunks can be linked to entities in an existing KG, then one can connect chunks to each other through the relationships in KG.
 These connections can be exploited to retrieve more relevant chunks. This is a promising direction but
-its potential benefits should be subjected to rigorously evaluation, e.g., as major SIGIR publications evaluate a new retrieval technique. It won't pick up through commercial blog posts.
+its potential benefits should be subjected to rigorous evaluation, e.g., as major SIGIR publications evaluate a new retrieval technique. It won't pick up through commercial blog posts.
 - **What if an enterprise does not have a KG?** The hope of using KGs to do better retrieval in absence of a pre-existing KG raises the question and never ending quest of *automatic knowledge graph construction*. This is a very interesting topic and most recent research here uses LLMs for this purpose but: (i) LLMs seem behind in extracting quality knowledge graph facts; and (ii) it's not clear if use of LLMs for this purpose at scale is economically feasible.
 
 ---
