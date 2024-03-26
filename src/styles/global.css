@@ -48,7 +48,7 @@
   }
 
   article img {
-    @apply rounded w-full;
+    @apply rounded;
   }
 
   th {
