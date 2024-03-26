@@ -10,8 +10,6 @@ authors: ["chang", {"name": "Chris Norman", "image": "https://www.commonfate.io/
 tags: ["visualization"]
 ---
 
-## IAMGraphViz Overview
-
 [Common Fate](https://www.commonfate.io/)  is a framework for managing complex cloud permissions. They provide tools to simplify access at scale to AWS, Azure, and Google Cloud accounts. You can learn about what you can do with Common Fate on [their website](https://www.commonfate.io/). Here, we will talk about a recent proof of concept graph visualization tool called IAMGraphViz that [Chang Liu](https://www.linkedin.com/in/mewim/) (who is coauthoring this post) and I developed using Kùzu! IAMGraphViz is intended for infrastructure engineers to dig deep into the permission assignments in AWS IAM Identity Center using graph visualization. Using IAMGraphViz, one can easily visualize who has what type of access to different accounts on AWS as well as how they have access to these accounts. This is all done by analyzing the paths from users to accounts in a graph visualization, where the nodes and edges model users, accounts, groups, group memberships, permission sets and other entities in the AWS IAM Identity Center system.
 
 The IAMGraphViz project is designed and implemented as a web application using a graph DBMS (GDBMS) to store and retrieve data. Before landing on Kùzu, we surveyed using several other GDBMSs, such as Neo4j, but they were all harder to use. Neo4j, for example, requires hosting a separate database. We then discovered Kùzu, which only required a `pip install` and import statement and we could simply embed it into our application. In this project our datasets could fit entirely onto a single compute node,and so Kùzu was far simpler for us to work with than alternatives. Kùzu is also far cheaper and more serverless-friendly than running a separate database.
@@ -20,7 +18,7 @@ This post follows the [Colab](https://colab.research.google.com/drive/1fotlNnOj1
 
 So let's get to it!
 
-## Quick AWS IAM Overview
+## Overview of AWS IAM
 
 We will use the data model shown in the figure below that faithfully (but partially) models the
 core concepts of AWS IAM permission management. Let's first review these concepts, all
