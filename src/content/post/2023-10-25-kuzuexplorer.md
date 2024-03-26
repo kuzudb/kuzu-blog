@@ -10,7 +10,7 @@ authors: ["chang"]
 tags: ["visualization"]
 ---
 
-Today, we are happy to release KùzuExplorer, which is Kùzu's browser-based frontend to
+Today, we are happy to announce the release of KùzuExplorer, a browser-based frontend for Kùzu to
 visualize and explore database schemas and query results in the form of a graph, table, or in JSON.
 This is a very useful tool for exploring databases and debugging applications during prototyping
 phase. This post describes a brief overview of the main features of KùzuExplorer with pointers to
