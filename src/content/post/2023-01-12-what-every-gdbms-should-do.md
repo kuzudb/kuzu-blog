@@ -324,7 +324,7 @@ a particular application domain we are currently excited
 about and we want to see Kùzu used in: graph data science in the python ecosystem!
 This figure from my CIDR slides describes this vision pictorially:
 
-![Kùzu as a GDBMS for Graph Data Science Pipelines](/img/2023-01-12-what-every-gdbms-should-do/kuzu-as-gdbms-of-gds.png)
+<Image src="/img/2023-01-12-what-every-gdbms-should-do/kuzu-as-gdbms-of-gds.png" width="600" /> 
 
 Suppose you are building a graph analytics, machine learning, or visualization
 pipeline from raw record files on disk. You will want to model your raw records 

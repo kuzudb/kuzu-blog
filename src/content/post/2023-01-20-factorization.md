@@ -283,7 +283,7 @@ When designing the query processor of Kùzu, we had 3 design goals:
 Kùzu has a vectorized query processor, which is the common wisdom
 in analytical read-optimized systems. 
 
-![](/img/2023-01-20-factorization/factorized-vectors.png)
+<Image src="/img/2023-01-20-factorization/factorized-vectors.png" width="600" /> 
 
 Vectorization, in the context of DBMS query processors 
 refers to the design where operators pass a set of tuples, 1024 or 2048, 
