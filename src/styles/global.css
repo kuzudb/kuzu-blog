@@ -60,6 +60,10 @@
   }
 }
 
+section.footnotes {
+  @apply text-sm;
+}
+
 .video-wrapper {
   aspect-ratio: 16 / 9;
 }
