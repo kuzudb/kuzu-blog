@@ -1,6 +1,6 @@
 ---
 slug: "in-praise-of-rdf"
-title: "In Praise of RDF"
+title: "In praise of RDF"
 description: "RDF data model, its virtues, vices, and applications."
 pubDate: "March 28 2024"
 heroImage: "/img/2024-03-28-in-praise-of-rdf/product-catalog.png"
