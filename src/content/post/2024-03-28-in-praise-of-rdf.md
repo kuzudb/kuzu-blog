@@ -43,13 +43,14 @@ to import and query RDF data in Kùzu.
   (ii) seamless schema and data querying; (iii) data integration without transformations;
   and (iv) automatic logical inference/reasoning.
 
-- **RDF vices:**: *Main tradeoffs of creating large RDF databases are: (i) performance and scalability; 
-  (ii) complexity of modeling; and (iii) ensuring logical consistency in complex domains.*
-  - **Role of RDF and reasoning in the context of LLMs**: *RDF and knowledge graphs
+- **RDF vices:**: The main trade-offs of creating large RDF databases are: (i) performance and scalability; 
+  (ii) complexity of modeling; and (iii) ensuring logical consistency in complex domains.
+  - **Role of RDF and reasoning in the context of LLMs**: RDF and knowledge graphs
     are being used in retrieval augmented generation (RAG) to link the chunks or the entities
     in the chunks. Beyond RDF, for the role that advanced KRR systems can play in the era of LLMs, 
     here is a [great article](https://arxiv.org/ftp/arxiv/papers/2308/2308.04445.pdf) 
-    by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).*
+    by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).
+
 - **Kùzu RDFGraphs**: [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/) is a new feature in Kùzu to map RDF triples into Kùzu's structured property graph model.
   This way you can query RDF datasets in Cypher, enhance them with property graph data, and benefit from
   Kùzu's fast query processor.
@@ -58,8 +59,8 @@ to import and query RDF data in Kùzu.
 [^1]: Several terms are used for systems that manage RDF and provide a high-level query language over them.
       These include RDF databases, RDF engines, triple stores, or RDF DBMSs. I will use RDF DBMSs in this post.
 
-## RDF as a Data Model
-Since the 1980s and possibly earlier, the database and AI communities have prefered 
+## RDF as a data model
+Since the 1980s and possibly earlier, the database and AI communities have preferred 
 to refer to the information stored in information systems as "data" vs "knowledge".[^2] Let's put 
 this distinction aside for now. As a core database researcher, let me explain
 RDF first and foremost as a data model. It is in fact an extremely simple and expressive
@@ -94,6 +95,7 @@ you will have trouble modeling the domain meaningfully as a set
 of tables. Think of cataloguing the products sold by an e-commerce company.
 Suppose your goal is to answer a variety of questions about the products 
 for business reporting, analytics, and search purposes:
+
 - How many products are there under the clothing category? How many are under the shirts category?
 - Which products produced in Canada are subject to Textile Labeling Act?
 - Which materials are used in Levi's 511 jeans?
@@ -102,7 +104,7 @@ You need to model your products, their categories, the materials used in produci
 the regulations they are subject to, amongst other information. But your company, call it "Global Corps", sells tens of
 thousands of products from international merchants.
 The products under clothing will be very different from those in electronics or 
-furnitute. Regulations that apply to products will be vastly different across product categories 
+furniture. Regulations that apply to products will be vastly different across product categories 
 and countries. Even within a single category, say jeans, some products will 
 be produced using 2 material, others 10. 
 The point is, the product catalogue of an e-commerce company
@@ -114,7 +116,7 @@ under hierarchies of classes and categories with irregular sets of properties
 and relationships. RDF, as a data model, is a great fit for modeling exactly such complex, irregular information.
 It is a great fit because it is a very simple model.
 
-### RDF Basics & Virtue 1: Flexible Modeling
+### RDF basics & virtue 1: Flexible modeling
 Before I start, let me point you to this book by
 Allemang and Hendler, [Semantic Web for the Working Ontologist](http://www.acad.bg/ebook/semantic/0123735564%20-%20Morgan%20Kaufmann%20-%20Semantic%20Web%20for%20the%20Working%20Ontologist%20Effective%20Modeling%20in%20RDFS%20and%20OWL%20-%20(2008).pdf) 
 (see [this](https://www.amazon.com/Semantic-Web-Working-Ontologist-Effective/dp/0123859654) more recent but paid edition).
@@ -122,7 +124,7 @@ It is a great book to learn about RDF and its related standards that contains a 
 (which is the best way to explain technical material).
 The RDF data model consists of three main components:
 
-**Resources**: Resources model entities,
+1. **Resources**: Resources model entities,
 concepts, or even properties in the modeled domain. They are identified by unique internationalized resource identifiers (IRIs), which are URL-like
 strings. IRIs are broadly in the form of <`prefix-namespace:local-identifier`>. Some standard prefix names
 will be discussed later on. For our running example, let's use the prefix `http://global-corps.io/rdf-ex#` for the namespace
@@ -132,14 +134,14 @@ can be both data and schema/meta-data. So entities in the domain are resources. 
 are also resources. For example, IRI `gc:Jeans` can model a class/type/category
 of jeans products (so it's part of schema).[^3] 
 
-[^3]: As a side note, although I won't use the term  in this post, the set of resources that describe
+[^3]: As a side note, although I won't use the term in this post, the set of resources that describe
 the schema/metadata of database, i.e., the classes and class hierarchies
 and the triples between them, are called *ontologies*. The rest of the resources represent data. 
 
-**Literals**: Resources have properties which can be other resources or literals, which are 
+2. **Literals**: Resources have properties which can be other resources or literals, which are 
 values, such as strings or integers (explained momentarily).
 
-**Triples**: Now we can describe how to express information in RDF.
+3. **Triples**: Now we can describe how to express information in RDF.
 All information in RDF is expressed as a set of <subject, predicate, object> triples, which are
 short sentences. Subjects are resources, predicates are like verbs, and objects are 
 either resources or literals. Here are some example triples 
@@ -157,7 +159,8 @@ are namespace to identify several standardized RDF vocabulary (more on these sta
 <gc:Jeans, rdf:subClassOf, gc:Clothing>
 <gc:Clothing, rdf:subClassOf, gc:Product>
 ...
-``` 
+```
+
 The below image shows a sample of the database. 
 Triples are naturally modeled as edges between resources and literals.
 That is why RDF is considered a graph-based data model. I'm removing 
@@ -166,7 +169,7 @@ of `gc:Levis-511`.
 Some triples are between resources, such as <`gc:Levis-511`, `rdf:type`, `gc:LooseJeans`>,
 while others are between a resource and literal, such as <`gc:Levis-511`, `gc:jean-size`, `32`>.
 
-<img src="/img/2024-03-21-in-praise-of-rdf/product-catalog.png" style="width: 800px; height: auto;"/>
+<Image src="/img/2024-03-28-in-praise-of-rdf/product-catalog.png" width="800" />
 
 Let me now highlight how expressive and flexible RDF is:
 - Entities can be part of multiple classes. For example, the figure shows 'Apple Watch' appearing 
@@ -191,8 +194,7 @@ Let's focus on the relational model on the one side and
 the two popular graph-based data models, property graph (PG) data model and RDF on the other side.
 I am also adding Kùzu's variant of the PG model into this framework. The framework is shown in the figure below.
 
-
-<img src="/img/2024-03-21-in-praise-of-rdf/data-models.png" style="width: 600px; height: auto;"/>
+<Image src="/img/2024-03-28-in-praise-of-rdf/data-models.png" width="600" />
 
 Think of the x-axis as representing the flexibility of the model to express complex domains (flexibility increases
 from left-to-right). Think of the y-axis as representing how much a DBMS can exploit in the structure
@@ -253,7 +255,7 @@ and in logic things get very abstract very quickly, and we might soon find ourse
 questioning whether a spoon we are looking at really exists. Let me just make the point of why RDF and its standards
 form a knowledge representation system.
 
-<img src="/img/2024-03-21-in-praise-of-rdf/rdf-standards.png" style="float:right; width: 300px; height: auto;"/>
+<Image src="/img/2024-03-28-in-praise-of-rdf/rdf-standards.png" width="300" />
 
 The figure to the right[^6] shows 4 of the important standards around RDF.
 These standards come with a standard set of terms, such as `rdf:type` or `rdfs:subClassOf`,
@@ -281,11 +283,13 @@ and also a type of `gc:Clothing` (<`gc:Levis-511`, `rdf:type`, `gc:Clothing`>).
 In short, because the standards around RDF are formally defined to enable such reasoning, people refer to RDF and 
 its standards as a knowledge representation system. Indeed, some RDF DBMSs are able 
 to return those triples. Consider the following SPARQL query:
+
 ```sparql
 SELECT ?x WHERE {
   gc:Levis-511 rdf:type ?x
 }
 ```
+
 I hope the query is self-explanatory to anyone who knows SQL, asking for the
 triples of the form <`gc:Levis-511`, `rdf:type`, `?x`>. If you ask an RDF DBMS that implements the RDFS standard,
 the above query will return three values for the unbound variable `?x`:
@@ -297,7 +301,7 @@ no explicit triples in the system for <`gc:Levis-511`, `rdf:type`, `gc:Jeans`> a
 by Brachman and Levesque, [Knowledge Representation and Reasoning](https://www.cin.ufpe.br/~mtcfa/files/in1122/Knowledge%20Representation%20and%20Reasoning.pdf).
 I am not particularly recommending to read this if you are interested in RDF and how to use it. This is more a book
 for graduate seminars covering the foundations of the topic, but it is a very good read.
-KRR systems often use logic-based languages to represent knowledge. Often these langauges are
+KRR systems often use logic-based languages to represent knowledge. Often these languages are
 subsets of first order logic (FOL), where information is represented as formulas like 
 $\exists x \forall y Friends(x, y) \wedge \neg LivesIn(x, Canada)$. If you want to indulge yourself
 in science and ponder about why we cannot compute whether a query/formula in FOL is true or false
@@ -318,7 +322,7 @@ in some structured or semi-structured form, such as RDF triples. This vision has
 as originally described in the paper, but the technologies and standards developed by the Semantic Web community, such as 
 RDF, RDFS, OWL, and SPARQL have seen adoption.
 
-[^6]: The image is a copy of Figure 1 from Juan Sequeda's [phd thesis](https://repositories.lib.utexas.edu/server/api/core/bitstreams/3f81a71a-082f-4946-94ce-5578428e7af0/content)
+[^6]: The image is a copy of Figure 1 from Juan Sequeda's [PhD thesis](https://repositories.lib.utexas.edu/server/api/core/bitstreams/3f81a71a-082f-4946-94ce-5578428e7af0/content)
 
 ### Further RDF Virtues
 I discussed that one benefit of RDF is its flexibility in modeling complex domains. 
@@ -326,7 +330,7 @@ Let me give brief examples of a few other benefits you can get from RDF modeling
 
 #### Virtue 2: Schema-Data Combined Querying
 Notice that in RDF there is no difference between how information about data and schema are represented.
-Every statement is a triple and subjects of these triples can be resources/entities represeting data, e.g.,
+Every statement is a triple and subjects of these triples can be resources/entities representing data, e.g.,
 Levi's 511, or classes, e.g., Jeans. Consider one of the motivating questions I had above: 
 Which products produced in Canada are subject to Textile Labeling Act?
 Suppose further that you have encoded which classes of items fall under Textile Labeling Act.
@@ -334,6 +338,7 @@ So maybe you had a triple <`gc:Jeans`, `gc:subjectTo`, `gc:TextileLabelingAct`>.
 Note however, that this triple is not about the data. It's about a class of items, so
 it's technically about the schema.
 Now you can answer the question with the following query:
+
 ```sparql
 SELECT ?item WHERE {
   ?item rdf:type ?class .
@@ -367,13 +372,13 @@ standardized OWL (which stands for "web ontology language"[^7]) vocabulary to do
 I did this with the `gc:contains` property, which was tagged with type `owl:TransitiveProperty`. This means
 that if you have a triple <`a`, `gc:contains`, `b`> and <`b`, `gc:contains`, `c`>, then you can infer <`a`, `gc:contains`, `c`>.
 So in a DBMS that implements the OWL standard for `owl:TransitiveProperty`, if you ask the query:
+
 ```sparql
 SELECT ?material WHERE {
   gc:Levis-511 gc:contains ?material
 }
 ```
 you could get both `gc:denim` and transitively `gc:cotton`, even though there is no direct <`gc:Levis-511`, `gc:contains`, `gc:cotton`> triple.
-
 
 [^7]: Kudos to the standardizing committee for taking the liberty to define an abbreviation that 
 does not follow the order of the words. The typical abbreviation for "web ontology language" would be WOL,
@@ -390,19 +395,22 @@ contains the following triples:
 <md:MerchantA, md:locatedIn, md:Waterloo>
 ...
 ```
+
 Prefix namespace `md` above stands for **m**erchant **d**ata. Suppose `md:Prod123` 
 models Levi's 511 in this database. 
 You can integrate this data with the database in the original running example by using 
 the standardized `owl:sameAs` predicate. So you can simply add the single <`gc:Levis-511`, `owl:sameAs`, `md:Prod123`>.
 Then, suppose you ask the following query to a DBMS that implements the OWL standard:
+
 ```sparql
 SELECT ?material WHERE {
   gc:Levis-511 sd:contains ?material
 }
 ```
+
 You would get `md:MerchantA` and `md:MerchantB` as the merchants of `gc:Levis-511`. 
 No virtual schema designs or schema mappings are needed,
-as one would have to do in a relational system. The query above all works
+as one would have to do in a relational system. The query, above all, works
 because: (i) RDF is very flexible and consists of simple sentences; and 
 (ii) standards around RDF are very clear about the meaning of `owl:sameAs` and its entailments.
 You simply had to add a new sentence to your database, "Levi's 511 and Prod123 are the same thing",
@@ -414,7 +422,7 @@ of products either with `gc:merchant` or `md:merchant` property.
 
 ### RDF Vices: Performance, Complexity, Inconsistencies
 As I mentioned in my diagram of data models, as a rule of thumb, the more flexible a data model, 
-so less structure there is to exploit, the less performant and scalable you should expect a DBMS supporting the data model to be (in query performance at least).
+the less structure there is to exploit, and so the less performant and scalable you should expect a DBMS supporting the data model to be (in query performance at least).
 Again, I'm making a relative argument modulo the rest of the optimizations in th system. 
 Lack of structure means fewer optimizations systems can do. 
 
@@ -433,7 +441,7 @@ other approach, is simple. By definition these are complex tasks.
 
 But of course no pain no gain in life. If you invested and successfully modeled a complex domain in your
 enterprise, now you can use that data in many applications, perhaps most importantly in search
-and question answerting (more on this momentarily).
+and question answering (more on this momentarily).
 
 ### Conclusions: A Minor Plug for Kùzu RDFGraphs & Remembering Logic-based Databases in the Era of LLMs
 My goal in this post was to tell you about RDF. What is it, what is it not, why I
@@ -462,7 +470,6 @@ Some of these approaches try to retrieve data from an automatically generated tr
 Others try to link the chunks in their documents by using a knowledge graph.
 I reviewed some of these approaches
 and my general opinions on this approach in a [previous blog post on RAG](https://blog.kuzudb.com/post/llms-graphs-part-2/).
-
 
 **Symbolic AI + LLM Visions:** RDF technology was popularized by the Semantic Web 
 community and its roots go back to fundamental topics in AI on knowledge representation and reasoning. 
@@ -506,7 +513,7 @@ To demonstrate what is possible in a system that can reason,
 consider the figure below copy-pasted from the Brachman and Levesque book on KRRs
 (Figure 2.1 there):
 
-<img src="/img/2024-03-21-in-praise-of-rdf/three-boxes.png" style="float:right; width: 400px; height: auto;"/>
+<Image src="/img/2024-03-28-in-praise-of-rdf/three-boxes.png" width="400" />
 
 
 Suppose we model the boxes as tuples, and we are able to express that
@@ -518,7 +525,8 @@ Suppose we model these facts as triples using some IRIs to model the boxes
 and `xyz:color`, `xyz:onTopOf` and `owl:cardinality` predicates. 
 Suppose we want to ask the following question: "are there (or how many)
 green boxes are above not green boxes". We could do this in SPARQL as follows:
-```
+
+```sparql
 SELECT count(*) WHERE {
 ?box1 xyz:color "green" .
 ?box1 xyz:ontopOf ?box2 .
@@ -540,10 +548,11 @@ it seems like a good time to revisit this ideal,
 and re-think what would deductive databases look like in 2020s. This is yet another
 reason to be interested in RDF, semantic web, and the broader field of KRR.
 
-Phew! I covered a lot of content. I may have raised more questions than I answered 
-but I hope I at least succeeded in giving you an overview and appreciation of RDF and when and how
-to use it. I need a sentence to end the post, so let it be this: Long live the ideal of reasoning systems!
+Phew! I covered a lot of content, and I may have raised more questions than I answered.
+But I hope I at least succeeded in giving you an overview and appreciation of RDF and when and how
+to use it. I need a sentence to end the post, so let it be this: *Long live the ideal of reasoning systems!*
 
+---
 
 [^8]: In his terminology, knowledge bases are more expressive than the knowledge graphs 
 I described here. What I showed you might look quite expressive but as I mentioned
