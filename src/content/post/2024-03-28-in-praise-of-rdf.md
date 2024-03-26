@@ -45,11 +45,12 @@ to import and query RDF data in Kùzu.
 
 - **RDF vices:**: The main trade-offs of creating large RDF databases are: (i) performance and scalability; 
   (ii) complexity of modeling; and (iii) ensuring logical consistency in complex domains.
-  - **Role of RDF and reasoning in the context of LLMs**: RDF and knowledge graphs
-    are being used in retrieval augmented generation (RAG) to link the chunks or the entities
-    in the chunks. Beyond RDF, for the role that advanced KRR systems can play in the era of LLMs, 
-    here is a [great article](https://arxiv.org/ftp/arxiv/papers/2308/2308.04445.pdf) 
-    by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).
+
+- **Role of RDF and reasoning in the context of LLMs**: RDF and knowledge graphs
+  are being used in retrieval augmented generation (RAG) to link the chunks or the entities
+  in the chunks of text documents. Beyond RDF, for the role that advanced KRR systems can play in the era of LLMs, 
+  here is a [great article](https://arxiv.org/ftp/arxiv/papers/2308/2308.04445.pdf) 
+  by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).
 
 - **Kùzu RDFGraphs**: [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/) is a new feature in Kùzu to map RDF triples into Kùzu's structured property graph model.
   This way you can query RDF datasets in Cypher, enhance them with property graph data, and benefit from
@@ -448,7 +449,12 @@ and question answering (more on this momentarily).
 My goal in this post was to tell you about RDF. What is it, what is it not, why I
 find it a very important data model to know about, and why I have a high opinion of it. 
 If you were interested about RDF but never got to learning, I hope I have piqued your interest
-to learn more. I want to end with several notes.
+to learn more. The post shouldn't come across as saying that RDF should be used for everything.
+On the contrary, often what developers model and store in the DBMSs have perfect or close to perfect
+structure, and using the relational or property graph models would be the right modeling choice.
+But there are cases as I outlined when you need a model that's more flexible and RDF is likely what you need. 
+
+I want to end with several notes.
 
 ### A minor plug for Kùzu RDFGraphs
 
