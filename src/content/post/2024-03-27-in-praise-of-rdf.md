@@ -1,6 +1,6 @@
 ---
 slug: "in-praise-of-rdf"
-title: "In praise of RDF"
+title: "In Praise of RDF"
 description: "RDF data model, its virtues, vices, and applications."
 pubDate: "March 27 2024"
 heroImage: "/img/2024-03-27-in-praise-of-rdf/data-models.png"
@@ -18,10 +18,10 @@ It is a data exchange format. It is knowledge graphs. It is a web standard. Ther
 
 My goal in this post is to tell you about RDF, its virtues, vices, history, and applications; at least
 as much as one can manage in a single blog post.
-I hope to clarify what RDF is, when you need it, and why I think it is an essential data model 
+I hope to clarify what RDF is, when you need it, and why I think it is a fundamental data model 
 to know about. As I will highlight, 
 RDF can even play an increasingly important role in the era of LLM-based applications. 
-I will also delve into some fascinating topics in AI that intersect with databases:
+I will also discuss some fascinating topics in AI that intersect with databases:
 logic, reasoning, and knowledge representation systems. 
 I also put in a minor plug at the end for a new feature we added called [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/),
 to import and query RDF data in Kùzu.
@@ -32,19 +32,19 @@ to import and query RDF data in Kùzu.
 #### TL;DR: The key takeaways from this post are:
 
 - **RDF overview**: RDF is a simple and flexible data model, where
-  both data and schema are sentences in the form of (subject, predicate/verb, object) triples.
+  both data and schema are simple sentences in the form of (subject, predicate/verb, object) triples.
   A collection of these triples forms a graph.
   RDF is further a knowledge representation system due to the standards around RDF, such as RDFS and OWL,
-  that give clear meaning to the vocabulary in triples, especially the verbs.
+  that give clear meaning to certain vocabulary in triples, especially the verbs.
   This enables DBMSs[^1] to do automatic logical inference over triples. RDF has its historical roots in Semantic Web, which has its roots
   in good old-fashioned symbolic AI/knowledge representation and reasoning (KRR).
 
-- **RDF virtues**: The main benefits of RDF are: (i) modeling complex, irregular domains;
+- **RDF virtues**: The main pros of RDF are: (i) modeling complex, irregular domains;
   (ii) seamless schema and data querying; (iii) data integration without transformations;
   and (iv) automatic logical inference/reasoning.
 
-- **RDF vices**: The main tradeoffs that are commonly compromised when building large RDF databases are: (i) performance and scalability; 
-  (ii) complexity of modeling; and (iii) ensuring logical consistency in complex domains.
+- **RDF vices**: The main cons of building large RDF databases are: (i) performance and scalability; (ii) verbosity; and
+  (iii) inherent challenges of modeling complex domains, such and ensuring logical consistency in the database.
 
 - **Role of RDF and reasoning in the context of LLMs**: RDF and knowledge graphs
   are being used in retrieval augmented generation (RAG) to link the chunks or the entities
@@ -54,15 +54,15 @@ to import and query RDF data in Kùzu.
 
 - **Kùzu RDFGraphs**: [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/) is a new feature in Kùzu to map RDF triples into Kùzu's structured property graph model.
   This way you can query RDF datasets in Cypher, enhance them with property graph data, and benefit from
-  Kùzu's blazingly fast query processor.
+  Kùzu's fast query processor.
 ---
 
 [^1]: Several terms are used for systems that manage RDF and provide a high-level query language over them.
       These include RDF databases, RDF engines, triple stores, or RDF DBMSs. I will use "RDF DBMSs" in this post.
 
 ## RDF as a data model
-Since the 1980s and possibly earlier, the database and AI communities have preferred 
-to refer to the information stored in information systems as "data", rather than "knowledge".[^2] Let's put 
+Since the 1980s and possibly earlier, the database and AI communities have had different preferences  
+for referring to the information stored in information systems as "data" vs "knowledge".[^2] Let's put 
 this distinction aside for now. As a core database researcher, let me explain
 RDF, first and foremost, as a data model. It is in fact an extremely simple and expressive
 data model. For reasons I will explain below, it is considered a graph-based model.
@@ -88,7 +88,7 @@ But what would the tables be?
 Would you have a separate table for persons, institutions, locations, soccer clubs? 
 Would you model the politicians in a table with their parties? But some politicians
 don't have parties, and there are vastly different political roles out there. 
-It is hopeless. You couldn't even get started. The data is too irregular and complex.
+It is hopeless. You couldn't even get started. The data is too irregular. It is too complex.
 
 I did not have to go that extreme. Similar situations arise in many enterprises. 
 As long as the modeled domain is large and complex enough, 
@@ -106,15 +106,15 @@ the regulations they are subject to, amongst other information. But your company
 thousands of products from international merchants.
 The products under clothing will be _very_ different from those in electronics or 
 furniture. Regulations that apply to products will be vastly different across product categories 
-and countries. Even within a single category, say "jeans", some products will 
+and countries. Even within a single category, say "Jeans", some products will 
 be produced using two materials, others ten. 
 The point is, the product catalogue of an e-commerce company
 can be very complex and irregular. If you want an enterprise-level database to answer such questions,
 you will have trouble coming up with a well-defined set of tables to give structure to this domain.
 
 What you want is a more *object-oriented* model of the domain, one that allows putting entities
-under hierarchies of classes and categories within irregular sets of properties 
-and relationships. RDF, as a data model, is a great fit for modeling exactly such complex, irregular information.
+under hierarchies of classes and categories, and having irregular sets of properties on entities and 
+irregular relationships between entities. RDF, as a data model, is a great fit for modeling exactly such complex, irregular information.
 It is a great fit because it is a very simple model.
 
 ### Virtue 1 and the basics of RDF: Flexible modeling
@@ -143,7 +143,7 @@ and the triples between them, are called *ontologies*. The rest of the resources
 values, such as strings or integers (explained momentarily).
 
 3. **Triples**: Now we can describe how to express information in RDF.
-All information in RDF is expressed as a set of `<subject, predicate, object>` triples, which are
+All information in RDF is expressed as a set of <subject, predicate, object> triples, which are
 short sentences. Subjects are resources, predicates are like verbs, and objects are 
 either resources or literals. Here are some example triples 
 about Global Corps's product catalogue. `rdf` and `rdfs` prefixes below are for
@@ -189,13 +189,13 @@ That's ample flexibility to model a complex domain. If there is new information 
 have formed a consistent mental model of what things are and how to refer to them, you can add new triples 
 to your database to represent it.
 
-### An overview of data models 
+### A rough view of data models 
 If you are eager to read about
 RDF as a knowledge representation system, you can skip to the [next part](#rdf-as-a-knowledge-representation-system). 
 I want to describe a mental framework of data models that I find helpful when comparing them. 
 Let's focus on the relational model on the one side and
 the two popular graph-based data models, property graph (PG) and RDF on the other side.
-I am also adding Kùzu's variant of the PG model (which we call the *structured* property graph model) into this framework.
+I am also adding Kùzu's variant of the PG model, which we call the *structured* PG model, into this framework.
 The framework is shown in the figure below.
 
 <Image src="/img/2024-03-27-in-praise-of-rdf/data-models.png" width="600" />
@@ -205,24 +205,21 @@ from left to right), and the y-axis as representing how much a DBMS can exploit 
 to be fast and scalable at managing and querying databases in that model (see below for more). For simplicity,
 let's ignore write performance.
 
-#### Flexibility
-
-The relational model is located as the left-most point because it is the most "rigid", i.e., the most
+- Flexibility: The relational model is located as the left-most point because it is the most "rigid", i.e., the most
 structured data model. RDF is the right-most point because it is the most flexible model. 
-The original labeled property graph (LPG) model introduced by Neo4j, and PGs in general, fall 
+The original PG model introduced by Neo4j falls 
 somewhere in between. On the one hand, PGs allow putting arbitrary key-value pairs on node and relationship
 records, so they provide more flexibility than the relational model. 
 But in PG, you cannot construct proper type hierarchies as in RDF, nor can you model information about
 types of relationships as in RDF. RDF has a great foundation in *knowledge representation and reasoning*, 
 so its expressiveness is very well thought out.
 
-#### Opportunity for a DBMS to exploit structure for performance and scalability
-
+- Opportunity for a DBMS to exploit structure for performance and scalability: 
 It is impossible to predict the speed and scalability of systems just based on the data model they expose to users.
 The actual speed and scalability of a DBMS depends on many implementation choices the implementors make.
 However, as a rule of thumb, DBMSs can be faster and more scalable
 by *exploiting structure* in the data they manage. For example, DBMSs can compress and scan records fast if they are 
-homogenous, e.g., if every item in "jeans" has exactly one "size" property and "size" properties are all of the same type, 
+homogenous, e.g., if every item in "Jeans" has exactly one "size" property and "size" properties are all of the same type, 
 e.g., integers. DBMSs can sort, join,
 and run fast aggregates on data if they know a priori how to get to each piece of data quickly, 
 e.g., if they know their data type so they know the exact number of bytes used to store them on disk. 
@@ -235,7 +232,7 @@ makes the job of a PG DBMS harder. But I still put property graph model higher o
 because in my experience most of the databases users put into PG DBMSs are extracted from relational systems so have 
 inherent structure.
 
-It's worth reiterating that Kùzu implements a variant of the property graph data model that we call the *structured* property graph model. This is 
+**Note on Kùzu's structured PG model:** Kùzu implements a variant of the property graph data model that we call the *structured* property graph model. This is 
 more or less equivalent to the relational model, except that we require users to identify their tables as "node" or
 "relationship" tables. That is why this model appears at the same location as the relational model in the figure above.
 This is a conscious choice that we are very happy about.
@@ -250,7 +247,7 @@ tables, users are telling us something important about their workloads. Specific
 that the relationship records will be used to join node records with their "neighbor" node records.
 This is true in other PG DBMSs as well. They also have the same information.
 Kùzu and other GDBMSs exploit this information by building join indices over the relationship tables, 
-so that common joins of node records with their neighbors are *fast*.
+so that common joins of node records with their neighbors can be very fast.
 
 ## RDF as a knowledge representation system
 Let me now justify why some people refer to RDF as a knowledge representation system, or to RDF databases
@@ -375,7 +372,7 @@ unnecessarily repeat the table name "Jeans" with each tuple in the `Jeans` table
 course do this in the relational model but your query will not be as simple as the one above. Most likely,
 it will be *a set of queries* you have to run.
 RDF, in contrast, is a very flexible model.
-It's closer to speaking natural language. Every information is a sentence, so records can join 
+It's closer to speaking a natural language. Every information is a sentence, so records can join 
 on schema names, or data values, or predicates/properties.
 
 ### Virtue 3: Inference/reasoning 
@@ -433,24 +430,32 @@ For example, if in the original database you had a property `gc:merchant` with m
 have also indicated <`gc:merchant`, `owl:equivalentProperty`, `md:merchant`>. Then you could query all merchants
 of products either with `gc:merchant` or `md:merchant` property. 
 
-## RDF vices: Performance, complexity, inconsistencies
+## RDF vices: Performance, verbosity, inconsistencies
 As I mentioned in my diagram of data models, as a rule of thumb, the more flexible a data model, 
 the less structure there is to exploit, and so, the less performant and scalable you should expect a DBMS supporting the data model to be (in query performance at least).
 Again, I'm making a relative argument modulo the rest of the optimizations in the system. 
 Lack of structure means that there are fewer optimizations a system can do. 
 
-The second vice is that the flexibility of RDF stated earlier, comes at a cost, especially when modeling complex domains of information.
-If you are ambitious and attempt to construct really large
-knowledge graphs in RDF, you will have to deal with a lot of modeling complexity. This can be painful.
-There are examples of large scale knowledge graph constructions, like the [SNOMED project](https://en.wikipedia.org/wiki/SNOMED_CT),
-that aims to model all medical terms. These projects are very complex and require decades
-of work. 
+The second obvious vice of RDF is that it can be verbose to model data. For example,
+suppose you wanted to model that Levi's 511, Levi's 512, and Levi's 513 are jeans and have sizes 32, 33, 34, respectively.
+In relational modeling, you would have `Jeans` tables with 3 succinct tuples: `("Levis-511", 32)`, `("Levis-512", 33)`, `("Levis-513", 34)`.
+In RDF, you have to work harder. You need to have 6 triples, 3 for types and 3 for size. For example two of the
+triples for Levi's 511 are
+`<gc:Levis-511, rdf:type, gc:LooseJeans>`, `<gc:Levis-511, gc:size, 32>`. There is also additional verbosity
+due to the use of IRIS to refer to resources, 
+which are long strings, even if their namespaces can be abbreviated. So expect this verbosity to slow your development down.
+
+The third vice is that if you are in a situation when you need RDF, you are likely developing a database
+that is modeling a complex domain. Therefore inherently, you will have to deal with a lot of challenges and pain of 
+modeling complex things. There are examples of large scale knowledge graph constructions that can take 
+many years of work. As an extreme example, the [SNOMED project](https://en.wikipedia.org/wiki/SNOMED_CT)
+aims to model all medical terms has required many decades of work.
 One part of the problem is to keep your constraints, equivalences, and hierarchies consistent.
 For example, you can indicate somewhere that <`gc:Levis-511`, `owl:sameAs`, `md:Prod123`>,
 <`gc:Prod123`, `owl:sameAs`, `xyz:Prod456`> and somewhere else that <`gc:Levis-511`, `owl:differentFrom`, `xyz:Prod456`>.
 Now your database is inconsistent.
-So reading this blog post, don't think complex domain modeling, with RDF or any
-other approach, is simple. By definition, these are complex tasks. 
+It is unfair to say that this is a vice of RDF but be aware that if you are modeling a complex domain, with RDF or any
+other approach, it is not going to be simple. By definition, you have embarked on a complex task.
 
 But of course, no pain, no gain in life. If you invested and successfully modeled a complex domain in your
 enterprise, you can now use that data in several applications, perhaps most importantly in information retrieval
@@ -468,9 +473,9 @@ But there are cases, as I outlined, where you need a model that's more flexible 
 
 I want to end with several notes.
 
-### A minor plug for Kùzu RDFGraphs
+#### A minor plug for Kùzu RDFGraphs
 
-**Kùzu RDFGraphs:** First, I want to highlight a new feature we introduced in Kùzu called [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/).
+First, I want to highlight a new feature we introduced in Kùzu called [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/).
 Let me emphasize here that Kùzu's native data model is **not** RDF -- it is structured property graphs. But, part of our mission
 is to simplify graph modeling for people and the other part is to develop the most 
 competent GDBMS out there in terms of performance and scalability, which we do by basing our core
@@ -484,7 +489,7 @@ and further enhance them with other records you have modeled as a property graph
 We also have some [pre-loaded RDFGraphs](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-repo) 
 you can download and start playing around with.
 
-### Remembering logic-based databases in the era of LLMs
+#### Remembering logic-based databases in the era of LLMs
 
 **RDF, knowledge graphs, and RAG in LLMs**: Second, there might be an important role for RDF and 
 knowledge graphs to play in the era of LLMs. People are actively working on doing better retrieval augmented generation (RAG)
@@ -497,7 +502,7 @@ and my general opinions on this approach in a [previous blog post](../llms-graph
 **Symbolic AI + LLM vision:** RDF technology was popularized by the Semantic Web 
 community and its roots go back to fundamental topics in AI on knowledge representation and reasoning. 
 This is a fascinating area that is referred to as good old-fashioned (symbolic) AI, which
-may have had its own winter for decades and been under the shadow of statistical AI that dominated in the following years. 
+may had its own winter for decades and been under the shadow of statistical AI for a while. 
 However, symbolic AI is gaining more prominence lately 
 in the context of LLMs, which are extremely popular and have severe 
 [reasoning limitations](https://openreview.net/pdf?id=wUU-7XTL5XO). In contrast to RAG,
@@ -505,7 +510,7 @@ another direction to improve the output of LLMs is to combine them with systems 
 just like the simple inference examples I presented using RDF standards.
 For a good read on this vision of hybrid LLM + symbolic AI approach, 
 I highly recommend this
-[article](https://arxiv.org/ftp/arxiv/papers/2308/2308.04445.pdf) by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).
+[article](https://arxiv.org/ftp/arxiv/papers/2308/2308.04445.pdf) co-authored by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).
 Lenat is a legendary AI researcher who devoted his life
 to develop probably the most ambitious known symbolic AI system called [Cyc](https://en.wikipedia.org/wiki/Cyc).
 Cyc is a system that has common sense knowledge
@@ -513,15 +518,15 @@ about the world based on millions of rules, such as "no person can be at more th
 one place at the same time", or that "people believe that cats can breathe".
 See this [Lex Friedman podcast](https://www.youtube.com/watch?v=3wMKoSRbGVs) 
 of Lenat to learn more and be fascinated by Cyc.
-In his article Lenat discusses a more direct approach than RAG 
+In their article Lenat and his co-author [Gary Marcus](https://en.wikipedia.org/wiki/Gary_Marcus) discuss 
+a more direct approach than RAG 
 where a knowledge base's[^8] reasoning capabilities
-can be directly used to build new hybrid LLM + symbolic AI systems.
-Lenat describes five different opportunities through which LLMs can benefit from 
-a symbolic AI that reasons using the knowledge present in a knowledge graph/base.
+can help LLMs. Specifically, they describe five different opportunities through which LLMs can benefit from 
+a symbolic AI that reasons using a knowledge graph/base.
 For example, it can double check if the LLM's arguments are logically consistent 
-(his first opportunity). Or when an LLM generates a conclusion (without argument),
-the knowledge-based AI can check if there is a sequence of inferences 
-one can make to arrive at the same result (his fifth opportunity). 
+(their first opportunity). Or when an LLM generates a conclusion (without argument),
+the symbolic reasoning AI can check if there is a sequence of inferences 
+one can make to arrive at the same result (their fifth opportunity). 
 Pursuing these visions would be very exciting.
 
 **Remembering deductive databases:** Database people generally love 
@@ -529,8 +534,8 @@ building systems that are scalable and fast, but dumb. RDF DBMSs or
 the logic-based deductive databases of 90s are relatively harder to scale and make
 performant.
 It has always surprised me that the database community never built and
-commercialized RDF DBMSs, with the exception of a few academic projects in early 2000s, e.g., [RDF3X](foo-bar).
-RDF DBMSs have tended to come from the Semantic Web community.
+commercialized RDF DBMSs, with the exception of a few academic projects in early 2000s, e.g., [RDF3X](https://link.springer.com/article/10.1007/s00778-009-0165-y).
+Instead, serious RDF DBMSs have tended to be built by people from the Semantic Web community.
 But given the increased interest in symbolic AI, this has become a relevant topic again.
 To demonstrate what is possible in a system that can reason,
 consider the figure below copy-pasted from the Brachman and Levesque book on KRRs
