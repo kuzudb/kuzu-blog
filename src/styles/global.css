@@ -48,7 +48,7 @@
   }
 
   article img {
-    @apply rounded w-full;
+    @apply rounded;
   }
 
   th {
@@ -58,6 +58,10 @@
   hr {
     @apply h-0.5 border-solid bg-zinc-300 dark:bg-zinc-600;
   }
+}
+
+section.footnotes {
+  @apply text-sm;
 }
 
 .video-wrapper {
