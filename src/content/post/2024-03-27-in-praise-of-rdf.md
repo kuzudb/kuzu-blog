@@ -327,7 +327,7 @@ the Semantic Web community starting in the 2000s. This is a separate community o
 that intersects with the AI, especially the KRR, community.
 Historically, the Semantic Web community aims to make the web more intelligent 
 by describing the "semantics/meaning" of the pages and general content on the web. 
-Here is teh seminal paper called "[The Semantic Web](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf)" by Berners-Lee, Hendler (same Hendler above), and Lassila
+Here is the seminal paper called "[The Semantic Web](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf)" by Berners-Lee, Hendler (same Hendler above), and Lassila
 that got the field going. The vision has been to have an alternative web for computers that can automatically
 understand what is on the web. The vision imagines websites describing the meaning of their contents 
 in some structured or semi-structured form, such as RDF triples. This vision has not been realized
