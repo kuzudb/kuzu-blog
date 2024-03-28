@@ -16,28 +16,35 @@ const { title, description, pubDate, heroImage, categories, tags, authors } = As
 <Base meta_title={title} description={description} image={heroImage} blogpost>
   <article>
     <div class="md:col-10 mb-12">
-      <h1 class="text-2xl md:text-4xl font-bold">{title}</h1>
+      <h1 class="text-2xl font-bold md:text-4xl">{title}</h1>
       <div class="text-text mt-4 flex flex-wrap text-zinc-800 dark:text-zinc-200">
         {
           authors?.map((author) => (
-            <div class="mx-3 mt-2 flex flex-wrap font-medium author-info__container">
+            <div class="author-info__container mx-3 mt-2 flex flex-wrap font-medium" style="margin-left: 0;">
               <figure>
                 <Image
                   alt={typeof author === 'string' ? allAuthors[author].name : author.name}
-                  class="mr-2 h-6 w-6 rounded-full"
+                  class="mr-2 rounded-full"
                   width={250}
                   height={250}
                   src={typeof author === 'string' ? allAuthors[author].image : author.image}
                   decoding="async"
                   loading="lazy"
+                  style={'height: 3rem; width: 3rem;'}
                 />
               </figure>
-              <span>{typeof author === 'string' ? allAuthors[author].name : author.name}</span>
+              <span style="max-width: 12rem;"
+              ><b>{typeof author === 'string' ? allAuthors[author].name : author.name}</b>
+                <br />
+                <small style="font-weight: 300;">
+                  {typeof author === 'string' ? allAuthors[author].bio : author.bio}</small>
+                </span>
             </div>
           ))
         }
-
-        <div class="mx-3 mt-2 flex flex-wrap items-center font-medium">
+      </div>
+      <div class="text-text mt-4 flex flex-wrap text-zinc-800 dark:text-zinc-200">
+        <div class="mx-3 mt-2 flex flex-wrap items-center font-medium" style="margin-left: 0;">
           <CalendarIcon />
           <FormattedDate date={pubDate} />
         </div>
