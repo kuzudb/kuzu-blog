@@ -8,6 +8,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 import rehypeKatex from 'rehype-katex'; // relevant
 import remarkMath from 'remark-math'; // relevant
 import remarkToc from 'remark-toc';
+import rehypeSlug from 'rehype-slug';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeToc from 'rehype-toc';
 
 import { manifest } from './src/utils/manifest';
 
@@ -32,9 +35,9 @@ export default defineConfig({
           // Katex plugin options
         },
       ],
-      'rehype-slug',
-      ['rehype-autolink-headings', { behavior: 'append' }],
-      ['rehype-toc', { headings: ['h1', 'h2', 'h3'] }],
+      rehypeSlug,
+      [rehypeAutolinkHeadings, { behavior: 'append' }],
+      [rehypeToc, { headings: ['h1', 'h2', 'h3'] }],
     ],
   },
   integrations: [
