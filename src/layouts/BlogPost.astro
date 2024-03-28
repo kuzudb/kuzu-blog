@@ -20,7 +20,7 @@ const { title, description, pubDate, heroImage, categories, tags, authors } = As
       <div class="text-text mt-4 flex flex-wrap text-zinc-800 dark:text-zinc-200">
         {
           authors?.map((author) => (
-            <div class="author-info__container mx-3 mt-2 flex flex-wrap font-medium" style="margin-left: 0;">
+            <div class="author-info__container mx-3 mt-2 flex flex-wrap font-medium" style="margin-left: 0; margin-right: 1.2em;">
               <figure>
                 <Image
                   alt={typeof author === 'string' ? allAuthors[author].name : author.name}
@@ -36,8 +36,7 @@ const { title, description, pubDate, heroImage, categories, tags, authors } = As
               <span style="max-width: 12rem;"
               ><b>{typeof author === 'string' ? allAuthors[author].name : author.name}</b>
                 <br />
-                <small style="font-weight: 300;">
-                  {typeof author === 'string' ? allAuthors[author].bio : author.bio}</small>
+                <small style="font-weight: 300; white-space: pre">{typeof author === 'string' ? allAuthors[author].bio : author.bio}</small>
                 </span>
             </div>
           ))
