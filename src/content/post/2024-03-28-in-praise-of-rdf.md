@@ -7,6 +7,7 @@ heroImage: "/img/2024-03-28-in-praise-of-rdf/data-models.png"
 categories: ["concept"]
 authors: ["semih"]
 tags: ["rdf"]
+draft: true
 ---
 
 I want to write about something that
