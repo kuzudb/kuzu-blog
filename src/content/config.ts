@@ -10,6 +10,7 @@ const post = defineCollection({
     categories: z.array(z.string()).default(['others']),
     tags: z.array(z.string()).default(['others']),
     authors: z.array(z.any()).default(['team']),
+    draft: z.boolean().default(false),
   }),
 });
 
