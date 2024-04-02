@@ -1,5 +1,4 @@
 ---
-import { Image } from "astro:assets";
 import FormattedDate from "@components/FormattedDate.astro";
 import config from "@config/config.json";
 import { slugify } from "@utils/slug";
@@ -18,7 +17,7 @@ type PostType = {
     pubDate: Date;
     categories: string[];
     tags: string[];
-    autors: string[];
+    authors: string[];
   };
 };
 ---
