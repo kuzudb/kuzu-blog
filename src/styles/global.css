@@ -43,7 +43,7 @@
     @apply bg-yellow-300;
   }
 
-  a {
+  a:hover {
     @apply hover:text-orange-600;
   }
 
