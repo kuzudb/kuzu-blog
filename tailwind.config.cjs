@@ -17,9 +17,6 @@ module.exports = {
               'background-repeat': 'no-repeat',
               'background-size': '100% 1.5px',
               'background-position': '0 100%',
-              '&:hover': {
-                color: 'rgb(var(--color-text-link))',
-              },
             },
             'h1, h2, h3, h4, h5': {
               color: 'rgb(var(--color-text-heading))',
