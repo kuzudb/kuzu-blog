@@ -44,7 +44,7 @@ to import and query RDF data in Kùzu.
   and (iv) automatic logical inference/reasoning.
 
 - **RDF vices**: The main cons of building large RDF databases are: (i) performance and scalability; (ii) verbosity; and
-  (iii) inherent challenges of modeling complex domains, such and ensuring logical consistency in the database.
+  (iii) inherent challenges of modeling complex domains, such as ensuring logical consistency in the database.
 
 - **Role of RDF and reasoning in the context of LLMs**: RDF and knowledge graphs
   are being used in retrieval augmented generation (RAG) to link the chunks or the entities
