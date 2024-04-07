@@ -309,10 +309,10 @@ In this post, we showed how RDF data in Turtle format can be easily loaded into 
 done by specifying Kùzu as a backend in the RDFLib plugin. We then demonstrated how SHACL shapes can be used to
 validate the RDF data, allowing users to create data graphs in RDF that satisfy a set of conditions.
 Kùzu provides a simple and intuitive interface to load, query and visualize RDF graphs, without compromising
-scalability and performance, because the RDF triples are essentially mapped to into Kùzu's native property graph model.
+scalability and performance, because the RDF triples are essentially mapped to Kùzu's native property graph model.
 
 Taking this further, users can expand on the demonstrated workflow by creating more complex
-RDF data models in their domains, define more intricate SHACL shapes, and apply more advanced functionality
+RDF graphs in their domains, define more intricate SHACL shapes, and apply more advanced functionality
 in RDFLib. For example, you can do reasoning over RDF graphs using the [OWL-RL](https://owl-rl.readthedocs.io/en/latest/owlrl.html) implementation available in RDFLib.
 
 We hope this post has provided a good starting point for users to explore RDF data models, SHACL, and how
