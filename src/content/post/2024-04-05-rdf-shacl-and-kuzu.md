@@ -9,26 +9,17 @@ authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubus
 tags: ["rdf", "shacl", "rdflib"]
 ---
 
-The Resource Description Framework (RDF) model, along with property graphs, is one of the most common
-graph data models used in practice. In this post, we will explore how you can work with RDF data in Kùzu
+The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
+graph data models used in practice[^1]. In this post, we will explore how you can work with RDF data in Kùzu
 using [RDFLib](https://rdflib.readthedocs.io/en/stable/) and [pySHACL](https://github.com/RDFLib/pySHACL).
 We will demonstrate how to load this data into Kùzu, write SHACL shape constraints to validate the data,
 and use Kùzu Explorer to visualize the resulting RDF graph.
 
 ## Basics of RDF
 
-RDF is a simple and flexible data model[^1], where the data and schema are defined in the form of `<subject, predicate, object>`
-triples. A collection of these triples forms a knowledge graph. Due to the standards around RDF, such as RDFS and OWL, it is also a
-*knowledge representation system* that gives clear meaning to certain vocabulary in triples, especially the predicates/verbs. RDF has its historical roots in
-Semantic Web, which itself has roots in good old-fashioned symbolic AI/knowledge representation and reasoning (KRR).
-
-The main pros of RDF are: (i) modeling complex, irregular domains; (ii) seamless schema and data querying; (iii) data integration
-without transformations; and (iv) automatic logical inference/reasoning[^2]. On the other hand, the main cons of building large RDF databases
-are: (i) performance and scalability; (ii) verbosity; and (iii) inherent challenges of modeling complex domains, such as ensuring
-logical consistency in the database.
-
-Kùzu's [docs](https://docs.kuzudb.com/rdf-graphs/rdf-basics/) and our earlier blog post[^1] on RDF provide a much more detailed explanation on
-the terminology and where RDF graphs are useful, but for the purposes of this post, a brief summary is provided in the table below:
+Our [earlier blog post](../in-praise-of-rdf) on RDF and Kùzu's [docs](https://docs.kuzudb.com/rdf-graphs/rdf-basics/)
+provide a much more detailed explanation on RDF and when it is useful, but for the purposes
+of this post, a brief summary of the terminology is provided in the table below:
 
 | Term | Description |
 | --- | --- |
@@ -90,10 +81,10 @@ kz:faculty rdfs:subClassOf kz:person .
 
 The data represents an RDF graph with schema information about two students, Adam and Karissa,
 a faculty member named Zhang, and a city named Waterloo. It also specifies how these resources are related
-to one another. Note that `a` is just shorthand for `rdf:type` in the Turtle file, i.e., `kz:Adam a kz:student`
-means the same as `kz:Adam rdf:type kz:student`.
+to one another. Note that `a` is shorthand for `rdf:type` in Turtle files, i.e., `kz:Adam a kz:student` is
+equivalent to `kz:Adam rdf:type kz:student`.
 
-Conceptually, this can be represented in RDF as follows:
+Pictorially, this can be represented in RDF as follows:
 
 ![](/img/rdf-shacl-kuzu/rdf-running-example.png)
 
@@ -121,7 +112,7 @@ conn.execute("COPY UniKG FROM 'uni.ttl'")
 
 ## Register Kùzu in RDFLib plugins
 
-[RDFLib](https://rdflib.readthedocs.io/en/stable/) is a Python library that provides a simple API for querying RDF data. It is extensible with plugins[^3], allowing it to work with
+[RDFLib](https://rdflib.readthedocs.io/en/stable/) is a Python library that provides a simple API for querying RDF data. It is extensible with plugins[^2], allowing it to work with
 different storage backends. In this case, we simply register the Kùzu plugin in RDFLib. For databases like Kùzu that offer on-disk persistence,
 the graph needs to first be opened before we can query it.
 
@@ -268,7 +259,7 @@ RETURN *;
 
 ![](/img/rdf-shacl-kuzu/demo-rdf-viz.png)
 
-As can be seen, the graph structure is identical to that shown earlier, in the conceptual representation.
+As can be seen, the graph structure is identical to that shown earlier, in the pictorial representation.
 
 The yellow edges represent resource-to-literal relationships (`UniKG_lt`), while the red edges represent
 resource-to-resource relationships (`UniKG_rt`). We can inspect the schema of the RDF graph, including
@@ -322,8 +313,7 @@ scalability and performance, because the RDF triples are essentially mapped to i
 
 Taking this further, users can expand on the demonstrated workflow by creating more complex
 RDF data models in their domains, define more intricate SHACL shapes, and apply more advanced functionality
-in RDFLib. OWL-RL is a brute-force implementation of OWL 2 RDF-based semantics, available in in RDFLib[^4],
-allowing users to perform reasoning over RDF graphs.
+in RDFLib. For example, you can do reasoning over RDF graphs using the [OWL-RL](https://owl-rl.readthedocs.io/en/latest/owlrl.html) implementation available in RDFLib.
 
 We hope this post has provided a good starting point for users to explore RDF data models, SHACL, and how
 their combination can be leveraged to build a variety of applications powered by Kùzu! Go through our
@@ -338,6 +328,4 @@ Many thanks to [Paco Nathan](https://github.com/ceteri) @ Derwen.ai for his cont
 
 [^1]: If you're new to RDF, it's highly recommended that you read our past blog post "[In praise of RDF](../in-praise-of-rdf)" in its
 entirety.
-[^2]: Automatic logical inference and reasoning over RDF graphs are currently not supported in Kùzu.
-[^3]: RDFLib [documentation on plugins](https://rdflib.readthedocs.io/en/stable/plugin_stores.html).
-[^4]: OWL-RL [technical documentation](https://owl-rl.readthedocs.io/en/latest/owlrl.html) for RDFLib.
+[^2]: RDFLib [documentation on plugins](https://rdflib.readthedocs.io/en/stable/plugin_stores.html).
