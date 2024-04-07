@@ -65,7 +65,7 @@ kz:Waterloo a kz:City ;
 kz:Adam a kz:student ;
     kz:livesIn kz:Waterloo ;
     kz:name "Adam" ;
-    kz:age  30 .
+    kz:age 30.0 .
 
 kz:student rdfs:subClassOf kz:person .
 
@@ -149,27 +149,27 @@ df = pd.DataFrame([r.asdict() for r in graph.query(query)])
 The following result is obtained:
 
 ```
-                                src                                              rel                             dst
+                        src                                              rel                             dst
 0   http://kuzu.io/rdf-ex#Waterloo                       http://kuzu.io/rdf-ex#name                        Waterloo
 1   http://kuzu.io/rdf-ex#Waterloo                 http://kuzu.io/rdf-ex#population                          150000
 2       http://kuzu.io/rdf-ex#Adam                       http://kuzu.io/rdf-ex#name                            Adam
-3       http://kuzu.io/rdf-ex#Adam                        http://kuzu.io/rdf-ex#age                              30
+3       http://kuzu.io/rdf-ex#Adam                        http://kuzu.io/rdf-ex#age                            30.0
 4    http://kuzu.io/rdf-ex#Karissa                       http://kuzu.io/rdf-ex#name                         Karissa
 5      http://kuzu.io/rdf-ex#Zhang                       http://kuzu.io/rdf-ex#name                           Zhang
 6    http://kuzu.io/rdf-ex#Karissa                     http://kuzu.io/rdf-ex#bornIn  http://kuzu.io/rdf-ex#Waterloo
 7       http://kuzu.io/rdf-ex#Adam                    http://kuzu.io/rdf-ex#livesIn  http://kuzu.io/rdf-ex#Waterloo
 8   http://kuzu.io/rdf-ex#Waterloo  http://www.w3.org/1999/02/22-rdf-syntax-ns#type      http://kuzu.io/rdf-ex#City
-9    http://kuzu.io/rdf-ex#Karissa  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#student
-10      http://kuzu.io/rdf-ex#Adam  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#student
-11   http://kuzu.io/rdf-ex#faculty  http://www.w3.org/2000/01/rdf-schema#subClassOf    http://kuzu.io/rdf-ex#person
-12   http://kuzu.io/rdf-ex#student  http://www.w3.org/2000/01/rdf-schema#subClassOf    http://kuzu.io/rdf-ex#person
+9    http://kuzu.io/rdf-ex#faculty  http://www.w3.org/2000/01/rdf-schema#subClassOf    http://kuzu.io/rdf-ex#person
+10   http://kuzu.io/rdf-ex#student  http://www.w3.org/2000/01/rdf-schema#subClassOf    http://kuzu.io/rdf-ex#person
+11   http://kuzu.io/rdf-ex#Karissa  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#student
+12      http://kuzu.io/rdf-ex#Adam  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#student
 13     http://kuzu.io/rdf-ex#Zhang  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#faculty
 ```
 
 ## Specify SHACL shape constraints
 
-SHACL allows us to define constraints on the RDF graph. To demonstrate how this works, consider this rather strict
-constraint:
+SHACL allows us to define constraints on the RDF graph. To demonstrate how this works, consider a scenario where
+we require that the `age` property of a `student` resource be an integer. The SHACL shape constraint for this is shown below:
 
 ```turtle
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
@@ -180,12 +180,12 @@ kz:PersonShape
     a sh:NodeShape ;
     sh:targetClass kz:student ;
     sh:property [
-        sh:path kz:name ;
-        sh:minLength 5
+        sh:path kz:age ;
+        sh:datatype xsd:integer
     ] .
 ```
 
-The above lines check that the `name` property of a `student` resource has a minimum length of 5 characters.
+The above lines check that the `age` property of a `student` resource is of the type `xsd:integer`.
 
 ## Validate RDF data against SHACL shapes
 
@@ -207,29 +207,34 @@ results = pyshacl.validate(
 )
 ```
 
-Sure enough, the validation fails in this case because in our data, the name of the student `Adam`
-has only 4 characters. The validation report is output so that we can see the constraint violation.
+When the above lines are run, the validation fails because of a constraint violation -- the `age`
+property of the student `Adam` is provided as a float, not an integer.
 
 ```turtle
 Validation Report
 Conforms: False
 Results (1):
-Constraint Violation in MinLengthConstraintComponent (http://www.w3.org/ns/shacl#MinLengthConstraintComponent):
+Constraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#DatatypeConstraintComponent):
         Severity: sh:Violation
-        Source Shape: [ sh:minLength Literal("5", datatype=xsd:integer) ; sh:path kz:name ]
+        Source Shape: [ sh:datatype xsd:integer ; sh:path kz:age ]
         Focus Node: <http://kuzu.io/rdf-ex#Adam>
-        Value Node: Literal("Adam")
-        Result Path: kz:name
-        Message: String length not >= Literal("5", datatype=xsd:integer)
+        Value Node: Literal("30.0", datatype=xsd:double)
+        Result Path: kz:age
+        Message: Value is not Literal with datatype xsd:integer
 ```
 
-The violation can easily be fixed by setting the minimum length of the `name` property to a smaller value, such as 2.
-When this is done, the validation passes.
+The violation can easily be fixed by setting the `age` property to an integer value (`30`) in the RDF data.
 
 ```turtle
 Validation Report
 Conforms: True
 ```
+
+The example shown above is simple enough for demonstration purposes, but SHACL shapes can be used to
+define more complex constraints. For example, we could have also defined a constraint that allows
+the `kz:person` target class to only be one of two subclasses -- `kz:student` and `kz:faculty` --
+any other person class would be considered a violation in this university knowledge graph. The SHACL
+[documentation](https://www.w3.org/TR/shacl/#shapes) provides a comprehensive list of constraints that can be defined.
 
 ## Visualize the RDF graph in Kùzu Explorer
 
@@ -302,6 +307,9 @@ As can be seen, you can choose the most appropriate query language to analyze yo
 workflow and how you want to interface with the graph -- using SPARQL via RDFLib or Cypher via Kùzu.
 Under the hood, Kùzu's query processor will use its native structured property
 graph model to plan and optimize the query, so there are no negative performance implications when using Cypher.
+
+**Note**: You can also extend Kuzu's RDFGraphs with other property graphs, and query both your triples
+*and* the other property graphs with a uniform query language, Cypher. See Kùzu's [documentation](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview#querying-of-regular-node-and-relationship-tables-and-rdfgraphs) page for more information.
 
 ## Conclusions
 
