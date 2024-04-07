@@ -7,6 +7,7 @@ heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubusercontent.com/u/57973?v=4", "bio": "Managing Partner at Derwen.ai"}]
 tags: ["rdf", "shacl", "rdflib"]
+draft: true
 ---
 
 The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
