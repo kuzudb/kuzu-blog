@@ -19,8 +19,8 @@
     "meta_description": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database"
   },
   "blog_description": {
-    "heading": "Welcome to the Kùzu blog",
-    "bio": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database."
+    "heading": "Blog",
+    "bio": "Kùzu is a highly scalable, extremely fast, embeddable property graph database management system."
   },
   "author": {
     "name": "Kùzu Team",
