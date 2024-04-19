@@ -2,12 +2,12 @@
 slug: "rdf-shacl-and-kuzu"
 title: "Validating RDF data with SHACL in Kùzu"
 description: "Combining RDFLib and SHACL to validate RDF data in Kùzu"
-pubDate: "April 05 2024"
+pubDate: "April 19 2024"
 heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubusercontent.com/u/57973?v=4", "bio": "Managing Partner at Derwen.ai"}]
-tags: ["rdf", "shacl", "rdflib"]
-draft: true
+tags: ["rdf", "shacl", "rdflib", "pyshacl"]
+draft: false
 ---
 
 The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
@@ -40,17 +40,30 @@ to describe the structure of RDF graphs. Some examples are shown below:
 - `rdfs:subClassOf` is used to form class hierarchies
 - `owl:sameAs` is used to identify that two resources are the same
 
-## What is SHACL?
+## Scope and motivation for SHACL
+
+RDF does not impose any logical restrictions on the domains and ranges of properties. For example,
+a property may be applied to itself, or classes may contain themselves[^3]. Additionally, there are no
+constraints on the cardinality of properties, or the data types of literals. This flexibility is a
+double-edged sword -- while it allows the modeling of complex domains in the real world, it also
+makes it easy to introduce errors in the data.
+
+This fostered the development of the Shapes Constraint Language (SHACL), a W3C recommendation that
+provides a way to impose structural constraints on RDF graphs.
 
 The following is an excerpt from the [SHACL specification](https://www.w3.org/TR/shacl/) guide:
 
 > The Shapes Constraint Language (SHACL) is a language for validating RDF graphs against a set of conditions. These conditions are provided as shapes and other constructs expressed in the form of an RDF graph. RDF graphs that are used in this manner are called "shapes graphs" in SHACL and the RDF graphs that are validated against a shapes graph are called "data graphs". As SHACL shape graphs are used to validate that data graphs satisfy a set of conditions they can also be viewed as a description of the data graphs that do satisfy these conditions.
 
-Although it may seem at first glance that the sole purpose of SHACL is to perform validation, its descriptions may be used for a variety of other purposes, including user interface building, code generation and data integration.
+Although the purpose of this post is to demonstrate how SHACL can be used to validate RDF data in Kùzu, SHACL also allows for a variety of other use cases
+besides validation, such as user interface building and data integration[^4].
 
-In the example below, we will use the `RDFLib` library in Python to load RDF data into Kùzu, and `pySHACL` to validate the data against a set of SHACL shapes. We will then use Kùzu Explorer to visualize the resulting RDF graph.
+## Example
 
-## Dataset
+This section will walk you through a demonstration of how to load RDF data into Kùzu, validate it against SHACL shapes,
+and visualize the RDF graph using Kùzu Explorer.
+
+### Dataset
 
 Consider the following RDF data, which represents a simple knowledge graph about students, faculty members, locations, and their relationships:
 
@@ -92,7 +105,7 @@ Pictorially, this can be represented in RDF as follows:
 `kz:Adam` is an alias for the IRI `http://kuzu.io/rdf-ex#Adam`, as specified in the prefix section at the top of the Turtle file. Each resource's properties are
 represented as triples between the resource and literals. The relationships between resources are also represented as triples, such as `kz:Adam livesIn kz:Waterloo`.
 
-## Load data into a Kùzu database
+### Load data into a Kùzu database
 
 The following snippet shows how to ingest the RDF data into Kùzu. We first create an RDF graph
 and then copy data from the Turtle file named `uni.ttl` into a local database directory named `db`.
@@ -111,7 +124,7 @@ conn.execute("CREATE RDFGraph UniKG")
 conn.execute("COPY UniKG FROM 'uni.ttl'")
 ```
 
-## Register Kùzu in RDFLib plugins
+### Register Kùzu in RDFLib plugins
 
 [RDFLib](https://rdflib.readthedocs.io/en/stable/) is a Python library that provides a simple API for querying RDF data. It is extensible with plugins[^2], allowing it to work with
 different storage backends. In this case, we simply register the Kùzu plugin in RDFLib. For databases like Kùzu that offer on-disk persistence,
@@ -167,7 +180,7 @@ The following result is obtained:
 13     http://kuzu.io/rdf-ex#Zhang  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#faculty
 ```
 
-## Specify SHACL shape constraints
+### Specify SHACL shape constraints
 
 SHACL allows us to define constraints on the RDF graph. To demonstrate how this works, consider a scenario where
 we require that the `age` property of a `student` resource be an integer. The SHACL shape constraint for this is shown below:
@@ -188,7 +201,7 @@ kz:PersonShape
 
 The above lines check that the `age` property of a `student` resource is of the type `xsd:integer`.
 
-## Validate RDF data against SHACL shapes
+### Validate RDF data against SHACL shapes
 
 We can use the `pySHACL` library to validate the RDF data against SHACL shapes. The shape constraint
 from above is read into Python code and used to validate the RDF graph.
@@ -237,7 +250,7 @@ the `kz:person` target class to only be one of two subclasses -- `kz:student` an
 any other person class would be considered a violation in this university knowledge graph. The SHACL
 [documentation](https://www.w3.org/TR/shacl/#shapes) provides a comprehensive list of constraints that can be defined.
 
-## Visualize the RDF graph in Kùzu Explorer
+### Visualize the RDF graph in Kùzu Explorer
 
 When building and validating RDF graphs, the ability to get visual feedback is quite useful. Kùzu
 Explorer is a web-based interface that allows you to visualize RDF graphs and query them using Cypher (no knowledge of SPARQL required).
@@ -273,7 +286,7 @@ each table's primary keys, visually, by clicking on the "Schema" tab in Kùzu Ex
 
 ![](/img/rdf-shacl-kuzu/demo-rdf-schema.png)
 
-## Querying the RDF graph with Cypher
+### Querying the RDF graph with Cypher
 
 Further Cypher queries can be run on the RDF graph, that perform the same operations as their SPARQL equivalents.
 In the example below, we want to run a query to only return students named "Karissa".
@@ -338,3 +351,6 @@ Many thanks to [Paco Nathan](https://github.com/ceteri) @ Derwen.ai for his cont
 [^1]: If you're new to RDF, it's highly recommended that you read our past blog post "[In praise of RDF](../in-praise-of-rdf)" in its
 entirety.
 [^2]: RDFLib [documentation on plugins](https://rdflib.readthedocs.io/en/stable/plugin_stores.html).
+[^3]: W3C Recommendation 10 February 2004, [RDF Semantics](https://www.w3.org/TR/rdf-mt/)
+[^4]: W3C Working Group Note 20 July 2017, [SHACL use cases and requirements](https://www.w3.org/TR/shacl-ucr/)
+
