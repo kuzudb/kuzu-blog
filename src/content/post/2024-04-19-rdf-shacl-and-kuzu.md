@@ -7,7 +7,7 @@ heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubusercontent.com/u/57973?v=4", "bio": "Managing Partner at Derwen.ai"}]
 tags: ["rdf", "shacl", "rdflib", "pyshacl"]
-draft: false
+draft: true
 ---
 
 The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
@@ -269,7 +269,7 @@ docker run -p 8000:8000 \
     --rm kuzudb/explorer:latest
 ```
 
-In a nutshell, Kùzu's RDFGraphs extension creates four distinct tables when the RDF data is loaded into the database:
+In a nutshell, Kùzu's [RDFGraphs extension](https://docs.kuzudb.com/rdf-graphs/) creates four distinct tables when the RDF data is loaded into the database:
 
 - `UniKG_l`: A node table that contains literals
 - `UniKG_r`: A node table that contains resources, where the primary key is the unique IRI
