@@ -128,7 +128,7 @@ conn.execute("COPY UniKG FROM 'uni.ttl'")
 
 [RDFLib](https://rdflib.readthedocs.io/en/stable/) is a Python library that provides a simple API for querying RDF data. It is extensible with plugins[^2], allowing it to work with
 different storage backends. In this case, we simply register the Kùzu plugin in RDFLib. For databases like Kùzu that offer on-disk persistence,
-the graph needs to first be opened before we can query it.
+the graph needs to first be instantiated and loaded before we can query it.
 
 ```py
 import rdflib
@@ -139,8 +139,10 @@ rdflib.plugin.register(
     "graph",
     "PropertyGraph",
 )
+
 # Create an RDF graph instance
 graph = rdflib.Graph(store="kuzudb", identifier="kuzudb")
+
 # Open the RDF graph
 graph.open(configuration="db", create=True)
 ```
@@ -156,6 +158,7 @@ query = """
         ?src ?rel ?dst .
     }
 """
+
 # Export query results to a Pandas DataFrame
 df = pd.DataFrame([r.asdict() for r in graph.query(query)])
 ```
@@ -249,6 +252,10 @@ define more complex constraints. For example, we could have also defined a const
 the `kz:person` target class to only be one of two subclasses -- `kz:student` and `kz:faculty` --
 any other person class would be considered a violation in this university knowledge graph. The SHACL
 [documentation](https://www.w3.org/TR/shacl/#shapes) provides a comprehensive list of constraints that can be defined.
+
+To learn more about using SHACL in general, see the
+[SHACL Wiki](https://kvistgaard.github.io/shacl/#/page/shacl%20wiki) project by
+Veronika Heimsbakk and Ivo Velitchkov.
 
 ### Visualize the RDF graph in Kùzu Explorer
 
