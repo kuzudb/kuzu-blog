@@ -110,12 +110,13 @@ represented as triples between the resource and literals. The relationships betw
 The following snippet shows how to ingest the RDF data into Kùzu. We first create an RDF graph
 and then copy data from the Turtle file named `uni.ttl` into a local database directory named `db`.
 
-```py
-from pathlib import Path
+```python
+import pathlib
 import kuzu
 
 DB_DIR = "db"
-db_path = Path(DB_DIR)
+db_path = pathlib.Path(DB_DIR)
+
 # Populate Kùzu with the RDF data
 db = kuzu.Database(DB_DIR)
 conn = kuzu.Connection(db)
@@ -130,7 +131,8 @@ conn.execute("COPY UniKG FROM 'uni.ttl'")
 different storage backends. In this case, we simply register the Kùzu plugin in RDFLib. For databases like Kùzu that offer on-disk persistence,
 the graph needs to first be instantiated and loaded before we can query it.
 
-```py
+```python
+import json
 import rdflib
 
 rdflib.plugin.register(
@@ -141,15 +143,28 @@ rdflib.plugin.register(
 )
 
 # Create an RDF graph instance
-graph = rdflib.Graph(store="kuzudb", identifier="kuzudb")
+graph = rdflib.Graph(
+    store = "kuzudb",
+    identifier = "kuzudb",
+)
+
+# Populate the configuration data
+
+config_data: str = json.dumps({
+    "db_path": "db",
+    "db_name": "UniKG",
+})
 
 # Open the RDF graph
-graph.open(configuration="db", create=True)
+graph.open(
+    configuration = config_data,
+    create = True,
+)
 ```
 
 We can then run a simple SPARQL query via RDFLib to retrieve all triples from the RDF graph.
 
-```py
+```python
 import pandas as pd
 
 query = """
@@ -209,7 +224,7 @@ The above lines check that the `age` property of a `student` resource is of the 
 We can use the `pySHACL` library to validate the RDF data against SHACL shapes. The shape constraint
 from above is read into Python code and used to validate the RDF graph.
 
-```py
+```python
 import pyshacl
 # `shapes_graph` is the SHACL constraint from above specified in Turtle format
 
@@ -227,7 +242,7 @@ results = pyshacl.validate(
 When the above lines are run, the validation fails because of a constraint violation -- the `age`
 property of the student `Adam` is provided as a float, not an integer.
 
-```turtle
+```
 Validation Report
 Conforms: False
 Results (1):
@@ -242,7 +257,7 @@ Constraint Violation in DatatypeConstraintComponent (http://www.w3.org/ns/shacl#
 
 The violation can easily be fixed by setting the `age` property to an integer value (`30`) in the RDF data.
 
-```turtle
+```
 Validation Report
 Conforms: True
 ```
