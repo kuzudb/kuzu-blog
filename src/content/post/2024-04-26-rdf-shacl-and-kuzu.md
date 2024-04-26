@@ -2,12 +2,12 @@
 slug: "rdf-shacl-and-kuzu"
 title: "Validating RDF data with SHACL in Kùzu"
 description: "Combining RDFLib and SHACL to validate RDF data in Kùzu"
-pubDate: "April 19 2024"
+pubDate: "April 26 2024"
 heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubusercontent.com/u/57973?v=4", "bio": "Managing Partner at Derwen.ai"}]
 tags: ["rdf", "shacl", "rdflib", "pyshacl"]
-draft: true
+draft: false
 ---
 
 The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
@@ -109,27 +109,36 @@ represented as triples between the resource and literals. The relationships betw
 
 The following snippet shows how to ingest the RDF data into Kùzu. We first create an RDF graph
 and then copy data from the Turtle file named `uni.ttl` into a local database directory named `db`.
+We can specify the name of the RDF database in Kùzu as a constant, `UniKG`, so that it can be used
+in the downstream Cypher queries.
 
 ```python
 import pathlib
 import kuzu
 
-DB_DIR = "db"
-db_path = pathlib.Path(DB_DIR)
+DB_PATH = "db"
+DB_NAME = "UniKG"
+db_path = pathlib.Path(DB_PATH)
 
 # Populate Kùzu with the RDF data
-db = kuzu.Database(DB_DIR)
+db = kuzu.Database(DB_PATH)
 conn = kuzu.Connection(db)
 
-conn.execute("CREATE RDFGraph UniKG")
-conn.execute("COPY UniKG FROM 'uni.ttl'")
+conn.execute(f"CREATE RDFGraph {DB_NAME}")
+conn.execute(f"COPY {DB_NAME} FROM 'uni.ttl'")
 ```
 
 ### Register Kùzu in RDFLib plugins
 
-[RDFLib](https://rdflib.readthedocs.io/en/stable/) is a Python library that provides a simple API for querying RDF data. It is extensible with plugins[^2], allowing it to work with
-different storage backends. In this case, we simply register the Kùzu plugin in RDFLib. For databases like Kùzu that offer on-disk persistence,
-the graph needs to first be instantiated and loaded before we can query it.
+[RDFLib](https://rdflib.readthedocs.io/en/stable/) is a well-known Python library that provides an API for querying RDF data,
+allowing Python developers access to the entire W3C stack. It is extensible with plugins[^2], allowing
+it to work with different storage backends. For this blog post,
+we published an unofficial code repo that showcases how to use RDFLib with Kùzu as a backend.
+The code can be found [here](https://github.com/DerwenAI/kuzu-rdflib).
+
+To begin, we simply register the Kùzu plugin in RDFLib, instantiate an RDFLib `Graph` object that uses
+Kùzu as the backend, and open the graph. To allow the user to specify which Kùzu database to use,
+we pass the configuration data containing the database name and directory path as a mapping to the `open` method.
 
 ```python
 import json
@@ -162,7 +171,17 @@ graph.open(
 )
 ```
 
-We can then run a simple SPARQL query via RDFLib to retrieve all triples from the RDF graph.
+Note that there needs to be a 1:1 correspondence between the instantiated `Graph`​ object in RDFlib
+and a named KùzuDB database (in this case, `UniKg`). If you're creating a new RDF database in Kùzu, you
+would need to reference that name instead in the `config_data` mapping for the RDFLib plugin.
+
+Under the hood, a custom method called `get_graph()`​
+is defined in [our demo code](https://github.com/DerwenAI/kuzu-rdflib/blob/main/graph.py) which
+allows for direct access to the underlying Kùzu RDF graph. We encourage you to explore the code
+in more detail and try the above workflow on your own data to understand how it works.
+
+We can then interact with our graph in RDFLib by running a simple SPARQL query that retrieves all
+triples from the RDF graph, outputting them as a Pandas DataFrame.
 
 ```python
 import pandas as pd
@@ -310,6 +329,8 @@ each table's primary keys, visually, by clicking on the "Schema" tab in Kùzu Ex
 
 ### Querying the RDF graph with Cypher
 
+Earlier, we showed how to query the RDF database using SPARQL in RDFLib. However, Kùzu also supports
+querying RDF graphs using Cypher! This section shows how to run Cypher queries on the same RDF graph
 Further Cypher queries can be run on the RDF graph, that perform the same operations as their SPARQL equivalents.
 In the example below, we want to run a query to only return students named "Karissa".
 
@@ -332,7 +353,7 @@ WHERE {
   ?src kz:name ?name .
 ```
 
-Both queries would return the following result:
+Both queries would return the same result:
 
 ```
                         s.iri                       p1.iri  RDF_VARIANT
