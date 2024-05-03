@@ -413,8 +413,8 @@ the standardized `owl:sameAs` predicate. So you can simply add the single <`gc:L
 Then, suppose you ask the following query to a DBMS that implements the OWL standard:
 
 ```sparql
-SELECT ?material WHERE {
-  gc:Levis-511 sd:contains ?material
+SELECT ?merchant WHERE {
+  gc:Levis-511 sd:merchant ?merchant
 }
 ```
 
