@@ -558,7 +558,7 @@ green boxes are above not green boxes". We could do this in SPARQL as follows:
 SELECT count(*) WHERE {
 ?box1 xyz:color "green" .
 ?box1 xyz:ontopOf ?box2 .
-?box2 xyz:ontopOf ?box1 .
+?box2 xyz:color "not green" .
 }
 ```
 No system that I know of can evaluate this query to return the correct answer,
