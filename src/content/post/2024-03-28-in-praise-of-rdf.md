@@ -400,8 +400,8 @@ example, and Allemang and Hendler's book has many others. Suppose another depart
 about some products storing information about the merchants who sell them. Let's suppose this database
 contains the following triples:
 ```turtle
-<md:Prod123, sd:merchant, md:MerchantA>
-<md:Prod123, sd:merchant, md:MerchantB>
+<md:Prod123, md:merchant, md:MerchantA>
+<md:Prod123, md:merchant, md:MerchantB>
 <md:MerchantA, md:locatedIn, md:Waterloo>
 ...
 ```
@@ -414,7 +414,7 @@ Then, suppose you ask the following query to a DBMS that implements the OWL stan
 
 ```sparql
 SELECT ?merchant WHERE {
-  gc:Levis-511 sd:merchant ?merchant
+  gc:Levis-511 md:merchant ?merchant
 }
 ```
 
