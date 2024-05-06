@@ -400,8 +400,8 @@ example, and Allemang and Hendler's book has many others. Suppose another depart
 about some products storing information about the merchants who sell them. Let's suppose this database
 contains the following triples:
 ```turtle
-<md:Prod123, sd:merchant, md:MerchantA>
-<md:Prod123, sd:merchant, md:MerchantB>
+<md:Prod123, md:merchant, md:MerchantA>
+<md:Prod123, md:merchant, md:MerchantB>
 <md:MerchantA, md:locatedIn, md:Waterloo>
 ...
 ```
@@ -413,8 +413,8 @@ the standardized `owl:sameAs` predicate. So you can simply add the single <`gc:L
 Then, suppose you ask the following query to a DBMS that implements the OWL standard:
 
 ```sparql
-SELECT ?material WHERE {
-  gc:Levis-511 sd:contains ?material
+SELECT ?merchant WHERE {
+  gc:Levis-511 md:merchant ?merchant
 }
 ```
 
@@ -558,7 +558,7 @@ green boxes are above not green boxes". We could do this in SPARQL as follows:
 SELECT count(*) WHERE {
 ?box1 xyz:color "green" .
 ?box1 xyz:ontopOf ?box2 .
-?box2 xyz:ontopOf ?box1 .
+?box2 xyz:color "not green" .
 }
 ```
 No system that I know of can evaluate this query to return the correct answer,
