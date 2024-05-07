@@ -219,8 +219,13 @@ The following result is obtained:
 
 ### Specify SHACL shape constraints
 
-SHACL allows us to define constraints on the RDF graph. To demonstrate how this works, consider a scenario where
-we require that the `age` property of a `student` resource be an integer. The SHACL shape constraint for this is shown below:
+Since the Kuzu-RDFLib plugin we implemented exposes an RDFLib `Graph` object, it can be used
+with any other library that works with RDFLib graphs. In this example, we will show how to use the
+[pySHACL](https://github.com/RDFLib/pySHACL) library, which validates RDFLib graphs against SHACL constraints.
+
+To demonstrate how this works, consider a scenario where
+we require that the `age` property of a `student` resource be an integer.
+The SHACL shape constraint for this is shown below:
 
 ```turtle
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
@@ -240,8 +245,7 @@ The above lines check that the `age` property of a `student` resource is of the 
 
 ### Validate RDF data against SHACL shapes
 
-We can use the `pySHACL` library to validate the RDF data against SHACL shapes. The shape constraint
-from above is read into Python code and used to validate the RDF graph.
+Importing the `pySHACL` library allows us to validate the RDF data against SHACL shapes as follows:
 
 ```python
 import pyshacl
@@ -259,7 +263,7 @@ results = pyshacl.validate(
 ```
 
 When the above lines are run, the validation fails because of a constraint violation -- the `age`
-property of the student `Adam` is provided as a float, not an integer.
+property of the student `Adam` was provided in the Turtle file as a float, not an integer.
 
 ```
 Validation Report
@@ -330,7 +334,7 @@ each table's primary keys, visually, by clicking on the "Schema" tab in Kùzu Ex
 ### Querying the RDF graph with Cypher
 
 Earlier, we showed how to query the RDF database using SPARQL in RDFLib. However, Kùzu also supports
-querying RDF graphs using Cypher! This section shows how to run Cypher queries on the same RDF graph
+querying RDF graphs using Cypher! This section shows how to run Cypher queries on the same RDF graph.
 Further Cypher queries can be run on the RDF graph, that perform the same operations as their SPARQL equivalents.
 In the example below, we want to run a query to only return students named "Karissa".
 
@@ -396,4 +400,3 @@ entirety.
 [^2]: RDFLib [documentation on plugins](https://rdflib.readthedocs.io/en/stable/plugin_stores.html).
 [^3]: W3C Recommendation 10 February 2004, [RDF Semantics](https://www.w3.org/TR/rdf-mt/)
 [^4]: W3C Working Group Note 20 July 2017, [SHACL use cases and requirements](https://www.w3.org/TR/shacl-ucr/)
-
