@@ -209,7 +209,7 @@ A classic example we like using is a Twitter friend recommendation engine that i
 the following rule: If a user A follows two users B and C, who both follow D, recommend
 D to A. This is the pattern:
 
-<Image src="/public/img/2023-01-12-what-every-gdbms-should-do/diamond-pattern.png" width="500" />
+<Image src="/img/2023-01-12-what-every-gdbms-should-do/diamond-pattern.png" width="500" />
 
 The whitepapers of existing GDBMSs are full of these patterns, e.g., branching trees, money laundering circles,
 cliques of customers who buy similar items, etc. These correspond to complex
