@@ -400,11 +400,15 @@ We also showed how Kùzu provides a simple and intuitive interface to load, quer
 scalability and performance, because the RDF triples are essentially mapped to Kùzu's native property graph model.
 Users    can decide whether to query the graph via SPARQL (via RDFLib) or via Cypher (directly in Kùzu).
 
-Taking this further, you can expand on the demonstrated workflow by creating more complex
-RDF graphs in your domain, define more intricate SHACL shapes, and ask  more advanced questions on your data.
-For example, you can perform knowledge representation & reasoning tasks like transitive closure
-over your RDF graphs using the [OWL-RL](https://owl-rl.readthedocs.io/en/latest/owlrl.html) implementation
-available in RDFLib.
+This is just the tip of the iceberg in terms of the pipelines you can build over
+your Kùzu RDFGraphs with RDFLib integration. This post showed only how you get access to
+two implementations of RDF standards in Python: SPARQL and SHACL. But there are other Python
+libraries that integrate with RDFLib to implement other standards, such as [OWL](https://www.w3.org/OWL/) through the Python [OWL-RL](https://owl-rl.readthedocs.io/en/latest/)
+library. OWL-RL can be used to do basic inheritance computations. 
+Using the Kùzu plugin for RDFLib (see [here](https://github.com/DerwenAI/kuzu-rdflib)) in conjunction with these libraries,
+you can build more complex pipelines and get access to the implementations of other RDF standards.
+Check out the examples in Derwen.ai's [kglab](https://github.com/DerwenAI/kglab) library to see a variety of
+other RDFLib plugins you get access to in Python.
 
 We hope this post has provided a good starting point for you to explore RDF data models, SHACL, and how
 to combine them using Kùzu your graph backend! Go through our RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/)
