@@ -5,7 +5,7 @@ description: "Combining RDFLib and SHACL to validate RDF data in Kùzu"
 pubDate: "May 10 2024"
 heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
-authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubusercontent.com/u/57973?v=4", "bio": "Managing Partner at Derwen.ai"}]
+authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Managing Partner at Derwen.ai"}]
 tags: ["rdf", "shacl", "rdflib", "pyshacl"]
 draft: false
 ---
@@ -385,9 +385,10 @@ You can also extend Kuzu's RDFGraphs with other property graphs, and query both 
 
 ### Note on performance
 When running SPARQL queries via RDFLib on top of a Kùzu backend, keep in mind that all the
-RDF triples are pulled into memory, so you would typically resort to
-querying the Kùzu RDF graph directly [using Cypher](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview/)
-for larger graphs where the triples do not fit in memory.
+RDF triples are pulled into memory, so this may not work well for larger graphs where the triples
+do not fit in memory. However, in such cases, you could still query the RDF graph directly in Cypher
+via Kùzu's [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview/)
+while also retaining query performance.
 
 ---
 
