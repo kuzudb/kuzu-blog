@@ -2,7 +2,7 @@
 slug: "rdf-shacl-and-kuzu"
 title: "Validating RDF data with SHACL in Kùzu"
 description: "Combining RDFLib and SHACL to validate RDF data in Kùzu"
-pubDate: "May 10 2024"
+pubDate: "May 14 2024"
 heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Managing Partner at Derwen.ai"}]
