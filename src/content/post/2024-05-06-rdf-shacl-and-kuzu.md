@@ -398,7 +398,7 @@ done by specifying Kùzu as a backend in the RDFLib plugin. We then demonstrated
 validate the RDF data via the pySHACL library, allowing users to create data graphs in RDF that satisfy a set of conditions.
 We also showed how Kùzu provides a simple and intuitive interface to load, query and visualize RDF graphs, without compromising
 scalability and performance, because the RDF triples are essentially mapped to Kùzu's native property graph model.
-Users    can decide whether to query the graph via SPARQL (via RDFLib) or via Cypher (directly in Kùzu).
+Users can decide whether to query the graph via SPARQL (via RDFLib) or via Cypher (directly in Kùzu).
 
 This is just the tip of the iceberg in terms of the pipelines you can build over
 your Kùzu RDFGraphs with RDFLib integration. This post showed only how you get access to
@@ -411,8 +411,8 @@ Check out the examples in Derwen.ai's [kglab](https://github.com/DerwenAI/kglab)
 other RDFLib plugins you get access to in Python.
 
 We hope this post has provided a good starting point for you to explore RDF data models, SHACL, and how
-to combine them using Kùzu your graph backend! Go through our RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/)
-to learn more.
+to combine them using Kùzu as your graph backend. Feel free to go through our RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/)
+to learn more!
 
 ## Code
 
