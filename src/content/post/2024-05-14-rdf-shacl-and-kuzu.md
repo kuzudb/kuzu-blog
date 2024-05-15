@@ -362,8 +362,10 @@ The above Cypher query is functionally equivalent to this SPARQL query that can 
 PREFIX kz: <http://kuzu.io/rdf-ex#>
 SELECT DISTINCT ?src ?name
 WHERE {
-  ?src a kz:student .
-  ?src kz:name ?name .
+    ?src a kz:student .
+    ?src kz:name ?name .
+    FILTER(?name = "Karissa")
+}
 ```
 
 Both queries would return the same result:
