@@ -2,12 +2,12 @@
 slug: "rdf-shacl-and-kuzu"
 title: "Validating RDF data with SHACL in Kùzu"
 description: "Combining RDFLib and SHACL to validate RDF data in Kùzu"
-pubDate: "April 19 2024"
+pubDate: "May 14 2024"
 heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
-authors: ["prashanth", {"name": "Paco Nathan", "image": https://avatars.githubusercontent.com/u/57973?v=4", "bio": "Managing Partner at Derwen.ai"}]
+authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Managing Partner at Derwen.ai"}]
 tags: ["rdf", "shacl", "rdflib", "pyshacl"]
-draft: true
+draft: false
 ---
 
 The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
@@ -109,27 +109,36 @@ represented as triples between the resource and literals. The relationships betw
 
 The following snippet shows how to ingest the RDF data into Kùzu. We first create an RDF graph
 and then copy data from the Turtle file named `uni.ttl` into a local database directory named `db`.
+We can specify the name of the RDF database in Kùzu as a constant, `UniKG`, so that it can be used
+in the downstream Cypher queries.
 
 ```python
 import pathlib
 import kuzu
 
-DB_DIR = "db"
-db_path = pathlib.Path(DB_DIR)
+DB_PATH = "db"
+DB_NAME = "UniKG"
+db_path = pathlib.Path(DB_PATH)
 
 # Populate Kùzu with the RDF data
-db = kuzu.Database(DB_DIR)
+db = kuzu.Database(DB_PATH)
 conn = kuzu.Connection(db)
 
-conn.execute("CREATE RDFGraph UniKG")
-conn.execute("COPY UniKG FROM 'uni.ttl'")
+conn.execute(f"CREATE RDFGraph {DB_NAME}")
+conn.execute(f"COPY {DB_NAME} FROM 'uni.ttl'")
 ```
 
 ### Register Kùzu in RDFLib plugins
 
-[RDFLib](https://rdflib.readthedocs.io/en/stable/) is a Python library that provides a simple API for querying RDF data. It is extensible with plugins[^2], allowing it to work with
-different storage backends. In this case, we simply register the Kùzu plugin in RDFLib. For databases like Kùzu that offer on-disk persistence,
-the graph needs to first be instantiated and loaded before we can query it.
+[RDFLib](https://rdflib.readthedocs.io/en/stable/) is a well-known Python library that provides an API for querying RDF data,
+allowing Python developers access to the entire W3C stack. It is extensible with plugins[^2], allowing
+it to work with different storage backends. For this blog post,
+we published an unofficial code repo that showcases how to use RDFLib with Kùzu as a backend.
+The code can be found [here](https://github.com/DerwenAI/kuzu-rdflib).
+
+To begin, we simply register the Kùzu plugin in RDFLib, instantiate an RDFLib `Graph` object that uses
+Kùzu as the backend, and open the graph. To allow the user to specify which Kùzu database to use,
+we pass the configuration data containing the database name and directory path as a mapping to the `open` method.
 
 ```python
 import json
@@ -162,7 +171,17 @@ graph.open(
 )
 ```
 
-We can then run a simple SPARQL query via RDFLib to retrieve all triples from the RDF graph.
+Note that there needs to be a 1:1 correspondence between the instantiated `Graph`​ object in RDFlib
+and a named KùzuDB database (in this case, `UniKg`). If you're creating a new RDF database in Kùzu, you
+would need to reference that name instead in the `config_data` mapping for the RDFLib plugin.
+
+Under the hood, a custom method called `get_graph()`​
+is defined in [our demo code](https://github.com/DerwenAI/kuzu-rdflib/blob/main/graph.py) which
+allows for direct access to the underlying Kùzu RDF graph. We encourage you to explore the code
+in more detail and try the above workflow on your own data to understand how it works.
+
+We can then interact with our graph in RDFLib by running a simple SPARQL query that retrieves all
+triples from the RDF graph, outputting them as a Pandas DataFrame.
 
 ```python
 import pandas as pd
@@ -198,10 +217,24 @@ The following result is obtained:
 13     http://kuzu.io/rdf-ex#Zhang  http://www.w3.org/1999/02/22-rdf-syntax-ns#type   http://kuzu.io/rdf-ex#faculty
 ```
 
+Note that in this case, although we specified a simple SPARQL query that captures all triples in the graph,
+we could just as well have specified an arbitrary SPARQL query to the `graph.query()` method.
+RDFLib comes with an implementation of the SPARQL 1.1 query language[^5], so you can pass more
+complex queries with additional predicate filters, including prepared queries that can save
+time in re-parsing and translating the query into SPARQL algebra each time the query is run[^5].
+
+This means that you can actually query your Kùzu RDF graphs with SPARQL instead of Cypher using the Kuzu-RDFLib extension!
+See the [section below](#query-the-rdf-graph-with-cypher) for an additional example.
+
 ### Specify SHACL shape constraints
 
-SHACL allows us to define constraints on the RDF graph. To demonstrate how this works, consider a scenario where
-we require that the `age` property of a `student` resource be an integer. The SHACL shape constraint for this is shown below:
+Since the Kuzu-RDFLib plugin we implemented exposes an RDFLib `Graph` object, it can be used
+with any other library that works with RDFLib graphs. In this example, we will show how to use the
+[pySHACL](https://github.com/RDFLib/pySHACL) library, which validates RDFLib graphs against SHACL constraints.
+
+To demonstrate how this works, consider a scenario where
+we require that the `age` property of a `student` resource be an integer.
+The SHACL shape constraint for this is shown below:
 
 ```turtle
 @prefix sh:   <http://www.w3.org/ns/shacl#> .
@@ -221,8 +254,7 @@ The above lines check that the `age` property of a `student` resource is of the 
 
 ### Validate RDF data against SHACL shapes
 
-We can use the `pySHACL` library to validate the RDF data against SHACL shapes. The shape constraint
-from above is read into Python code and used to validate the RDF graph.
+Importing the `pySHACL` library allows us to validate the RDF data against SHACL shapes as follows:
 
 ```python
 import pyshacl
@@ -240,7 +272,7 @@ results = pyshacl.validate(
 ```
 
 When the above lines are run, the validation fails because of a constraint violation -- the `age`
-property of the student `Adam` is provided as a float, not an integer.
+property of the student `Adam` was provided in the Turtle file as a float, not an integer.
 
 ```
 Validation Report
@@ -308,10 +340,10 @@ each table's primary keys, visually, by clicking on the "Schema" tab in Kùzu Ex
 
 ![](/img/rdf-shacl-kuzu/demo-rdf-schema.png)
 
-### Querying the RDF graph with Cypher
+### Query the RDF graph with Cypher
 
-Further Cypher queries can be run on the RDF graph, that perform the same operations as their SPARQL equivalents.
-In the example below, we want to run a query to only return students named "Karissa".
+Recall that earlier, we showed how to query the RDF database using SPARQL in RDFLib. However, Kùzu also supports
+querying RDF graphs using Cypher! In the example below, we run a query to only return students named "Karissa".
 
 ```cypher
 // Run using Kùzu Explorer
@@ -321,7 +353,9 @@ WHERE (s)-[p2]->(o {iri: kz + "student"})
 RETURN DISTINCT s.iri, p1.iri, l.val;
 ```
 
-The above query is functionally equivalent to this SPARQL query that can be run in RDFLib:
+### Query the RDF graph with SPARQL
+
+The above Cypher query is functionally equivalent to this SPARQL query that can be run via RDFLib:
 
 ```sparql
 # Run using RDFLib
@@ -332,36 +366,54 @@ WHERE {
   ?src kz:name ?name .
 ```
 
-Both queries would return the following result:
+Both queries would return the same result:
 
 ```
                         s.iri                       p1.iri  RDF_VARIANT
 http://kuzu.io/rdf-ex#Karissa   http://kuzu.io/rdf-ex#name      Karissa
 ```
 
-As can be seen, you can choose the most appropriate query language to analyze your data, depending on your
+As can be seen, **you can choose the most appropriate query language** to analyze your data, depending on your
 workflow and how you want to interface with the graph -- using SPARQL via RDFLib or Cypher via Kùzu.
 Under the hood, Kùzu's query processor will use its native structured property
 graph model to plan and optimize the query, so there are no negative performance implications when using Cypher.
 
-**Note**: You can also extend Kuzu's RDFGraphs with other property graphs, and query both your triples
+You can also extend Kuzu's RDFGraphs with other property graphs, and query both your triples
 *and* the other property graphs with a uniform query language, Cypher. See Kùzu's [documentation](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview#querying-of-regular-node-and-relationship-tables-and-rdfgraphs) page for more information.
+
+---
+
+### Note on performance
+When running SPARQL queries via RDFLib on top of a Kùzu backend, keep in mind that all the
+RDF triples are pulled into memory, so this may not work well for larger graphs where the triples
+do not fit in memory. However, in such cases, you could still query the RDF graph directly in Cypher
+via Kùzu's [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview/)
+while also retaining query performance.
+
+---
 
 ## Conclusions
 
 In this post, we showed how RDF data in Turtle format can be easily loaded into Kùzu using RDFLib. This was
 done by specifying Kùzu as a backend in the RDFLib plugin. We then demonstrated how SHACL shapes can be used to
-validate the RDF data, allowing users to create data graphs in RDF that satisfy a set of conditions.
-Kùzu provides a simple and intuitive interface to load, query and visualize RDF graphs, without compromising
+validate the RDF data via the pySHACL library, allowing users to create data graphs in RDF that satisfy a set of conditions.
+We also showed how Kùzu provides a simple and intuitive interface to load, query and visualize RDF graphs, without compromising
 scalability and performance, because the RDF triples are essentially mapped to Kùzu's native property graph model.
+Users can decide whether to query the graph via SPARQL (via RDFLib) or via Cypher (directly in Kùzu).
 
-Taking this further, users can expand on the demonstrated workflow by creating more complex
-RDF graphs in their domains, define more intricate SHACL shapes, and apply more advanced functionality
-in RDFLib. For example, you can do reasoning over RDF graphs using the [OWL-RL](https://owl-rl.readthedocs.io/en/latest/owlrl.html) implementation available in RDFLib.
+This is just the tip of the iceberg in terms of the pipelines you can build over
+your Kùzu RDFGraphs with RDFLib integration. This post showed only how you get access to
+two implementations of RDF standards in Python: SPARQL and SHACL. But there are other Python
+libraries that integrate with RDFLib to implement other standards, such as [OWL](https://www.w3.org/OWL/) through the Python [OWL-RL](https://owl-rl.readthedocs.io/en/latest/)
+library. OWL-RL can be used to do basic inheritance computations. 
+Using the Kùzu plugin for RDFLib (see [here](https://github.com/DerwenAI/kuzu-rdflib)) in conjunction with these libraries,
+you can build more complex pipelines and get access to the implementations of other RDF standards.
+Check out the examples in Derwen.ai's [kglab](https://github.com/DerwenAI/kglab) library to see a variety of
+other RDFLib plugins you get access to in Python.
 
-We hope this post has provided a good starting point for users to explore RDF data models, SHACL, and how
-their combination can be leveraged to build a variety of applications powered by Kùzu! Go through our
-RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/) to learn more about the capabilities of Kùzu with RDF data.
+We hope this post has provided a good starting point for you to explore RDF data models, SHACL, and how
+to combine them using Kùzu as your graph backend. Feel free to go through our RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/)
+to learn more!
 
 ## Code
 
@@ -375,4 +427,4 @@ entirety.
 [^2]: RDFLib [documentation on plugins](https://rdflib.readthedocs.io/en/stable/plugin_stores.html).
 [^3]: W3C Recommendation 10 February 2004, [RDF Semantics](https://www.w3.org/TR/rdf-mt/)
 [^4]: W3C Working Group Note 20 July 2017, [SHACL use cases and requirements](https://www.w3.org/TR/shacl-ucr/)
-
+[^5]: Querying with SPARQL, [RDFLib docs](https://rdflib.readthedocs.io/en/stable/intro_to_sparql.html)
