@@ -431,7 +431,7 @@ model as you learn more about the data. Using an embeddable solution like Kùzu 
 in this regard, as you can quickly load the data and test your queries without having to worry
 about setting up servers or authentication.
 
-In the next post, we'll look at a larger dataset of a similar nature, to answer more complex
+In the [next post](../transforming-your-data-to-graphs-2), we'll look at a larger dataset of a similar nature, to answer more complex
 questions about disputed transactions. In the meantime, give [Kùzu](https://github.com/kuzudb/kuzu)
 a try out on your own data, and begin thinking about whether knowledge graphs are a good fit for
 your use case!
