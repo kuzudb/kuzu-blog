@@ -1,127 +1,127 @@
 [
   {
-    "title": "OSIRIS-REx: 1st US Asteroid Sample Lands Soon (Official NASA Trailer)",
-    "description": "NASA's Origins, Spectral Interpretation, Resource Identification, Security-Regolith Explorer (OSIRIS-REx) is the first U.S. mission ...",
-    "channelId": "UCLA_DiR1FfKNvjuUpBHmylQ",
-    "channelTitle": "NASA",
-    "videoId": "neZYcnduRTo",
+    "title": "RDF - Part 1: What is Resource Description Framework, and its benefits?",
+    "description": "Prof. Salihoğlu explains the fundamentals of RDF, covering resources, URIs, literals, and (subject, predicate, object) triples, and ...",
+    "channelId": "UC3kFBpnMVI9aEs-TUiFcb4g",
+    "channelTitle": "KùzuDB",
+    "videoId": "4ovHjBuMB_E",
     "thumbnails": {
       "default": {
-        "url": "https://i.ytimg.com/vi/neZYcnduRTo/default.jpg",
+        "url": "https://i.ytimg.com/vi/4ovHjBuMB_E/default.jpg",
         "width": 120,
         "height": 90
       },
       "medium": {
-        "url": "https://i.ytimg.com/vi/neZYcnduRTo/mqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/4ovHjBuMB_E/mqdefault.jpg",
         "width": 320,
         "height": 180
       },
       "high": {
-        "url": "https://i.ytimg.com/vi/neZYcnduRTo/hqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/4ovHjBuMB_E/hqdefault.jpg",
         "width": 480,
         "height": 360
       }
     },
-    "publishedAt": "2023-09-18T21:26:42Z"
+    "publishedAt": "2024-06-12T16:42:37Z"
   },
   {
-    "title": "NASA Astronaut Frank Rubio: A Year of Science in Space",
-    "description": "NASA astronaut Frank Rubio is set to return to Earth this fall after setting the record for the longest single spaceflight by a U.S. ...",
-    "channelId": "UCLA_DiR1FfKNvjuUpBHmylQ",
-    "channelTitle": "NASA",
-    "videoId": "d6F9o6LKpVA",
+    "title": "Graph vs. Relational databases? When do you need a graph database?",
+    "description": "Graph databases offer significant benefits for modeling complex and irregular domains, including the ability to express complex ...",
+    "channelId": "UC3kFBpnMVI9aEs-TUiFcb4g",
+    "channelTitle": "KùzuDB",
+    "videoId": "sr63gtm1-j8",
     "thumbnails": {
       "default": {
-        "url": "https://i.ytimg.com/vi/d6F9o6LKpVA/default.jpg",
+        "url": "https://i.ytimg.com/vi/sr63gtm1-j8/default.jpg",
         "width": 120,
         "height": 90
       },
       "medium": {
-        "url": "https://i.ytimg.com/vi/d6F9o6LKpVA/mqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/sr63gtm1-j8/mqdefault.jpg",
         "width": 320,
         "height": 180
       },
       "high": {
-        "url": "https://i.ytimg.com/vi/d6F9o6LKpVA/hqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/sr63gtm1-j8/hqdefault.jpg",
         "width": 480,
         "height": 360
       }
     },
-    "publishedAt": "2023-09-18T20:00:19Z"
+    "publishedAt": "2024-06-06T16:36:49Z"
   },
   {
-    "title": "Hispanic Heritage Month Greetings from Space",
-    "description": "In celebration of Hispanic Heritage Month 2023, NASA astronaut Frank Rubio pays tribute to former NASA astronaut José ...",
-    "channelId": "UCLA_DiR1FfKNvjuUpBHmylQ",
-    "channelTitle": "NASA",
-    "videoId": "ZSHnE8Pd5s4",
+    "title": "What Is A Graph Database? Common features of graph DBMSs.",
+    "description": "Join us as we dive into the fascinating world of graph databases with Semih Salihoğlu, an expert in the field! Discover the core ...",
+    "channelId": "UC3kFBpnMVI9aEs-TUiFcb4g",
+    "channelTitle": "KùzuDB",
+    "videoId": "BksVyv5864k",
     "thumbnails": {
       "default": {
-        "url": "https://i.ytimg.com/vi/ZSHnE8Pd5s4/default.jpg",
+        "url": "https://i.ytimg.com/vi/BksVyv5864k/default.jpg",
         "width": 120,
         "height": 90
       },
       "medium": {
-        "url": "https://i.ytimg.com/vi/ZSHnE8Pd5s4/mqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/BksVyv5864k/mqdefault.jpg",
         "width": 320,
         "height": 180
       },
       "high": {
-        "url": "https://i.ytimg.com/vi/ZSHnE8Pd5s4/hqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/BksVyv5864k/hqdefault.jpg",
         "width": 480,
         "height": 360
       }
     },
-    "publishedAt": "2023-09-18T17:35:04Z"
+    "publishedAt": "2024-05-30T18:45:59Z"
   },
   {
-    "title": "A New Long-Duration Spaceflight Record on This Week @NASA – September 15, 2023",
-    "description": "A new long-duration spaceflight record, our SpaceX Crew-6 mission is back home, and our asteroid sample return mission is on ...",
-    "channelId": "UCLA_DiR1FfKNvjuUpBHmylQ",
-    "channelTitle": "NASA",
-    "videoId": "6g9_kyHTaYI",
+    "title": "Kùzu user meeting - February 27 2024",
+    "description": "This is the recording of the fourth Kùzu user meeting. We discussed the new features from the v0.0.12 release up until the v0.2.0 ...",
+    "channelId": "UC3kFBpnMVI9aEs-TUiFcb4g",
+    "channelTitle": "KùzuDB",
+    "videoId": "1SoqVJLy5vQ",
     "thumbnails": {
       "default": {
-        "url": "https://i.ytimg.com/vi/6g9_kyHTaYI/default.jpg",
+        "url": "https://i.ytimg.com/vi/1SoqVJLy5vQ/default.jpg",
         "width": 120,
         "height": 90
       },
       "medium": {
-        "url": "https://i.ytimg.com/vi/6g9_kyHTaYI/mqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/1SoqVJLy5vQ/mqdefault.jpg",
         "width": 320,
         "height": 180
       },
       "high": {
-        "url": "https://i.ytimg.com/vi/6g9_kyHTaYI/hqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/1SoqVJLy5vQ/hqdefault.jpg",
         "width": 480,
         "height": 360
       }
     },
-    "publishedAt": "2023-09-16T14:18:45Z"
+    "publishedAt": "2024-02-28T18:45:34Z"
   },
   {
-    "title": "OSIRIS-REx Asteroid Sample Return (Official 4K NASA Broadcast)",
-    "description": "Watch a spacecraft deliver an asteroid sample to Earth! Our OSIRIS-REx (Origins, Spectral Interpretation, Resource Identification, ...",
-    "channelId": "UCLA_DiR1FfKNvjuUpBHmylQ",
-    "channelTitle": "NASA",
-    "videoId": "Kdwyqctp908",
+    "title": "Kùzu user meeting - November 22 2023",
+    "description": "This is the recording of the third Kùzu user meeting. We discussed the new features from the v0.0.7 release up until the v0.1.0 ...",
+    "channelId": "UC3kFBpnMVI9aEs-TUiFcb4g",
+    "channelTitle": "KùzuDB",
+    "videoId": "-L0mMPSQOsk",
     "thumbnails": {
       "default": {
-        "url": "https://i.ytimg.com/vi/Kdwyqctp908/default_live.jpg",
+        "url": "https://i.ytimg.com/vi/-L0mMPSQOsk/default.jpg",
         "width": 120,
         "height": 90
       },
       "medium": {
-        "url": "https://i.ytimg.com/vi/Kdwyqctp908/mqdefault_live.jpg",
+        "url": "https://i.ytimg.com/vi/-L0mMPSQOsk/mqdefault.jpg",
         "width": 320,
         "height": 180
       },
       "high": {
-        "url": "https://i.ytimg.com/vi/Kdwyqctp908/hqdefault_live.jpg",
+        "url": "https://i.ytimg.com/vi/-L0mMPSQOsk/hqdefault.jpg",
         "width": 480,
         "height": 360
       }
     },
-    "publishedAt": "2023-09-15T20:08:39Z"
+    "publishedAt": "2023-11-22T19:41:49Z"
   }
 ]
