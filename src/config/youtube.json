@@ -1,28 +1,28 @@
 [
   {
-    "title": "RDF - Part 1: What is Resource Description Framework, and its benefits?",
-    "description": "Prof. Salihoğlu explains the fundamentals of RDF, covering resources, URIs, literals, and (subject, predicate, object) triples, and ...",
+    "title": "3 Ways to Interact with Kùzu",
+    "description": "In this video, Prashanth Rao, AI Engineer at Kùzu Inc. discusses 3 common ways to interact with Kùzu: the client API, the ...",
     "channelId": "UC3kFBpnMVI9aEs-TUiFcb4g",
     "channelTitle": "KùzuDB",
-    "videoId": "4ovHjBuMB_E",
+    "videoId": "wV2iphFc_f0",
     "thumbnails": {
       "default": {
-        "url": "https://i.ytimg.com/vi/4ovHjBuMB_E/default.jpg",
+        "url": "https://i.ytimg.com/vi/wV2iphFc_f0/default.jpg",
         "width": 120,
         "height": 90
       },
       "medium": {
-        "url": "https://i.ytimg.com/vi/4ovHjBuMB_E/mqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/wV2iphFc_f0/mqdefault.jpg",
         "width": 320,
         "height": 180
       },
       "high": {
-        "url": "https://i.ytimg.com/vi/4ovHjBuMB_E/hqdefault.jpg",
+        "url": "https://i.ytimg.com/vi/wV2iphFc_f0/hqdefault.jpg",
         "width": 480,
         "height": 360
       }
     },
-    "publishedAt": "2024-06-12T16:42:37Z"
+    "publishedAt": "2024-07-19T13:42:36Z"
   },
   {
     "title": "Graph vs. Relational databases? When do you need a graph database?",
