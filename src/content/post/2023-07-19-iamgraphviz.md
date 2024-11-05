@@ -6,7 +6,7 @@ IAM network of an enterprise"
 pubDate: "July 19 2023"
 heroImage: "/img/2023-07-19-iamgraphviz/readonlyviz.png"
 categories: ["example"]
-authors: ["chang", {"name": "Chris Norman", "image": "https://www.commonfate.io/_next/image?url=%2Fheadshots%2Fchris.jpg&w=3840&q=75", "bio": "Co-founder of Commonfate"}]
+authors: ["chang", {"name": "Chris Norman", "image": "/img/authors/chris.jpeg", "bio": "Co-founder of Commonfate"}]
 tags: ["visualization"]
 ---
 
