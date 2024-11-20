@@ -2,7 +2,7 @@
 slug: "how-bauplan-leverages-kuzu"
 title: "Ephemeral graphs for data DAGs: How Bauplan leverages Kùzu for FaaS planning"
 description: "Discover how Bauplan innovated on their FaaS planning pipelines using in-memory graphs in Kùzu, achieving 20x faster planning performance and more debuggable, maintainable workflows."
-pubDate: "November 18 2024"
+pubDate: "November 20 2024"
 heroImage: "/img/how-bauplan-leverages-kuzu/bauplan-control-plane.png"
 categories: ["example"]
 authors: [{"name": "Luca Bigon", "image": "/img/authors/luca-bigon.png", "bio": "Principal Engineer at Bauplan"}, {"name": "Jacopo Tagliabue", "image": "/img/authors/jacopo.jpeg", "bio": "CEO of Bauplan"}, "semih", "prashanth"]
