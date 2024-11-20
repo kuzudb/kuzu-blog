@@ -12,7 +12,7 @@ draft: false
 
 ## Data pipelines as declarative DAGs
 
-Data pipelines are the backbone of Artificial Intelligence and analytics use cases. In modern cloud architectures, such as [the lakehouse](https://arxiv.org/pdf/2308.05368), raw data in object storage is refined and transformed in a DAG, as practitioners turn raw datasets into cleaned ones for downstream models, such as the sample pipeline below:
+Data pipelines are the backbone of Artificial Intelligence and analytics use cases. In modern cloud architectures, such as [the lakehouse](https://arxiv.org/pdf/2308.05368), raw data in object storage is refined and transformed in a DAG, as practitioners turn raw datasets into cleaned ones for downstream models. A sample data pipeline is shown below:
 
 <Image src="/img/how-bauplan-leverages-kuzu/bauplan-sample-pipeline.jpg" />
 
@@ -29,7 +29,7 @@ def cleaned_data(
     # reference to its parent DAG node
     data=bauplan.Model(
         "raw_data",
-        columns=["c1, "c2", "c3"], 
+        columns=["c1", "c2", "c3"], 
         filter="eventTime BETWEEN 2023-01-01 AND 2023-02-01"
     ) 
 ):
@@ -57,7 +57,7 @@ The declarative API creates a principled division of labor between the system (i
 
 ## The challenge: From specifications to execution
 
-Unlike most FaaS platforms, Bauplan has a Control Plane (CP) / Data Plane (DP) separation: user code is shipped to the CP, which parses the code and produces a plan (using Kùzu); the plan is then sent to secure cloud workers in the DP for the actual execution. The below figure shows a simplified version of the CP. For a deeper architectural dive, check out the [Middleware paper](https://arxiv.org/pdf/2410.17465) -- note that the CP never sees any actual data, it just sees the metadata.
+Unlike most FaaS platforms, Bauplan has a Control Plane (CP) / Data Plane (DP) separation: user code is shipped to the CP, which parses the code and produces a plan (using Kùzu) -- the plan is then sent to secure cloud workers in the DP for the actual execution. The below figure shows a simplified version of the CP. For a deeper architectural dive, check out the [Middleware paper](https://arxiv.org/pdf/2410.17465). Note that the CP never sees any actual data, it just sees the metadata.
 
 <Image src="/img/how-bauplan-leverages-kuzu/bauplan-control-plane.png" />
 
@@ -92,7 +92,7 @@ Our initial solution was building custom code to parse functions, represent thei
 1. **Rule 1 (Single root rule)**: The pipeline DAG can contain only one root table, i.e., a table with no parents.
 2. **Rule 2 (Columns-in-leaf rule)**: Each column in the leaf tables should exist in their parents, and in the parents of their parents etc.
 
-We represent the DAG with objects for columns and tables - columns are linked to their tables, and tables are linked together in the DAG dependency. The following is (generated) code that may be used to validate the columns recursively (full gist [here](https://gist.github.com/jacopotagliabue/30d30566d6a9245aabbb28fe5d7d26bb)).
+We represent the DAG with objects for columns and tables -- columns are linked to their tables, and tables are linked together in the DAG dependency. The following is (generated) code that may be used to validate the columns recursively (full gist [here](https://gist.github.com/jacopotagliabue/30d30566d6a9245aabbb28fe5d7d26bb)).
 
 ```py
 # Traverse each table from root and validate columns at each step
@@ -160,7 +160,7 @@ res = conn.execute(
 # Rule 2: Ensure each table only uses columns that exist in its parent. Note that
 # unlike the imperative code we don’t need a recursive query here; we only need
 # to describe an operation to perform for each (p:Tbl)<-[:Parent]-(c:Tbl) pattern
-res = con.execute(
+res = conn.execute(
     """
     MATCH (p:Tbl)<-[:Parent]-(c:Tbl)
     WHERE NOT list_has_all(p.cols, c.cols)
@@ -175,7 +175,7 @@ Leveraging Kùzu’s in-memory mode, creating a database with the relevant objec
 
 Once the graph is created, queries express validation rules as pattern matching over the graph. Note that the Cypher queries above for the rules are more explicit and express the rules at a higher level. While our developers now have to pay the price of learning enough Cypher to be dangerous, every additional check, transformation and validation can now be expressed uniformly in a high-performance framework: what if you want to track the *type lineage* of a column across nodes? Cypher query! What if you want to add user permissions for each table and guarantee that they are propagated properly to children? Cypher query ...
 
-There are other benefits of using Kùzu. On top of code simplification and standardization, we have built our own custom tools around the core graph engine: since our ephemeral graphs should be deterministically produced, at each Bauplan run, given the user code and a few environment variables, we built logging and debugging flows that allows us to precisely check our inference during development, and reproduce errors in live systems when debugging. In particular, we now maintain distinct table structures for different phases of plan generation, along with their relationships. This led us to develop what we call "certification process" - a comprehensive suite that validates the graph at various stages of construction.
+There are other benefits of using Kùzu. On top of code simplification and standardization, we have built our own custom tools around the core graph engine: since our ephemeral graphs should be deterministically produced, at each Bauplan run, given the user code and a few environment variables, we built logging and debugging flows that allows us to precisely check our inference during development, and reproduce errors in live systems when debugging. In particular, we now maintain distinct table structures for different phases of plan generation, along with their relationships. This led us to develop what we call "certification process" -- a comprehensive suite that validates the graph at various stages of construction.
 
 The impact of this approach extends well beyond development and into our production environments. We've transformed our debugging capabilities by persisting both query logs and graph states to S3 during plan generation. Instead of reproducing issues by reconstructing the entire service context locally, we can now analyze production anomalies asynchronously by downloading the query log, rebuilding the exact graph generated at request time, and inspecting it programmatically and visually through [Kùzu Explorer](https://docs.kuzudb.com/visualization/). This clear separation between plan generation logic and service code has significantly streamlined our debugging workflow, allowing us to diagnose issues with precision and efficiency.
 
