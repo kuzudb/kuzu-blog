@@ -306,8 +306,8 @@ the metamodelling and experimentation phases of this project.
 If you're interested in experimenting with Kùzu and Graph RAG on your own projects, feel
 free to browse through the data and code in the [GitHub repo](https://github.com/Connected-Data/cdkg-challenge),
 or better yet, please contribute to the CDKG challenge by extending the graph with more metadata,
-or by adding more sophisticated retrieval methods. And do reach out to us if you have any interesting
-observations or implementations to share!
+or by adding more sophisticated retrieval methods. And do reach out to us [on Discord](https://kuzudb.com/chat)
+if you have any interesting observations or implementations to share!
 
 ---
 
