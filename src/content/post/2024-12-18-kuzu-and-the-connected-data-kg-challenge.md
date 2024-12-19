@@ -193,9 +193,9 @@ by a given `Talk`.
 
 The graph shown above is constructed using a series of Python scripts provided in the [GitHub repo](https://github.com/Connected-Data/cdkg-challenge/tree/main/src/kuzu).
 Kùzu's strong level of integration with the Python AI and data ecosystem is apparent in this workflow, where we use Polars,
-a popular DataFrame library, to transform and manipulate the metadata CSV file as per our desired data model.
+a popular DataFrame library in Python, to transform and manipulate the metadata CSV file as per our desired data model.
 We leverage Kùzu's [`COPY FROM`](https://docs.kuzudb.com/import/copy-from-dataframe/#polars)
-command to directly copy the contents of the Polars DataFrame into the database.
+command to bulk-ingest the contents of the Polars DataFrame into the database in a single line of code.
 
 
 <Image src="/img/kuzu-cdkg/cdl-part-1-workflow.png" />
