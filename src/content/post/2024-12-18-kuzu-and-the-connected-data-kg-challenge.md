@@ -18,7 +18,7 @@ standpoint, it helps to think of the following three key stages of any practical
 (2) Retrieval; and (3) Generation of the response.
 
 LLMs have revolutionized the way we interact with data due to their convenient natural language interface,
-and that the versatility of LLMs makes them useful at *each stage* of a Graph RAG pipeline.
+and their versatility makes them useful at *each stage* of a Graph RAG pipeline.
 In this blog post, I'll walk through an **end-to-end application** that addresses the three stages
 of building Graph RAG applications, highlighting how LLMs play a role at each stage:
 1. **Knowledge Graph (KG)[^1] Construction**: Combine a mix of unstructured and structured data sources to construct
