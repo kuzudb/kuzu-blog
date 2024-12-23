@@ -269,8 +269,8 @@ Nathan introduced intuitive examples that demonstrate the capabilities and trade
 The talk also reviewed common industry use cases and discussed how graph data science practices can be implemented using Python open source tools. Additionally, Nathan presented the 'kglab' abstraction layer, which integrates various libraries into the PyData stack for enhanced graph technology utilization.
 ```
 
-This example locates the talk by Paco Nathan using the `LOWER` function to match on the speaker's name, and returns the talk's title and description as requested in the question.
-The description property is a free-form text field that's provided as context to the generation LLM, so it is able to use this infromation to answer the question.
+This example locates the talk by Paco Nathan using the `LOWER` function to match on the speaker's name, and returns the talk's title and description.
+The description property is a free-form text field that's provided as context to the generation LLM, so it is able to use this information to answer the question.
 
 ---
 
