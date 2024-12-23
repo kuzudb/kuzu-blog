@@ -17,10 +17,10 @@ and this retrieved context from the graph is used by an LLM to generate the resp
 standpoint, it helps to think of the following three key stages of any practical Graph RAG pipeline: (1) Knowledge Graph Construction;
 (2) Retrieval; and (3) Generation of the response.
 
-Although LLMs have revolutionized the way we interact with data due to their convenient natural language interface,
-what is less discussed is that the versatility of LLMs makes them useful at *each stage* of building Graph RAG pipelines.
-In this blog post, I'll walk through an **end-to-end application** that addresses the following key steps
-in building Graph RAG applications:
+LLMs have revolutionized the way we interact with data due to their convenient natural language interface,
+and that the versatility of LLMs makes them useful at *each stage* of a Graph RAG pipeline.
+In this blog post, I'll walk through an **end-to-end application** that addresses the three stages
+of building Graph RAG applications, highlighting how LLMs play a role at each stage:
 1. **Knowledge Graph (KG)[^1] Construction**: Combine a mix of unstructured and structured data sources to construct
 a KG that can then provide LLMs with the relevant context for answering questions about the data. Interestingly, I'll also show how
 to use an LLM at this stage to extract entities from the unstructured data and augment the KG with these entities, though I will also
@@ -163,7 +163,6 @@ Kùzu implements the property graph model, so we choose to express the above met
 nodes and relationships in the graph. In general, the semantic model is broken down into two components:
 the *domain graph* and the *content graph* (also known as the *lexical graph*)[^5].
 
-
 #### Domain graph
 
 The domain graph in Kùzu is constructed using the information provided in the metadata CSV file.
@@ -179,7 +178,7 @@ the relationships are chosen based on our best judgment for easy querying. For e
 `(:Speaker)-[:GIVES_TALK]->(:Talk)` is an intuitive way to express that a speaker gives a talk,
 both for humans and for LLMs that write Cypher.
 
-The graph that's persisted in Kùzu and can be visualized in [Kùzu explorer](https://docs.kuzudb.com/visualization/).
+The graph that's persisted in Kùzu can be visualized in [Kùzu Explorer](https://docs.kuzudb.com/visualization/).
 In the figure below, the large green nodes represent each talk's `Category` ("Graph AI", "Semantic Technology", etc.),
 and the smaller blue nodes are the `Speaker` nodes, which are
 connected to the red `Talk` nodes. The purple nodes represent the `Event` that a talk belongs to. For this
@@ -356,11 +355,11 @@ frameworks like [LangGraph](https://www.langchain.com/langgraph) that uses DAGs 
 ## Key takeaways
 
 Recall that we began building our Graph RAG application by first defining a metamodel that captured the high-level structure of the data,
-*before* we started modelling the graph in Kùzu. When applying this approach to your own data, it's important to
-spend enough time becoming deeply familiar with the data and the domain, so that you can first gather the right data and then define the
-right semantic model that helps you answer the kinds of questions you want to ask. We showed how
-to combine the structured data (domain graph) with the keywords terms extracted from the unstructured text
-of the talk transcripts (content/lexical graph) to enrich the graph in Kùzu, that can then answer a range of questions via a natural language interface.
+*before* defining the semantic model, i.e., the property graph in Kùzu. When applying this approach to your own data, it's important to
+spend enough time becoming deeply familiar with the data and the domain, so that you can (1) gather the right data; and (2) define the
+semantic model that helps you answer the kinds of questions you want to ask. We showed how
+to construct a graph based on this metamodel by combining the structured data (domain graph) with the keywords terms extracted from the
+talk transcripts (content/lexical graph) that can then answer a range of questions via a natural language interface.
 The general principles of graph construction shown in this case study, such as the vocabulary of "domain graph" and "lexical graph",
 are becoming more widely adopted in the Graph RAG community[^5], and apply to other data sources than the one
 discussed here.
@@ -368,14 +367,15 @@ discussed here.
 Importantly, we showed how LLMs can play a key role at *each stage* of the Graph RAG pipeline, from knowledge graph construction
 to retrieval and generation. First, we used an LLM to extract keywords from the talk transcripts. Next, we used another LLM
 to generate Cypher queries that can answer questions about the data. Finally, we used a third LLM to generate a response
-to the question posed by the user. For the first stage, it's not necessary to use an LLM -- depending on the
-domain-specificity of the data, general purpose LLMs may not suit your needs for information extraction, so
-it's worth exploring other ML or NLP-based extraction methods, such as [GliNER](https://github.com/urchade/GLiNER)
-for entity extraction or [ReLiK](https://github.com/SapienzaNLP/relik) for relationship extraction.
+to the question posed by the user. For the first stage, however, it's not necessary to use an LLM -- depending on the
+domain-specificity of the data, general purpose LLMs may not suit your needs for information extraction.
+It's worth exploring other ML or NLP-based extraction methods, such as [GliNER](https://github.com/urchade/GLiNER)
+for entity extraction or [ReLiK](https://github.com/SapienzaNLP/relik) for relationship extraction
+for this stage.
 
-I hope that the techniques shown in this blog post make you excited to use Kùzu to build your own Graph RAG applications!
-Please feel free to browse through the code and the prompting strategies used in the project's [GitHub repo](https://github.com/Connected-Data/cdkg-challenge).
-Or better yet, please contribute to future iterations of the CDKG challenge by augmenting the graph with more metadata,
+Hopefully, the techniques shown in this blog post provide some ideas on how to use Kùzu to build your next Graph RAG application.
+Feel free to browse through the code and the prompting strategies used in the project's [GitHub repo](https://github.com/Connected-Data/cdkg-challenge),
+or better yet, please contribute to future iterations of the CDKG challenge by augmenting the graph with more metadata,
 or by adding more sophisticated retrieval and generation methods. And if you're using Kùzu, do reach out to us [on Discord](https://kuzudb.com/chat)
 if you have any interesting observations or implementations of your own to share!
 
