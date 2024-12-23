@@ -61,7 +61,7 @@ listed above.
 
 ## Stage 1: Graph construction
 
-Graph construction phase is a multi-step process that begins with a deep understanding of the data
+Graph construction is a multi-step process that begins with a deep understanding of the data
 sources and how the domain knowledge is structured. The following diagram shows the key steps in the process.
 
 <Image src="/img/kuzu-cdkg/cdl-graph-construction.png" />
