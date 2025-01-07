@@ -216,7 +216,7 @@ by a given `Talk`.
 The graph construction workflow in Kùzu consists of a series of Python scripts provided in the [GitHub repo](https://github.com/Connected-Data/cdkg-challenge/tree/main/src/kuzu).
 Kùzu's strong level of integration with the Python AI and data ecosystem is quite clearly visible in this workflow, where we use Polars,
 a popular DataFrame library in Python, to transform and manipulate the metadata CSV file as per our desired data model
-and seamlessly integrate the DataFrames with the ingestion into the database. We can do a similar thing for the
+and seamlessly ingest the DataFrame contents into the database. We can do a similar thing for the
 JSON file containing the extracted keyword terms.
 
 <Image src="/img/kuzu-cdkg/cdl-part-1-workflow.png" />
@@ -377,7 +377,7 @@ alternative LLMs
 - Extract more metadata from the data sources and add them to the domain graph to help answer more complex questions
 - Explore vector search strategies in combination with the graph traversal
 - Add better fallback mechanisms for cases where the graph traversal does not yield a response, via agentic
-frameworks like [LangGraph](https://www.langchain.com/langgraph) that uses DAGs to direct the user query to the appropriate retrieval method
+frameworks like [LangGraph](https://www.langchain.com/langgraph) that themselves use graph-based workflows to direct the user query to the appropriate retrieval method
 
 ## Key takeaways
 
