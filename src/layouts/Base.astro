@@ -76,8 +76,6 @@ const { title, meta_title, description, noindex, blogpost } = Astro.props;
       property="og:url"
       content={`${config.site.base_url}/${Astro.url.pathname.replace("/", "")}`}
     />
-    <!-- og-image -->
-    <meta property="og:image" content="/og-gray-small.png" />
     <!-- twitter-title -->
     <meta
       name="twitter:title"
@@ -88,8 +86,6 @@ const { title, meta_title, description, noindex, blogpost } = Astro.props;
       name="twitter:description"
       content={description ? description : config.metadata.meta_description}
     />
-    <!-- twitter-image -->
-    <meta name="twitter:image" content="/og-gray-small.png"  />
     <meta name="twitter:card" content="summary_large_image" />
     <ViewTransitions />
   </head>
