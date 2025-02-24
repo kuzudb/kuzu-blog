@@ -76,6 +76,10 @@ const { title, meta_title, description, noindex, blogpost } = Astro.props;
       property="og:url"
       content={`${config.site.base_url}/${Astro.url.pathname.replace("/", "")}`}
     />
+    <!-- og-image -->
+    <meta property="og:image" content="/og.png" />
+    <!-- twitter-image -->
+    <meta name="twitter:image" content="/og.png"  />
     <!-- twitter-title -->
     <meta
       name="twitter:title"
