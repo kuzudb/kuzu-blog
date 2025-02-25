@@ -10,9 +10,9 @@ tags: ["data-science", "networkx", "graph-algorithms", "analysis"]
 ---
 
 In the [previous post](../transforming-your-data-to-graphs-1), we showed how to transform a
-typical relational data model to a graph data model and load it into a Kùzu database that could
+typical relational data model to a graph data model and load it into a Kuzu database that could
 then be queried via Cypher to answer path-related questions about the data. The aim of this post is
-to show how Kùzu offers numerous tools that allow users to
+to show how Kuzu offers numerous tools that allow users to
 flexibly model and analyze data. We will analyze a transaction network, and
 use a combination of Cypher queries, graph visualization and network analysis to answer questions
 about the data.
@@ -42,7 +42,7 @@ marked after the fact and stored in a separate table.
 
 When considering questions about disputed transactions, aggregation queries are not enough. We need
 to study the paths between the clients, merchants and transactions. This is where a graph
-database like Kùzu is very handy. The data model used by Kùzu is a _structured_ property graph model,
+database like Kuzu is very handy. The data model used by Kuzu is a _structured_ property graph model,
 allowing us to capture the relationships between entities in a more natural way, for specific query
 workloads such as this one.
 
@@ -56,11 +56,11 @@ The transactions are modelled as edges, with an `is_disputed` property to indica
 a transaction is disputed or not. This simplifies the kinds of queries we need to write, and is
 sufficient for our initial analysis.
 
-## Inserting data into Kùzu
+## Inserting data into Kuzu
 
 The [previous post](../2024-01-24-transforming-your-data-1) went into the data transformation
 and ETL aspects, so we won't go over that here. In a nutshell, the following input files exist in CSV
-format that need to be inserted into Kùzu:
+format that need to be inserted into Kuzu:
 
 ```
 .
@@ -78,7 +78,7 @@ format that need to be inserted into Kùzu:
 └── load_data.py
 ```
 
-The script `load_data.py` reads the CSV files and inserts the data into Kùzu using the Python API.
+The script `load_data.py` reads the CSV files and inserts the data into Kuzu using the Python API.
 The result of running this script is a graph whose schema matches that shown in the sketch
 above.
 
@@ -86,10 +86,10 @@ above.
 
 ## Exploratory data analysis
 
-Once the data is loaded into Kùzu, it's very simple to begin exploring the data using Cypher queries
-in one of three ways: i) using a Kùzu CLI shell, ii) using a Jupyter notebook, and iii) using the
-Kùzu Explorer UI. Because the goal of this exercise is to perform exploratory data analysis on the
-graph, we'll [Kùzu Explorer](https://github.com/kuzudb/explorer) to visualize the graph and run Cypher queries.
+Once the data is loaded into Kuzu, it's very simple to begin exploring the data using Cypher queries
+in one of three ways: i) using a Kuzu CLI shell, ii) using a Jupyter notebook, and iii) using the
+Kuzu Explorer UI. Because the goal of this exercise is to perform exploratory data analysis on the
+graph, we'll [Kuzu Explorer](https://github.com/kuzudb/explorer) to visualize the graph and run Cypher queries.
 
 ```cypher
 MATCH (c:Client) RETURN COUNT(c) AS numClients
@@ -147,7 +147,7 @@ WHERE t.is_disputed = true
 RETURN * LIMIT 25;
 ```
 
-When running this query in Kùzu Explorer, we can customize the edge properties displayed in the graph visualization. In
+When running this query in Kuzu Explorer, we can customize the edge properties displayed in the graph visualization. In
 the following image, we mark the `TransactedWith` edges with the boolean value of the `is_disputed`
 property from the data. Only a small fraction of these transactions have the `is_disputed` property
 marked as `true`.
@@ -212,7 +212,7 @@ returned the names of the clients, but in a larger dataset it makes sense to ret
 number of clients instead.
 
 When viewed visually, these results can be quite powerful. The following image shows result from
-above, as seen in Kùzu Explorer.
+above, as seen in Kuzu Explorer.
 
 ![](/img/2024-02-23-transforming-your-data-2/dispute_graph_viz.png)
 
@@ -224,9 +224,9 @@ merchant, located in Boston, could be a source of fraud.
 
 ## Graph algorithms
 
-Kùzu is well-integrated with the PyData ecosystem, including PyTorch Geometric, Pandas, and
+Kuzu is well-integrated with the PyData ecosystem, including PyTorch Geometric, Pandas, and
 [NetworkX](https://networkx.org/documentation/stable/reference/index.html), a popular Python library
-for network analysis. Because Kùzu is an embedded graph database, it runs in-process with a Python
+for network analysis. Because Kuzu is an embedded graph database, it runs in-process with a Python
 application, so it's simple to isolate a subgraph of interest via Cypher and convert it
 to a NetworkX directed graph (DiGraph) for further analysis.
 
@@ -355,7 +355,7 @@ node_id | closeness_centrality
 96 | 0.024000
 
 Once we have the Pandas DataFrame, it's trivial to write a function that can modify the existing
-`Merchant` node table and add the closeness centrality scores back to the graph. Kùzu's Python
+`Merchant` node table and add the closeness centrality scores back to the graph. Kuzu's Python
 API has a native scan feature that can directly read from Pandas DataFrames in a zero-copy manner.
 
 Note that we first alter the original node table schema to add a new column for the closeness
@@ -383,29 +383,29 @@ can help us use these scores in downstream machine learning models, or to inform
 
 ## Conclusions
 
-Hopefully, this post has given you a good idea of how to use Kùzu to effectively model and analyze
+Hopefully, this post has given you a good idea of how to use Kuzu to effectively model and analyze
 your data via a combination of Cypher and graph algorithms. It's worth keeping in mind that
 Graph data science, just like conventional data science, is an iterative
 process. The ability to think of structured data (in tables) as graphs helps us rapidly isolate interesting subsets of the data,
 run graph algorithms and visualize substructures, making these powerful tools in the data scientist's toolkit.
 
-Kùzu's in-process architecture makes it very friendly towards these sorts of workflows without the
-data scientist having to worry about servers or managing infrastructure. Data can be conveniently read into Kùzu from a
+Kuzu's in-process architecture makes it very friendly towards these sorts of workflows without the
+data scientist having to worry about servers or managing infrastructure. Data can be conveniently read into Kuzu from a
 variety of sources, including relational databases, CSV or parquet files, or DataFrames. Future
-versions of Kùzu will support more convenience features, such as the ability to natively scan
+versions of Kuzu will support more convenience features, such as the ability to natively scan
 PostgreSQL tables, as well as native support for Arrow tables.
 
 In summary, the interoperability of an embedded graph database with popular Python libraries like
-NetworkX and Pandas makes Kùzu a powerful tool for graph data science. If you have data of a similar
+NetworkX and Pandas makes Kuzu a powerful tool for graph data science. If you have data of a similar
 nature in the form of relational tables, we highly recommend you to
-think about whether your use case can benefit from graph data models. If so, give Kùzu a try and
+think about whether your use case can benefit from graph data models. If so, give Kuzu a try and
 reach out to us on [Discord](https://discord.gg/VtX2gw9Rug) with your experiences and feedback!
 
 ## Code
 
 The code to reproduce the workflow shown in this post can be found in the
 [graphdb-demo](https://github.com/kuzudb/graphdb-demo/tree/main/src/python/transactions_with_disputes) repository.
-It uses Kùzu's Python API, but you are welcome to use the client API [of your choice](//docs.kuzudb.com/client-apis).
+It uses Kuzu's Python API, but you are welcome to use the client API [of your choice](//docs.kuzudb.com/client-apis).
 
 ## Further reading
 

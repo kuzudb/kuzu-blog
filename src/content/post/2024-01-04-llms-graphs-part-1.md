@@ -132,7 +132,7 @@ I'll show next.
 If you have been following the developments in the LLM space, you will not be surprised to hear that nowadays people build 
 Q&A systems that convert $Q_{NL}$ to a high-level query language using two common tools:
 (i) [LangChain](https://www.langchain.com/); and (ii) [LlamaIndex](https://www.llamaindex.ai/).
-The same tools also integrate with the underlying storage system to load and retrieve your data. To make this more concrete, let me review the [Kùzu-LangChain integration](https://python.langchain.com/docs/use_cases/graph/graph_kuzu_qa), which is similar to the integrations of other GDBMSs. You as a programmer have very little to do: you prepare your Kùzu
+The same tools also integrate with the underlying storage system to load and retrieve your data. To make this more concrete, let me review the [Kuzu-LangChain integration](https://python.langchain.com/docs/use_cases/graph/graph_kuzu_qa), which is similar to the integrations of other GDBMSs. You as a programmer have very little to do: you prepare your Kuzu
 database `db` and load your data into it, wrap it around a `KuzuGraph` and `KuzuQAChain` objects in Python and you have
 a text-to-Cypher pipeline:
 
@@ -193,12 +193,12 @@ You ultimately construct a string prompt that contains $Q_{NL}$, some
 instructions, and schema of the database, and the LLM will generate a query for you. 
 The `KuzuGraph` and `KuzuQAChain` are simple wrappers to do just that.
 If you want to play around with how well this works on other datasets,
-we have this pipeline implemented in Kùzu's browser frontend [KùzuExplorer](//docs.kuzudb.com/kuzuexplorer/). 
+we have this pipeline implemented in Kuzu's browser frontend [KùzuExplorer](//docs.kuzudb.com/kuzuexplorer/). 
 
-That is, for any database you have in Kùzu, you get a natural language interface over it in
+That is, for any database you have in Kuzu, you get a natural language interface over it in
 KùzuExplorer (just click the "robot icon" on the left panel). 
-You can develop similar pipelines with other GDBMSs using similar interfaces (*though I recommend using Kùzu as it will be the
-simplest to get started* 😉: *Unlike other GDBMSs, Kùzu is embeddable and requires no server set up*).
+You can develop similar pipelines with other GDBMSs using similar interfaces (*though I recommend using Kuzu as it will be the
+simplest to get started* 😉: *Unlike other GDBMSs, Kuzu is embeddable and requires no server set up*).
 If you instead want to build Q&A systems over your RDBMSs, you can use
 LangChain's [SQLDatabaseChain](https://python.langchain.com/docs/use_cases/qa_structured/sql#case-2-text-to-sql-query-and-execution) and 
 [SQLAgent](https://python.langchain.com/docs/use_cases/qa_structured/sql#case-3-sql-agents) or

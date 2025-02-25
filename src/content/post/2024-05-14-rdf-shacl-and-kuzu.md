@@ -1,7 +1,7 @@
 ---
 slug: "rdf-shacl-and-kuzu"
-title: "Validating RDF data with SHACL in Kùzu"
-description: "Combining RDFLib and SHACL to validate RDF data in Kùzu"
+title: "Validating RDF data with SHACL in Kuzu"
+description: "Combining RDFLib and SHACL to validate RDF data in Kuzu"
 pubDate: "May 14 2024"
 heroImage: "/img/rdf-shacl-kuzu/rdf-running-example.png"
 categories: ["example"]
@@ -11,14 +11,14 @@ draft: false
 ---
 
 The Resource Description Framework (RDF) model, along with property graphs, is one of the most popular
-graph data models used in practice[^1]. In this post, we will explore how you can work with RDF data in Kùzu
+graph data models used in practice[^1]. In this post, we will explore how you can work with RDF data in Kuzu
 using [RDFLib](https://rdflib.readthedocs.io/en/stable/) and [pySHACL](https://github.com/RDFLib/pySHACL).
-We will demonstrate how to load this data into Kùzu, write SHACL shape constraints to validate the data,
-and use Kùzu Explorer to visualize the resulting RDF graph.
+We will demonstrate how to load this data into Kuzu, write SHACL shape constraints to validate the data,
+and use Kuzu Explorer to visualize the resulting RDF graph.
 
 ## Basics of RDF
 
-Our [earlier blog post](../in-praise-of-rdf) on RDF and Kùzu's [docs](https://docs.kuzudb.com/rdf-graphs/rdf-basics/)
+Our [earlier blog post](../in-praise-of-rdf) on RDF and Kuzu's [docs](https://docs.kuzudb.com/rdf-graphs/rdf-basics/)
 provide a much more detailed explanation on RDF and when it is useful, but for the purposes
 of this post, a brief summary of the terminology is provided in the table below:
 
@@ -55,13 +55,13 @@ The following is an excerpt from the [SHACL specification](https://www.w3.org/TR
 
 > The Shapes Constraint Language (SHACL) is a language for validating RDF graphs against a set of conditions. These conditions are provided as shapes and other constructs expressed in the form of an RDF graph. RDF graphs that are used in this manner are called "shapes graphs" in SHACL and the RDF graphs that are validated against a shapes graph are called "data graphs". As SHACL shape graphs are used to validate that data graphs satisfy a set of conditions they can also be viewed as a description of the data graphs that do satisfy these conditions.
 
-Although the purpose of this post is to demonstrate how SHACL can be used to validate RDF data in Kùzu, SHACL also allows for a variety of other use cases
+Although the purpose of this post is to demonstrate how SHACL can be used to validate RDF data in Kuzu, SHACL also allows for a variety of other use cases
 besides validation, such as user interface building and data integration[^4].
 
 ## Example
 
-This section will walk you through a demonstration of how to load RDF data into Kùzu, validate it against SHACL shapes,
-and visualize the RDF graph using Kùzu Explorer.
+This section will walk you through a demonstration of how to load RDF data into Kuzu, validate it against SHACL shapes,
+and visualize the RDF graph using Kuzu Explorer.
 
 ### Dataset
 
@@ -105,11 +105,11 @@ Pictorially, this can be represented in RDF as follows:
 `kz:Adam` is an alias for the IRI `http://kuzu.io/rdf-ex#Adam`, as specified in the prefix section at the top of the Turtle file. Each resource's properties are
 represented as triples between the resource and literals. The relationships between resources are also represented as triples, such as `kz:Adam livesIn kz:Waterloo`.
 
-### Load data into a Kùzu database
+### Load data into a Kuzu database
 
-The following snippet shows how to ingest the RDF data into Kùzu. We first create an RDF graph
+The following snippet shows how to ingest the RDF data into Kuzu. We first create an RDF graph
 and then copy data from the Turtle file named `uni.ttl` into a local database directory named `db`.
-We can specify the name of the RDF database in Kùzu as a constant, `UniKG`, so that it can be used
+We can specify the name of the RDF database in Kuzu as a constant, `UniKG`, so that it can be used
 in the downstream Cypher queries.
 
 ```python
@@ -120,7 +120,7 @@ DB_PATH = "db"
 DB_NAME = "UniKG"
 db_path = pathlib.Path(DB_PATH)
 
-# Populate Kùzu with the RDF data
+# Populate Kuzu with the RDF data
 db = kuzu.Database(DB_PATH)
 conn = kuzu.Connection(db)
 
@@ -128,16 +128,16 @@ conn.execute(f"CREATE RDFGraph {DB_NAME}")
 conn.execute(f"COPY {DB_NAME} FROM 'uni.ttl'")
 ```
 
-### Register Kùzu in RDFLib plugins
+### Register Kuzu in RDFLib plugins
 
 [RDFLib](https://rdflib.readthedocs.io/en/stable/) is a well-known Python library that provides an API for querying RDF data,
 allowing Python developers access to the entire W3C stack. It is extensible with plugins[^2], allowing
 it to work with different storage backends. For this blog post,
-we published an unofficial code repo that showcases how to use RDFLib with Kùzu as a backend.
+we published an unofficial code repo that showcases how to use RDFLib with Kuzu as a backend.
 The code can be found [here](https://github.com/DerwenAI/kuzu-rdflib).
 
-To begin, we simply register the Kùzu plugin in RDFLib, instantiate an RDFLib `Graph` object that uses
-Kùzu as the backend, and open the graph. To allow the user to specify which Kùzu database to use,
+To begin, we simply register the Kuzu plugin in RDFLib, instantiate an RDFLib `Graph` object that uses
+Kuzu as the backend, and open the graph. To allow the user to specify which Kuzu database to use,
 we pass the configuration data containing the database name and directory path as a mapping to the `open` method.
 
 ```python
@@ -172,12 +172,12 @@ graph.open(
 ```
 
 Note that there needs to be a 1:1 correspondence between the instantiated `Graph`​ object in RDFlib
-and a named KùzuDB database (in this case, `UniKg`). If you're creating a new RDF database in Kùzu, you
+and a named KùzuDB database (in this case, `UniKg`). If you're creating a new RDF database in Kuzu, you
 would need to reference that name instead in the `config_data` mapping for the RDFLib plugin.
 
 Under the hood, a custom method called `get_graph()`​
 is defined in [our demo code](https://github.com/DerwenAI/kuzu-rdflib/blob/main/graph.py) which
-allows for direct access to the underlying Kùzu RDF graph. We encourage you to explore the code
+allows for direct access to the underlying Kuzu RDF graph. We encourage you to explore the code
 in more detail and try the above workflow on your own data to understand how it works.
 
 We can then interact with our graph in RDFLib by running a simple SPARQL query that retrieves all
@@ -223,7 +223,7 @@ RDFLib comes with an implementation of the SPARQL 1.1 query language[^5], so you
 complex queries with additional predicate filters, including prepared queries that can save
 time in re-parsing and translating the query into SPARQL algebra each time the query is run[^5].
 
-This means that you can actually query your Kùzu RDF graphs with SPARQL instead of Cypher using the Kuzu-RDFLib extension!
+This means that you can actually query your Kuzu RDF graphs with SPARQL instead of Cypher using the Kuzu-RDFLib extension!
 See the [section below](#query-the-rdf-graph-with-cypher) for an additional example.
 
 ### Specify SHACL shape constraints
@@ -304,11 +304,11 @@ To learn more about using SHACL in general, see the
 [SHACL Wiki](https://kvistgaard.github.io/shacl/#/page/shacl%20wiki) project by
 Veronika Heimsbakk and Ivo Velitchkov.
 
-### Visualize the RDF graph in Kùzu Explorer
+### Visualize the RDF graph in Kuzu Explorer
 
-When building and validating RDF graphs, the ability to get visual feedback is quite useful. Kùzu
+When building and validating RDF graphs, the ability to get visual feedback is quite useful. Kuzu
 Explorer is a web-based interface that allows you to visualize RDF graphs and query them using Cypher (no knowledge of SPARQL required).
-The instructions to launch Kùzu Explorer and connect to an existing database are shown in [the docs](https://docs.kuzudb.com/visualization/).
+The instructions to launch Kuzu Explorer and connect to an existing database are shown in [the docs](https://docs.kuzudb.com/visualization/).
 
 ```bash
 docker run -p 8000:8000 \
@@ -316,7 +316,7 @@ docker run -p 8000:8000 \
     --rm kuzudb/explorer:latest
 ```
 
-In a nutshell, Kùzu's [RDFGraphs extension](https://docs.kuzudb.com/rdf-graphs/) creates four distinct tables when the RDF data is loaded into the database:
+In a nutshell, Kuzu's [RDFGraphs extension](https://docs.kuzudb.com/rdf-graphs/) creates four distinct tables when the RDF data is loaded into the database:
 
 - `UniKG_l`: A node table that contains literals
 - `UniKG_r`: A node table that contains resources, where the primary key is the unique IRI
@@ -336,17 +336,17 @@ As can be seen, the graph structure is identical to that shown earlier, in the p
 
 The yellow edges represent resource-to-literal relationships (`UniKG_lt`), while the red edges represent
 resource-to-resource relationships (`UniKG_rt`). We can inspect the schema of the RDF graph, including
-each table's primary keys, visually, by clicking on the "Schema" tab in Kùzu Explorer.
+each table's primary keys, visually, by clicking on the "Schema" tab in Kuzu Explorer.
 
 ![](/img/rdf-shacl-kuzu/demo-rdf-schema.png)
 
 ### Query the RDF graph with Cypher
 
-Recall that earlier, we showed how to query the RDF database using SPARQL in RDFLib. However, Kùzu also supports
+Recall that earlier, we showed how to query the RDF database using SPARQL in RDFLib. However, Kuzu also supports
 querying RDF graphs using Cypher! In the example below, we run a query to only return students named "Karissa".
 
 ```cypher
-// Run using Kùzu Explorer
+// Run using Kuzu Explorer
 WITH "http://kuzu.io/rdf-ex#" as kz
 MATCH (s {iri: kz + "Karissa"})-[p1 {iri: kz + "name"}]->(l)
 WHERE (s)-[p2]->(o {iri: kz + "student"})
@@ -376,45 +376,45 @@ http://kuzu.io/rdf-ex#Karissa   http://kuzu.io/rdf-ex#name      Karissa
 ```
 
 As can be seen, **you can choose the most appropriate query language** to analyze your data, depending on your
-workflow and how you want to interface with the graph -- using SPARQL via RDFLib or Cypher via Kùzu.
-Under the hood, Kùzu's query processor will use its native structured property
+workflow and how you want to interface with the graph -- using SPARQL via RDFLib or Cypher via Kuzu.
+Under the hood, Kuzu's query processor will use its native structured property
 graph model to plan and optimize the query, so there are no negative performance implications when using Cypher.
 
 You can also extend Kuzu's RDFGraphs with other property graphs, and query both your triples
-*and* the other property graphs with a uniform query language, Cypher. See Kùzu's [documentation](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview#querying-of-regular-node-and-relationship-tables-and-rdfgraphs) page for more information.
+*and* the other property graphs with a uniform query language, Cypher. See Kuzu's [documentation](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview#querying-of-regular-node-and-relationship-tables-and-rdfgraphs) page for more information.
 
 ---
 
 ### Note on performance
-When running SPARQL queries via RDFLib on top of a Kùzu backend, keep in mind that all the
+When running SPARQL queries via RDFLib on top of a Kuzu backend, keep in mind that all the
 RDF triples are pulled into memory, so this may not work well for larger graphs where the triples
 do not fit in memory. However, in such cases, you could still query the RDF graph directly in Cypher
-via Kùzu's [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview/)
+via Kuzu's [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-overview/)
 while also retaining query performance.
 
 ---
 
 ## Conclusions
 
-In this post, we showed how RDF data in Turtle format can be easily loaded into Kùzu using RDFLib. This was
-done by specifying Kùzu as a backend in the RDFLib plugin. We then demonstrated how SHACL shapes can be used to
+In this post, we showed how RDF data in Turtle format can be easily loaded into Kuzu using RDFLib. This was
+done by specifying Kuzu as a backend in the RDFLib plugin. We then demonstrated how SHACL shapes can be used to
 validate the RDF data via the pySHACL library, allowing users to create data graphs in RDF that satisfy a set of conditions.
-We also showed how Kùzu provides a simple and intuitive interface to load, query and visualize RDF graphs, without compromising
-scalability and performance, because the RDF triples are essentially mapped to Kùzu's native property graph model.
-Users can decide whether to query the graph via SPARQL (via RDFLib) or via Cypher (directly in Kùzu).
+We also showed how Kuzu provides a simple and intuitive interface to load, query and visualize RDF graphs, without compromising
+scalability and performance, because the RDF triples are essentially mapped to Kuzu's native property graph model.
+Users can decide whether to query the graph via SPARQL (via RDFLib) or via Cypher (directly in Kuzu).
 
 This is just the tip of the iceberg in terms of the pipelines you can build over
-your Kùzu RDFGraphs with RDFLib integration. This post showed only how you get access to
+your Kuzu RDFGraphs with RDFLib integration. This post showed only how you get access to
 two implementations of RDF standards in Python: SPARQL and SHACL. But there are other Python
 libraries that integrate with RDFLib to implement other standards, such as [OWL](https://www.w3.org/OWL/) through the Python [OWL-RL](https://owl-rl.readthedocs.io/en/latest/)
 library. OWL-RL can be used to do basic inheritance computations. 
-Using the Kùzu plugin for RDFLib (see [here](https://github.com/DerwenAI/kuzu-rdflib)) in conjunction with these libraries,
+Using the Kuzu plugin for RDFLib (see [here](https://github.com/DerwenAI/kuzu-rdflib)) in conjunction with these libraries,
 you can build more complex pipelines and get access to the implementations of other RDF standards.
 Check out the examples in Derwen.ai's [kglab](https://github.com/DerwenAI/kglab) library to see a variety of
 other RDFLib plugins you get access to in Python.
 
 We hope this post has provided a good starting point for you to explore RDF data models, SHACL, and how
-to combine them using Kùzu as your graph backend. Feel free to go through our RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/)
+to combine them using Kuzu as your graph backend. Feel free to go through our RDFGraphs [documentation](https://docs.kuzudb.com/rdf-graphs/)
 to learn more!
 
 ## Code
