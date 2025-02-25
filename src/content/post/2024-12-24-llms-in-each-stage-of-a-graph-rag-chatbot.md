@@ -1,7 +1,7 @@
 ---
 slug: "llms-in-each-stage-of-a-graph-rag-chatbot"
 title: "Using LLMs in each stage of building a Graph RAG chatbot: A case study"
-description: "How we used Kùzu in combination with LLMs in multiple stages of the Graph RAG pipeline to build a QA chatbot for the Connected Data London Knowledge Graph Challenge"
+description: "How we used Kuzu in combination with LLMs in multiple stages of the Graph RAG pipeline to build a QA chatbot for the Connected Data London Knowledge Graph Challenge"
 pubDate: "Dec 24 2024"
 heroImage: "/img/kuzu-cdkg/full-graph.png"
 categories: ["example"]
@@ -31,15 +31,15 @@ which is then run on the graph database to retrieve the relevant nodes and relat
 3. **Generation**: Use the retrieved results as context for an LLM prompt to generate a response in natural language to the user question.
 I'll also show a chatbot UI written in Streamlit that helps users to interact with the application via a chat interface.
 
-We will use Kùzu as the underlying graph store for the application. The steps shown in this blog post can serve as a blueprint for similar
-applications on your own data. Along the way, I hope it becomes clear how useful Kùzu can be for facilitating the
+We will use Kuzu as the underlying graph store for the application. The steps shown in this blog post can serve as a blueprint for similar
+applications on your own data. Along the way, I hope it becomes clear how useful Kuzu can be for facilitating the
 rapid iteration and experimentation that is required for building more robust Graph RAG pipelines!
 
 ## Problem definition
 
 The dataset used for this case study is a real-world dataset of talk transcripts from past [Connected Data London](https://www.connected-data.london/) presentations.
 CDL is a leading graph-focused conference that brings together professionals in the fields of semantic technologies,
-knowledge graphs, databases, data science, and AI. From a Kùzu perspective, one of the highlights of the event was the
+knowledge graphs, databases, data science, and AI. From a Kuzu perspective, one of the highlights of the event was the
 [Connected Data Knowledge Graph (CDKG) challenge](https://2024.connected-data.london/talks/the-connected-data-knowledge-graph-a-knowledge-graph-for-the-community-by-the-community/).
 The challenge originated from
 a round table discussion in July 2024, in which a proof-of-concept Graph RAG application was demonstrated, that
@@ -55,7 +55,7 @@ from 260+ experts who have contributed to Connected Data events since their ince
 make it easier to discover, explore, digest, combine and reuse the collective knowledge in the community,
 and the underlying graph could be made available to the larger community for querying and exploration[^6].
 
-At Kùzu, we are motivated by the goal of helping developers more easily use graphs in their applications,
+At Kuzu, we are motivated by the goal of helping developers more easily use graphs in their applications,
 so we embarked upon the CDKG challenge by tackling each of the three stages of the Graph RAG pipeline
 listed above.
 
@@ -162,16 +162,16 @@ At a later stage, we update the metamodel to include the keywords (modeled as `T
 ### Semantic model
 
 The semantic model expresses the structure of the metamodel using a specific data model, such as RDF or property graphs.
-Kùzu implements the property graph model, so we choose to express the above metamodel as properties (i.e., key-value pairs) on
+Kuzu implements the property graph model, so we choose to express the above metamodel as properties (i.e., key-value pairs) on
 nodes and relationships in the graph. In general, the semantic model is broken down into two components:
 the *domain graph* and the *content graph* (also known as the *lexical graph*)[^5].
 
 #### Domain graph
 
-The domain graph in Kùzu is constructed using the information provided in the metadata CSV file.
-Kùzu is an embeddable property graph database that supports Cypher, so it's relatively straightforward
-to transform the metamodel into a property graph schema in Kùzu that we can then use to persist the graph
-in the database. Visually, the property graph schema in Kùzu looks like the following:
+The domain graph in Kuzu is constructed using the information provided in the metadata CSV file.
+Kuzu is an embeddable property graph database that supports Cypher, so it's relatively straightforward
+to transform the metamodel into a property graph schema in Kuzu that we can then use to persist the graph
+in the database. Visually, the property graph schema in Kuzu looks like the following:
 
 <Image src="/img/kuzu-cdkg/cdl-schema.png" />
 
@@ -181,7 +181,7 @@ the relationships are chosen based on our best judgment for easy querying. For e
 `(:Speaker)-[:GIVES_TALK]->(:Talk)` is an intuitive way to express that a speaker gives a talk,
 both for humans and for LLMs that write Cypher.
 
-The graph that's persisted in Kùzu can be visualized in [Kùzu Explorer](https://docs.kuzudb.com/visualization/).
+The graph that's persisted in Kuzu can be visualized in [Kuzu Explorer](https://docs.kuzudb.com/visualization/).
 In the figure below, the large green nodes represent each talk's `Category` ("Graph AI", "Semantic Technology", etc.),
 and the smaller blue nodes are the `Speaker` nodes, which are
 connected to the red `Talk` nodes. The purple nodes represent the `Event` that a talk belongs to. For this
@@ -213,15 +213,15 @@ by a given `Talk`.
 
 ### Implementation
 
-The graph construction workflow in Kùzu consists of a series of Python scripts provided in the [GitHub repo](https://github.com/Connected-Data/cdkg-challenge/tree/main/src/kuzu).
-Kùzu's strong level of integration with the Python AI and data ecosystem is quite clearly visible in this workflow, where we use Polars,
+The graph construction workflow in Kuzu consists of a series of Python scripts provided in the [GitHub repo](https://github.com/Connected-Data/cdkg-challenge/tree/main/src/kuzu).
+Kuzu's strong level of integration with the Python AI and data ecosystem is quite clearly visible in this workflow, where we use Polars,
 a popular DataFrame library in Python, to transform and manipulate the metadata CSV file as per our desired data model
 and seamlessly ingest the DataFrame contents into the database. We can do a similar thing for the
 JSON file containing the extracted keyword terms.
 
 <Image src="/img/kuzu-cdkg/cdl-part-1-workflow.png" />
 
-Note how straightforward it is to use Kùzu's [`COPY FROM`](https://docs.kuzudb.com/import/copy-from-dataframe/#polars)
+Note how straightforward it is to use Kuzu's [`COPY FROM`](https://docs.kuzudb.com/import/copy-from-dataframe/#polars)
 command to bulk-ingest the contents of the Polars DataFrame into the database in a single line of code, as shown below.
 
 ```python
@@ -247,9 +247,9 @@ conn.execute("COPY Speaker FROM speakers_df")
 
 ## Stage 2: Retrieval
 
-Let's now use the Kùzu graph to answer some questions about our data! We'll apply a technique called
+Let's now use the Kuzu graph to answer some questions about our data! We'll apply a technique called
 **Text2Cypher**, which uses an LLM to generate Cypher queries from the question posed in natural language.
-The Cypher query is then run in Kùzu to retrieve the relevant nodes and relationships from the graph.
+The Cypher query is then run in Kuzu to retrieve the relevant nodes and relationships from the graph.
 To ensure that we generate syntactically correct Cypher, we pass the schema of the graph as context to the
 LLM's prompt[^3].
 
@@ -274,7 +274,7 @@ RETURN t.title, s.name
 The talk titled "Knowledge Mesh: From Data Silos to Data Fabric at Global 2000 Enterprises" was given by speakers David Amzallag and Szymon Klarman.
 ```
 
-This example locates a partial match on the talk title using the `CONTAINS` and `LOWER` functions in Kùzu's Cypher,
+This example locates a partial match on the talk title using the `CONTAINS` and `LOWER` functions in Kuzu's Cypher,
 and returns the talk's title and the names of the speakers as requested in the question.
 
 ---
@@ -329,7 +329,7 @@ To make the RAG portion of the pipeline (stages 2 and 3) more easily accessible,
 classes and methods in a simple chatbot UI
 using a library like [Streamlit](https://streamlit.io/). The Streamlit UI for this project includes additional components
 to store the chat history and display the LLM-generated Cypher query, so that it's more transparent to the user
-what query is being run on the Kùzu database.
+what query is being run on the Kuzu database.
 
 The streamlit app can be run locally using the following command:
 
@@ -342,7 +342,7 @@ Below is an example of the Streamlit UI in action. The code for the Streamlit ch
 
 <Image src="/img/kuzu-cdkg/rag-chatbot-ui.gif" />
 
-That's it! We've successfully built a Graph RAG application on top of a Kùzu database that can answer
+That's it! We've successfully built a Graph RAG application on top of a Kuzu database that can answer
 questions about the data via a chatbot interface.
 
 ## Limitations and future work
@@ -359,7 +359,7 @@ the Text2Cypher pipeline in a way that minimizes the chances of a empty response
 As a next step, it's definitely worth
 extending the Graph RAG pipeline shown to include vector embeddings of the unstructured text of the talk
 transcripts, as this will improve the quality of the retrieval in cases where the graph
-traversal does not yield a response. On that note, Kùzu is on the verge of
+traversal does not yield a response. On that note, Kuzu is on the verge of
 releasing a native disk-based HNSW vector index that allows users to run similarity search queries in Cypher,
 so this will be a useful future addition to the Graph RAG pipeline. Stay tuned for more updates on this in a future blog post!
 
@@ -382,7 +382,7 @@ frameworks like [LangGraph](https://www.langchain.com/langgraph) that themselves
 ## Key takeaways
 
 Recall that we began building our Graph RAG application by first defining a metamodel that captured the high-level structure of the data,
-*before* expressing the semantic model, i.e., the domain and content graphs in Kùzu. When applying this approach to your own data, it's important to
+*before* expressing the semantic model, i.e., the domain and content graphs in Kuzu. When applying this approach to your own data, it's important to
 spend enough time becoming deeply familiar with the data and the domain, so that you can (1) gather the right data; (2) define a standardized vocabulary;
 and (3) decide on the right semantic model that helps you answer the kinds of questions you want to ask.
 
@@ -402,10 +402,10 @@ It's worth exploring other ML or NLP-based extraction methods, such as [GliNER](
 for entity extraction or [ReLiK](https://github.com/SapienzaNLP/relik) for relationship extraction
 during this stage.
 
-Hopefully, the techniques shown in this blog post provide some ideas on how to use Kùzu to build your next Graph RAG application.
+Hopefully, the techniques shown in this blog post provide some ideas on how to use Kuzu to build your next Graph RAG application.
 Feel free to browse through the code and the prompting strategies used in the project's [GitHub repo](https://github.com/Connected-Data/cdkg-challenge),
 or better yet, please contribute to future iterations of the CDKG challenge by augmenting the graph with more metadata,
-or by adding more sophisticated retrieval and generation methods. And if you're using Kùzu, do reach out to us [on Discord](https://kuzudb.com/chat)
+or by adding more sophisticated retrieval and generation methods. And if you're using Kuzu, do reach out to us [on Discord](https://kuzudb.com/chat)
 if you have any interesting observations or implementations of your own to share!
 
 ## Acknowledgements
@@ -419,8 +419,8 @@ All code and prompts used in this case study are available in the [GitHub repo](
 ---
 
 [^1]: The term "knowledge graph" used throughout this post is used in a general sense,
-and does not refer to a specific data model. Any reference to "knowledge graph" in relation to Kùzu refers to the
-underlying property graph, which is the data model expressed by Kùzu.
+and does not refer to a specific data model. Any reference to "knowledge graph" in relation to Kuzu refers to the
+underlying property graph, which is the data model expressed by Kuzu.
 
 [^2]: You can see the custom prompt that used to extract keywords from the talk transcripts and output the results to JSON format
 [here](https://github.com/Connected-Data/cdkg-challenge/blob/main/src/kuzu/01_extract_tag_keywords.py). The
@@ -432,7 +432,7 @@ reasonably well.
 [^3]: The system and user prompts used for the `gpt-4o-mini` LLM that generates the Cypher queries can be found
 in [this file](https://github.com/Connected-Data/cdkg-challenge/blob/main/src/kuzu/rag.py). Once again,
 [`ell`](http://docs.ell.so/) is the LLM prompting framework used. The temperature is once again set to 0.0
-to reduce the chance of the LLM hallucinating property names, node labels, and relationship labels. Some Kùzu-specific syntax
+to reduce the chance of the LLM hallucinating property names, node labels, and relationship labels. Some Kuzu-specific syntax
 and functions are specified in the user prompt to help the LLM generate syntactically correct Cypher -- for example,
 the `LOWER` function is required to match the case-insensitive nature of property names, and the `CONTAINS` function is used to match on
 substrings in the the specified part of the query.

@@ -24,7 +24,7 @@ RDF can even play an increasingly important role in the era of LLM-based applica
 I will also discuss some fascinating topics in AI that intersect with databases:
 logic, reasoning, and knowledge representation systems. 
 I also put in a minor plug at the end for a new feature we added called [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/),
-to import and query RDF data in Kùzu.
+to import and query RDF data in Kuzu.
 
 
 ---
@@ -52,9 +52,9 @@ to import and query RDF data in Kùzu.
   here is a [great article](https://arxiv.org/ftp/arxiv/papers/2308/2308.04445.pdf) 
   by the late [Douglas Lenat](https://en.wikipedia.org/wiki/Douglas_Lenat).
 
-- **Kùzu RDFGraphs**: [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/) is a new feature in Kùzu to map RDF triples into Kùzu's structured property graph model.
+- **Kuzu RDFGraphs**: [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/) is a new feature in Kuzu to map RDF triples into Kuzu's structured property graph model.
   This way you can query RDF datasets in Cypher, enhance them with property graph data, and benefit from
-  Kùzu's fast query processor.
+  Kuzu's fast query processor.
 ---
 
 [^1]: Several terms are used for systems that manage RDF and provide a high-level query language over them.
@@ -195,7 +195,7 @@ RDF as a knowledge representation system, you can skip to the [next part](#rdf-a
 I want to describe a mental framework of data models that I find helpful when comparing them. 
 Let's focus on the relational model on the one side and
 the two popular graph-based data models, property graph (PG) and RDF on the other side.
-I am also adding Kùzu's variant of the PG model, which we call the *structured* PG model, into this framework.
+I am also adding Kuzu's variant of the PG model, which we call the *structured* PG model, into this framework.
 The framework is shown in the figure below.
 
 <Image src="/img/2024-03-28-in-praise-of-rdf/data-models.png" width="600" />
@@ -232,21 +232,21 @@ makes the job of a PG DBMS harder. But I still put property graph model higher o
 because in my experience most of the databases users put into PG DBMSs are extracted from relational systems so have 
 inherent structure.
 
-**Note on Kùzu's structured PG model:** Kùzu implements a variant of the property graph data model that we call the *structured* property graph model. This is 
+**Note on Kuzu's structured PG model:** Kuzu implements a variant of the property graph data model that we call the *structured* property graph model. This is 
 more or less equivalent to the relational model, except that we require users to identify their tables as "node" or
 "relationship" tables. That is why this model appears at the same location as the relational model in the figure above.
 This is a conscious choice that we are very happy about.
-We sacrifice some flexibility of the original PG model, e.g., nodes cannot have multiple labels in Kùzu.
+We sacrifice some flexibility of the original PG model, e.g., nodes cannot have multiple labels in Kuzu.
 In return, we can exploit more structure in the data to do faster and more scalable
 query processing. Further, by requiring that tables are identified
 as nodes or relationships, we are able to provide
 a graph-based data model to users and implement Cypher, which has a very nice syntax for 
 expressing paths and several common complex and recursive joins. In fact, I could put
 structured PG higher than the relational model in the figure because by identifying their tables as node vs relationship
-tables, users are telling us something important about their workloads. Specifically, they inform Kùzu
+tables, users are telling us something important about their workloads. Specifically, they inform Kuzu
 that the relationship records will be used to join node records with their "neighbor" node records.
 This is true in other PG DBMSs as well. They also have the same information.
-Kùzu and other GDBMSs exploit this information by building join indices over the relationship tables, 
+Kuzu and other GDBMSs exploit this information by building join indices over the relationship tables, 
 so that common joins of node records with their neighbors can be very fast.
 
 ## RDF as a knowledge representation system
@@ -473,18 +473,18 @@ But there are cases, as I outlined, where you need a model that's more flexible 
 
 I want to end with several notes.
 
-#### A minor plug for Kùzu RDFGraphs
+#### A minor plug for Kuzu RDFGraphs
 
-First, I want to highlight a new feature we introduced in Kùzu called [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/).
-Let me emphasize here that Kùzu's native data model is **not** RDF -- it is structured property graphs. But, part of our mission
+First, I want to highlight a new feature we introduced in Kuzu called [RDFGraphs](https://docs.kuzudb.com/rdf-graphs/).
+Let me emphasize here that Kuzu's native data model is **not** RDF -- it is structured property graphs. But, part of our mission
 is to simplify graph modeling for people and the other part is to develop the most 
 competent GDBMS out there in terms of performance and scalability, which we do by basing our core
 architecture on state-of-the-art data management principles. As part of the former goal, 
 we want people to use
-Kùzu whenever they need to model their records as a graph, whether these records exist in 
+Kuzu whenever they need to model their records as a graph, whether these records exist in 
 CSV files, RDBMSs, or are already in an RDF triple format. In light of this, 
-RDFGraphs is a lightweight extension of our structured property graph model that allows users to map RDF triples into a Kùzu database. Once
-your triples are in Kùzu, you can query them with Cypher (no inference of course), 
+RDFGraphs is a lightweight extension of our structured property graph model that allows users to map RDF triples into a Kuzu database. Once
+your triples are in Kuzu, you can query them with Cypher (no inference of course), 
 and further enhance them with other records you have modeled as a property graph.
 We also have some [pre-loaded RDFGraphs](https://docs.kuzudb.com/rdf-graphs/rdfgraphs-repo) 
 you can download and start playing around with.

@@ -1,7 +1,7 @@
 ---
 slug: "what-every-gdbms-should-do-and-vision"
-title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
-description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kùzu)"
+title: "What every competent GDBMS should do (a.k.a. the goals and vision of Kuzu)"
+description: "What every competent GDBMS should do (a.k.a. the goals and vision of Kuzu)"
 pubDate: "Jan 12 2023"
 heroImage: "/img/2023-01-12-what-every-gdbms-should-do/bachmann.png"
 categories: ["concept"]
@@ -9,7 +9,7 @@ authors: ["semih"]
 tags: ["vision"]
 ---
 
-As a co-implementer of the Kùzu GDBMS and
+As a co-implementer of the Kuzu GDBMS and
 a professor at the University of Waterloo,
 I have been thinking of GDBMSs day in and day out for many years now.
 After years of understanding and publishing on the architectural principles 
@@ -18,9 +18,9 @@ of graph data management ([1](http://www.vldb.org/pvldb/vol12/p1692-mhedhbi.pdf)
 [3](https://www.vldb.org/pvldb/vol15/p1011-jin.pdf),
 [4](https://www.vldb.org/pvldb/vol15/p1533-chen.pdf)),
 we decided to develop 
-[Kùzu](https://github.com/kuzudb/kuzu) as a state-of-the-art modern embeddable GDBMS. 
+[Kuzu](https://github.com/kuzudb/kuzu) as a state-of-the-art modern embeddable GDBMS. 
 This post covers my broad opinions on GDBMSs, and the feature set they should
-optimize for and why. In doing so, it also gives an overall vision of Kùzu, so let's gear up!
+optimize for and why. In doing so, it also gives an overall vision of Kuzu, so let's gear up!
 
 ---
 
@@ -40,20 +40,20 @@ features/use cases that RDBMSs do not traditionally optimize for: (i) pre-define
 (iv) schema querying; 
 (v) efficient storage of semi-structured data and URIs.
 GDBMSs that want to be competitive in terms of performance
-need to perfect this feature set and that's exactly what Kùzu aims to do!
+need to perfect this feature set and that's exactly what Kuzu aims to do!
 
-- **Kùzu as the GDBMS for Graph Data Science**: 
-One example application domain the Kùzu team is excited about is 
+- **Kuzu as the GDBMS for Graph Data Science**: 
+One example application domain the Kuzu team is excited about is 
 to be a usable, efficient, and scalable GDBMS of graph data science in the Python graph analytics ecosystem. 
 Here we are looking at how DuckDB revolutionized tabular data science and
 want to repeat it in graph data science! 
 
 ---
 
-This week, I presented Kùzu to the database community at the [CIDR 2023](https://www.cidrdb.org/cidr2023/papers/p48-jin.pdf) 
+This week, I presented Kuzu to the database community at the [CIDR 2023](https://www.cidrdb.org/cidr2023/papers/p48-jin.pdf) 
 conference in Amsterdam. For those who are not familiar with academic database conferences, 
 CIDR brings together work from academia and industry to discuss recent research on 
-systems aspects of database technology. Our paper was about Kùzu's 
+systems aspects of database technology. Our paper was about Kuzu's 
 goals and vision and its core query processor design for evaluating complex growing joins.
 We intentionally targeted CIDR for our paper because of its systems 
 focus and we thought many system gurus would be there: the attendees included 
@@ -74,22 +74,22 @@ enterprise applications.
 
 I want to start a 3-part blog post to cover the contents of our CIDR paper in a less academic language: 
 
-- __Post 1__: Kùzu's goals and vision as a system (this post)
+- __Post 1__: Kuzu's goals and vision as a system (this post)
 - __Post 2__: [Factorization technique for compression](../factorization)
 - __Post 3__: [Worst-case optimal join algorithms](../wcoj)
 
 In this Post 1, I discuss the following: 
    (i)   [an overview of GDBMSs](#overview-of-gdbms-and-a-bit-of-history).
    (ii)  [the features GDBMSs should optimize  for and why;](#features-every-competent-gdbms-should-optimize-for-) and 
-   (iii) [an example application domain (graph data science!) we are immediately targeting with Kùzu. ](#kùzu-as-a-gdbms-for-graph-data-science-pipelines)
+   (iii) [an example application domain (graph data science!) we are immediately targeting with Kuzu. ](#kùzu-as-a-gdbms-for-graph-data-science-pipelines)
 (ii) and (iii) should give you a good idea about the current goals and 
-vision of Kùzu. If you know GDBMSs well, you should skip over (i).
+vision of Kuzu. If you know GDBMSs well, you should skip over (i).
 
 ## Overview of GDBMSs and a Bit of History 
 In one sentence, GDBMSs are read-optimized analytical DBMSs for modeling and querying application 
 data as a graph. As a consequence they are optimized for fast querying of node and 
 relationship records. 
-Modern GDBMSs, such as Neo4j, Tigergraph, MemGraph, or Kùzu, 
+Modern GDBMSs, such as Neo4j, Tigergraph, MemGraph, or Kuzu, 
 adopt the [property graph data model](https://neo4j.com/developer/graph-database/#property-graph)
 (or its variants), where you can model your records as a set of labeled nodes and 
 edges/relationships, and key-value properties on these relationships. When
@@ -170,7 +170,7 @@ DBMSs are very complex software systems and they make a ton of design tradeoffs 
 what they optimize for. There is a very distinctive set of technical features that 
 GDBMSs should optimize for and excel in, where RDBMSs and SQL traditionally don't.
 This feature set is exactly what 
-Kùzu aims to perfect over time, which is what I hope to articulate in this post.
+Kuzu aims to perfect over time, which is what I hope to articulate in this post.
 In short: GDBMSs do offer a ton of value if 
 they are architected correctly and every software engineer should know 
 about GDBMSs[^3].
@@ -219,7 +219,7 @@ you are asking a system to search through `k^t` many possible combinations and g
 functions are scary. We have been advocating the integration of 2 specific techniques
 into the query processors of GDBMSs for several years now: (i) factorization; and (ii) worst-case optimal joins.
 Both of these techniques are specifically designed for 
-many-to-many growing joins and we have integrated them in Kùzu. Stay tuned for for my next two posts on this. 
+many-to-many growing joins and we have integrated them in Kuzu. Stay tuned for for my next two posts on this. 
 
 ### Feature 3: Recursive Join Queries
 This is probably the most obvious feature where GDBMSs should excel in. First, objectively 
@@ -242,7 +242,7 @@ In contrast, recursion has been first-class citizen
 feature in every graph-based DBMS's query language.
 This distinction is even much more visible
 if you want to do other graph-specific recursive computation, such as finding shortest paths.
-In  Kùzu, we are starting to work on implementing 
+In  Kuzu, we are starting to work on implementing 
 and optimizing recursive query support and we hope to have first a basic version and 
 then optimized versions that hopefully works very well and contributes to the principles of how these
 queries should be evaluated.
@@ -315,13 +315,13 @@ many other applications require and benefit
 from the above feature set.  One can
 think of the dataset and workloads of these applications as the "beyond relational/SQL" datasets/workloads, which
 often require modeling and querying in a graph-based DBMS, and
-we want Kùzu to excel in and represent the state-of-art in this feature set! 
+we want Kuzu to excel in and represent the state-of-art in this feature set! 
 
-## Kùzu as a GDBMS for Graph Data Science Pipelines
+## Kuzu as a GDBMS for Graph Data Science Pipelines
 
 Finally, let me tell you a little bit about 
 a particular application domain we are currently excited
-about and we want to see Kùzu used in: graph data science in the python ecosystem!
+about and we want to see Kuzu used in: graph data science in the python ecosystem!
 This figure from my CIDR slides describes this vision pictorially:
 
 <Image src="/img/2023-01-12-what-every-gdbms-should-do/kuzu-as-gdbms-of-gds.png" width="600" /> 
@@ -335,7 +335,7 @@ You might even want a pipeline
 that extracts regular tables from your graphs to a tabular data science library, 
 such as NumPy,
 since the outputs of queries in Cypher are tables of records.
-We want people to use Kùzu as an embeddable library in their Python scripts, 
+We want people to use Kuzu as an embeddable library in their Python scripts, 
 to do their modeling, querying, feature extraction, 
 cleaning, and other transformations, all by benefiting from a high-level query language 
 and state-of-art graph data management techniques
@@ -346,7 +346,7 @@ and suggestions for features we should implement to enable your workloads.
 
 OK, this is it for now. In the next two blog posts, I will discuss 
 factorization and worst-case optimal join algorithms and describe 
-some of the principles that we adopted in Kùzu's query processor.
+some of the principles that we adopted in Kuzu's query processor.
 Until then, happy new year from the cold but cozy winter of 🇨🇦 
 and [pip install kuzu](https://github.com/kuzudb/kuzu)!
 
@@ -358,10 +358,10 @@ and [pip install kuzu](https://github.com/kuzudb/kuzu)!
 
 [^3]: I am a strong supporter of devoting a few lectures to GDBMSs after covering the fundamental topics on the relational model and RDBMSs in core introduction to DBMSs courses in undergraduate curriculums. Students should broaden their perspectives on the available data models and query/programming languages to them when they develop applications. GDBMSs is an obvious choice here. So is Datalog and RDF/SparQL.
 
-[^4]: We articulated this list of features in our CIDR 2023 paper. Incidentally, [a paper](https://www.cidrdb.org/cidr2023/papers/p66-wolde.pdf) written by CWI on a graph query extension to DuckDB, had a 12-item list of "techniques" that GDBMSs should implement at their cores. Let me call this the CWI list. These items are not features in the sense I'm using the word, so I call them techniques. As you'll see my features are higher-level system properties from user's perspective. Peter Boncz, who is renowned in the field for having written or advised many successful DBMSs that spinned off, presented the CWI paper. I highly recommend this as another reading if you want to know more about Peter and his co-authors' technical insights about how GDBMSs should be architected. Importantly, Kùzu has integrated or is in the process of integrating 11 of the 12 techniques in the CWI list(bulk path finding is the one we have to do more thinking on) and our prior publications had also articulated many of these insights,  such as the fact that [GDBMSs should be columnar systems](https://www.vldb.org/pvldb/vol14/p2491-gupta.pdf) doing vectorized querying and of course we did a ton of work on [worst-case optimal joins](https://www.vldb.org/pvldb/vol12/p1692-mhedhbi.pdf) and [factorization](https://www.cidrdb.org/cidr2023/papers/p48-jin.pdf), which are also in the CWI list. I should acknowledge that Peter had been advocating for some of the techniques on the CWI list at least since 2018. I remember a presentation he gave in 2018 to GDBMSs researchers and developers titled "Why are Existing GDBMSs Incompetent?", which listed some of the techniques in the CWI list and visibly has inspired the title of this blog.
+[^4]: We articulated this list of features in our CIDR 2023 paper. Incidentally, [a paper](https://www.cidrdb.org/cidr2023/papers/p66-wolde.pdf) written by CWI on a graph query extension to DuckDB, had a 12-item list of "techniques" that GDBMSs should implement at their cores. Let me call this the CWI list. These items are not features in the sense I'm using the word, so I call them techniques. As you'll see my features are higher-level system properties from user's perspective. Peter Boncz, who is renowned in the field for having written or advised many successful DBMSs that spinned off, presented the CWI paper. I highly recommend this as another reading if you want to know more about Peter and his co-authors' technical insights about how GDBMSs should be architected. Importantly, Kuzu has integrated or is in the process of integrating 11 of the 12 techniques in the CWI list(bulk path finding is the one we have to do more thinking on) and our prior publications had also articulated many of these insights,  such as the fact that [GDBMSs should be columnar systems](https://www.vldb.org/pvldb/vol14/p2491-gupta.pdf) doing vectorized querying and of course we did a ton of work on [worst-case optimal joins](https://www.vldb.org/pvldb/vol12/p1692-mhedhbi.pdf) and [factorization](https://www.cidrdb.org/cidr2023/papers/p48-jin.pdf), which are also in the CWI list. I should acknowledge that Peter had been advocating for some of the techniques on the CWI list at least since 2018. I remember a presentation he gave in 2018 to GDBMSs researchers and developers titled "Why are Existing GDBMSs Incompetent?", which listed some of the techniques in the CWI list and visibly has inspired the title of this blog.
 
 [^5]: Although some refer to these as an "adjacency list index" because that's a common term in graph terminology, I need to pay my respects to the giants in the field: these are plain old [1980s Valduriez join indices](https://dl.acm.org/doi/abs/10.1145/22952.22955). And no, they were invented in the context of RDBMSs. That said, they never found much adoption in RDBMSs. But they are almost universally adopted in GDBMSs.
 
 [^6]: Designing the schema, i.e., defining the types of entities and relationships and class structures and constraints of such complex domains can be decades of work. What I'm referring to as schema is called an "ontology" in knowledge graph/semantic web space. If you ever thought you modeled a hard application domain, take a look at [SNOMED](https://en.wikipedia.org/wiki/SNOMED_CT), which is a decades long effort to model and standardize human medical knowledge. Last term, I had a seminar on SNODEM in my graduate course on knowledge graphs and students were baffled by the complexity of this "ontology", which  describes the types of entities and their relationships and constraints, which RDF technology stack is quite good at.
 
-[^7]: Before we released Kùzu, we had support for adding arbitrary node/edge properties but we removed a large chunk of code out of the system to release a thinner code base. So currently you need to specify a schema for your nodes and relationships in Kùzu. We will wait and see if/when that demand comes and how strongly it comes. We know from our conversations with many users and developers of GDBMSs over the years that most datasets in enterprises are not this complex and can be structured. At least after a proof of concept phase of applications, developers structure their data.
+[^7]: Before we released Kuzu, we had support for adding arbitrary node/edge properties but we removed a large chunk of code out of the system to release a thinner code base. So currently you need to specify a schema for your nodes and relationships in Kuzu. We will wait and see if/when that demand comes and how strongly it comes. We know from our conversations with many users and developers of GDBMSs over the years that most datasets in enterprises are not this complex and can be structured. At least after a proof of concept phase of applications, developers structure their data.

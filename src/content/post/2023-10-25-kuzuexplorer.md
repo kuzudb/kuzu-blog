@@ -10,7 +10,7 @@ authors: ["chang"]
 tags: ["visualization"]
 ---
 
-Today, we are happy to announce the release of KùzuExplorer, a browser-based frontend for Kùzu to
+Today, we are happy to announce the release of KùzuExplorer, a browser-based frontend for Kuzu to
 visualize and explore database schemas and query results in the form of a graph, table, or in JSON.
 This is a very useful tool for exploring databases and debugging applications during prototyping
 phase. This post describes a brief overview of the main features of KùzuExplorer with pointers to
@@ -52,7 +52,7 @@ about what can be done in the Schema panel can be found [here](https://docs.kuzu
 
 ## Shell Panel: Query Result Visualization
 
-Using KùzuExplorer, you can also issue Cypher queries similar to Kùzu's
+Using KùzuExplorer, you can also issue Cypher queries similar to Kuzu's
 [command line interface](//docs.kuzudb.com/installation#command-line), and
 visualize the results of these queries.
 To issue queries go to the `Shell` tab on the right corner and you can type a Cypher query.

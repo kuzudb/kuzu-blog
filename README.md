@@ -1,6 +1,6 @@
-# Kùzu Blog
+# Kuzu Blog
 
-Code for Kùzu's blog site, built with [Astro](https://astro.build/), Tailwind CSS, and TypeScript.
+Code for Kuzu's blog site, built with [Astro](https://astro.build/), Tailwind CSS, and TypeScript.
 The site is built on top of the [EV0](https://github.com/gndx/ev0-astro-theme) OSS theme.
 
 ## 🚀 Getting Started
@@ -32,14 +32,14 @@ To configure the blog, edit the `src/config/config.json` file. This file contain
 ```scheme
 {
   "site": {
-    "title": "Blog - Kùzu",
+    "title": "Blog - Kuzu",
     "base_url": "blog.kuzudb.com",
     "base_path": "/",
     "favicon": "/favicon.ico",
     "logoLight": "/logoLight.png",
     "logoDark": "/logoDark.png",
     "lang": "en",
-    "description": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database",
+    "description": "Kuzu is a highly scalable, extremely fast, easy-to-use embeddable graph database",
     "pageSize": 6
   },
   "features": {
@@ -48,11 +48,11 @@ To configure the blog, edit the `src/config/config.json` file. This file contain
   },
   "metadata": {
     "meta_author": "Kùzu Inc.",
-    "meta_description": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database"
+    "meta_description": "Kuzu is a highly scalable, extremely fast, easy-to-use embeddable graph database"
   },
   "blog_description": {
-    "heading": "Welcome to the Kùzu blog",
-    "bio": "Kùzu is a highly scalable, extremely fast, easy-to-use embeddable graph database."
+    "heading": "Welcome to the Kuzu blog",
+    "bio": "Kuzu is a highly scalable, extremely fast, easy-to-use embeddable graph database."
   },
 }
 ```

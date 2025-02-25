@@ -1,6 +1,6 @@
 ---
 slug: "iamgraphviz"
-title: "IAMGraphViz: Visualizing AWS IAM Permissions with Kùzu"
+title: "IAMGraphViz: Visualizing AWS IAM Permissions with Kuzu"
 description: "An example of using graph visualizations for infrastructure engineers to analyze the 
 IAM network of an enterprise"
 pubDate: "July 19 2023"
@@ -10,9 +10,9 @@ authors: ["chang", {"name": "Chris Norman", "image": "/img/authors/chris.jpeg", 
 tags: ["visualization"]
 ---
 
-[Common Fate](https://www.commonfate.io/)  is a framework for managing complex cloud permissions. They provide tools to simplify access at scale to AWS, Azure, and Google Cloud accounts. You can learn about what you can do with Common Fate on [their website](https://www.commonfate.io/). Here, we will talk about a recent proof of concept graph visualization tool called IAMGraphViz that [Chang Liu](https://www.linkedin.com/in/mewim/) (who is coauthoring this post) and I developed using Kùzu! IAMGraphViz is intended for infrastructure engineers to dig deep into the permission assignments in AWS IAM Identity Center using graph visualization. Using IAMGraphViz, one can easily visualize who has what type of access to different accounts on AWS as well as how they have access to these accounts. This is all done by analyzing the paths from users to accounts in a graph visualization, where the nodes and edges model users, accounts, groups, group memberships, permission sets and other entities in the AWS IAM Identity Center system.
+[Common Fate](https://www.commonfate.io/)  is a framework for managing complex cloud permissions. They provide tools to simplify access at scale to AWS, Azure, and Google Cloud accounts. You can learn about what you can do with Common Fate on [their website](https://www.commonfate.io/). Here, we will talk about a recent proof of concept graph visualization tool called IAMGraphViz that [Chang Liu](https://www.linkedin.com/in/mewim/) (who is coauthoring this post) and I developed using Kuzu! IAMGraphViz is intended for infrastructure engineers to dig deep into the permission assignments in AWS IAM Identity Center using graph visualization. Using IAMGraphViz, one can easily visualize who has what type of access to different accounts on AWS as well as how they have access to these accounts. This is all done by analyzing the paths from users to accounts in a graph visualization, where the nodes and edges model users, accounts, groups, group memberships, permission sets and other entities in the AWS IAM Identity Center system.
 
-The IAMGraphViz project is designed and implemented as a web application using a graph DBMS (GDBMS) to store and retrieve data. Before landing on Kùzu, we surveyed using several other GDBMSs, such as Neo4j, but they were all harder to use. Neo4j, for example, requires hosting a separate database. We then discovered Kùzu, which only required a `pip install` and import statement and we could simply embed it into our application. In this project our datasets could fit entirely onto a single compute node,and so Kùzu was far simpler for us to work with than alternatives. Kùzu is also far cheaper and more serverless-friendly than running a separate database.
+The IAMGraphViz project is designed and implemented as a web application using a graph DBMS (GDBMS) to store and retrieve data. Before landing on Kuzu, we surveyed using several other GDBMSs, such as Neo4j, but they were all harder to use. Neo4j, for example, requires hosting a separate database. We then discovered Kuzu, which only required a `pip install` and import statement and we could simply embed it into our application. In this project our datasets could fit entirely onto a single compute node,and so Kuzu was far simpler for us to work with than alternatives. Kuzu is also far cheaper and more serverless-friendly than running a separate database.
 
 This post follows the [Colab](https://colab.research.google.com/drive/1fotlNnOj1FGad6skBG7MRrHVdHd3jIl6) that Chang Liu created after we discussed this use case together.
 
@@ -22,7 +22,7 @@ So let's get to it!
 
 We will use the data model shown in the figure below that faithfully (but partially) models the
 core concepts of AWS IAM permission management. Let's first review these concepts, all
-of which will be modeled as nodes in Kùzu, as a background.
+of which will be modeled as nodes in Kuzu, as a background.
 We will provide as simple definitions as we can to keep the post short and provide links
 to necessary AWS IAM documentation: 
 
@@ -104,6 +104,6 @@ Many other graph visualizations can be helpful for infrastructure engineers to a
 IAM network of an enterprise. For example, to find inconsistent privileges given to users,
 we might want to *find and plot multiple paths from a user to an account with different privileges*.
 Or we might want to extend our model with more fine grained resources that are connected to accounts
-and analyze paths from users to these resources (see the [PMapper](https://github.com/nccgroup/PMapper) project that models the IAM data in a more detailed way). The key takeaway is this: graph visualizations can be very powerful to analyze cloud permission data and embedding Kùzu into your applications
+and analyze paths from users to these resources (see the [PMapper](https://github.com/nccgroup/PMapper) project that models the IAM data in a more detailed way). The key takeaway is this: graph visualizations can be very powerful to analyze cloud permission data and embedding Kuzu into your applications
 to develop tools like IAMGraphViz is extremely easy and fun 🥳🙌💪!
 

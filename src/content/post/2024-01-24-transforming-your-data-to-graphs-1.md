@@ -1,7 +1,7 @@
 ---
 slug: "transforming-your-data-to-graphs-1"
 title: "Transforming your data to graphs - Part 1"
-description: "Graph thinking for relational data, and the ETL workflow in Kùzu"
+description: "Graph thinking for relational data, and the ETL workflow in Kuzu"
 pubDate: "January 24 2024"
 heroImage: "/img/2024-01-24-transforming-your-data-1/edge_tables.png"
 categories: ["tutorial"]
@@ -14,7 +14,7 @@ the core data structures used to model application data in two broad classes of 
 relational DBMSs (RDBMS) and graph DBMSs (GDBMS).
 
 In this post, we'll look at how to transform data that might exist in a typical relational system
-to a graph and load it into a Kùzu database. The aim of this post and the next one is to showcase
+to a graph and load it into a Kuzu database. The aim of this post and the next one is to showcase
 "graph thinking"[^1], where you explore connections in your existing structured data and apply
 it to potentially uncover new insights.
 
@@ -38,7 +38,7 @@ pattern will find all possible relationships between nodes with names Alice and 
 suitable to express queries for a variety of standard data analytics tasks, it is arguably not as
 suitable when it comes to expressing queries with recursive joins or those that describe complex
 patterns — they are expressed more naturally as paths or graph patterns. Graph queries
-in a well-designed GDBMS like Kùzu contain [specialized syntaxes](https://en.wikipedia.org/wiki/Kleene_star)
+in a well-designed GDBMS like Kuzu contain [specialized syntaxes](https://en.wikipedia.org/wiki/Kleene_star)
 and operators for these types of query workloads.
 
 For a much more detailed description on the benefits of graph modeling and GDBMSs, see our earlier
@@ -97,20 +97,20 @@ explicit name `TransactedWith`.
 
 ### Transforming relational data to graphs
 
-A key feature of Kùzu is that it's a **schema-based** graph database, making it
-highly convenient to read data that already exists in relational systems. Like RDBMSs, Kùzu also relies
+A key feature of Kuzu is that it's a **schema-based** graph database, making it
+highly convenient to read data that already exists in relational systems. Like RDBMSs, Kuzu also relies
 on strongly-typed values in columns and uses primary key constraints on tables to model the data.
-The only difference is that Kùzu uses separate node and edge tables, which we'll show how to
+The only difference is that Kuzu uses separate node and edge tables, which we'll show how to
 create below.
 
-> As such, Kùzu can be viewed as a relational system that provides graph
+> As such, Kuzu can be viewed as a relational system that provides graph
 > modeling capabilities over your tables, allowing you to express graph-based paths and patterns very
-> efficiently in Cypher, the query language implemented by Kùzu.
+> efficiently in Cypher, the query language implemented by Kuzu.
 
 
 In this post, for simplicity, we'll assume that the tables we showed in the relational schema are available
 as CSV files in the `data` directory. The `load_data.py` script will transform and load the
-data into a Kùzu database, while the `query.py` file will run some simple queries to test that
+data into a Kuzu database, while the `query.py` file will run some simple queries to test that
 the load was successful.
 
 ```bash
@@ -128,8 +128,8 @@ the load was successful.
 ### Node tables
 
 The data in the `client.csv`, `city.csv`, `company.csv` and `merchant.csv` files are already in the
-right structure for Kùzu to load them as node tables. You can create the node tables using the
-following Cypher queries and run them via the Kùzu CLI, or the client SDK of your choice.
+right structure for Kuzu to load them as node tables. You can create the node tables using the
+following Cypher queries and run them via the Kuzu CLI, or the client SDK of your choice.
 
 ```cypher
 // Client node table
@@ -170,7 +170,7 @@ CREATE NODE TABLE Merchant(
 )
 ```
 
-Note that `PRIMARY KEY` constraints are required on every node table in Kùzu, as they are used to
+Note that `PRIMARY KEY` constraints are required on every node table in Kuzu, as they are used to
 ensure that edges are always created on unique node pairs. In this case, we use the `client_id`,
 `city_id`, `company_id` and `merchant_id` columns as the primary keys for each respective table.
 
@@ -212,7 +212,7 @@ used to connect the nodes based on the values that match a primary key constrain
 
 The data for the edges require minor transformations to the existing CSV files in which the first
 and second columns respectively represent the `FROM` and `TO` nodes' primary keys. To help reduce
-the amount of custom code you have to write, Kùzu provides convenient APIs to
+the amount of custom code you have to write, Kuzu provides convenient APIs to
 scan/read from CSV files and to copy data from CSV files to a node or edge table. An example is
 shown below.
 
@@ -266,7 +266,7 @@ TO 'located_in.csv';
 
 With all the input files in place, we can now proceed to insert the data and build the graph!
 
-## Insert data into Kùzu
+## Insert data into Kuzu
 
 Collecting all the above functions, we can write a script that performs the following:
 
@@ -292,13 +292,13 @@ COPY LocatedIn FROM 'located_in.csv'
 ```
 
 The queries above require that the empty tables were created beforehand. The `COPY <edge_table> FROM <file>` statement
-writes the data into a Kùzu database. Running the queries on an existing database connection
+writes the data into a Kuzu database. Running the queries on an existing database connection
 results in the graph being saved to a local directory.
 
 ## Querying the graph
 
 We then run some simple queries to test that the data was loaded correctly. We can either create
-a standalone script using the client SDK of your choice, or fire up a [Kùzu CLI](//docs.kuzudb.com/getting-started/cli)
+a standalone script using the client SDK of your choice, or fire up a [Kuzu CLI](//docs.kuzudb.com/getting-started/cli)
 shell and run some Cypher queries.
 
 The first query finds all the clients who transacted with the merchants of "Starbucks".
@@ -372,7 +372,7 @@ as patterns and paths (possibly recursive ones), with an intuitive syntax.
 
 Running Cypher queries in a shell editor is great during initial testing, but on completion, obtaining visual
 feedback is very useful in refining the data model. In a recent blog post, we introduced
-[Kùzu Explorer](../kuzuexplorer), a browser-based frontend that allows
+[Kuzu Explorer](../kuzuexplorer), a browser-based frontend that allows
 users to visualize their graph data and run queries interactively.
 
 The explorer is currently only accessible via Docker, but a standalone application is on the way. To visualize
@@ -389,7 +389,7 @@ You can then see a query editor in your browser at `http://localhost:8000`.
 
 ### Verify schema
 
-In the Kùzu explorer window on the browser, click on the `Schema` tab on the top right.
+In the Kuzu explorer window on the browser, click on the `Schema` tab on the top right.
 
 ![](/img/2024-01-24-transforming-your-data-1/kuzu_schema_viz.png)
 
@@ -414,10 +414,10 @@ It's possible to customize the visual style of the graph by clicking on the `Set
 ## Conclusions
 
 The aim of this blog post is to show how to transform data that might exist in a typical relational
-system to a graph and load it into a Kùzu database. We also show how to visualize the graph and
+system to a graph and load it into a Kuzu database. We also show how to visualize the graph and
 run some simple queries to test our data model.
 
-What's important to take away from this exercise is that using a graph database like Kùzu for the
+What's important to take away from this exercise is that using a graph database like Kuzu for the
 kinds of queries we ran above makes a **lot** of sense. The raw transaction data that may have been
 sitting in an RDBMS system wasn't simple to reason about when it came to answering questions
 about connected entities. Doing so in SQL would have required multiple joins and subqueries, whereas
@@ -427,12 +427,12 @@ benefit from a graph data model, and there are many cases where SQL and RDBMS ar
 Another key takeaway is that designing a graph data model is an
 *iterative* exercise. You may not get it right the first time, and that's okay! The key is to have
 a good understanding of the data and the questions you want to answer, and to keep refining the
-model as you learn more about the data. Using an embeddable solution like Kùzu is really helpful
+model as you learn more about the data. Using an embeddable solution like Kuzu is really helpful
 in this regard, as you can quickly load the data and test your queries without having to worry
 about setting up servers or authentication.
 
 In the [next post](../transforming-your-data-to-graphs-2), we'll look at a larger dataset of a similar nature, to answer more complex
-questions about disputed transactions. In the meantime, give [Kùzu](https://github.com/kuzudb/kuzu)
+questions about disputed transactions. In the meantime, give [Kuzu](https://github.com/kuzudb/kuzu)
 a try out on your own data, and begin thinking about whether knowledge graphs are a good fit for
 your use case!
 
@@ -440,7 +440,7 @@ your use case!
 
 The code to reproduce the workflow shown in this post can be found in the
 [graphdb-demo](https://github.com/kuzudb/graphdb-demo/tree/main/src/python/transactions) repository.
-It uses Kùzu's Python API, but you are welcome to use the client API [of your choice](//docs.kuzudb.com/client-apis).
+It uses Kuzu's Python API, but you are welcome to use the client API [of your choice](//docs.kuzudb.com/client-apis).
 
 ## Further reading
 

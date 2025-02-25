@@ -225,7 +225,7 @@ is implemented in the examples used in LlamaIndex's documentations using [LlamaI
 
 ![](/img/2024-01-15-llms-graphs-part-2/triples-based-rag-overview.png)
 
-The triples are stored in a GDBMS. You can use a [LlamaIndex GraphStore](https://docs.llamaindex.ai/en/stable/community/integrations/graph_stores.html) for this and Kùzu has an implementation; see the [KuzuGraphStore demo here](https://docs.llamaindex.ai/en/stable/examples/index_structs/knowledge_graph/KuzuGraphDemo.html). The system extract entities using $Q_{NL}$, using some
+The triples are stored in a GDBMS. You can use a [LlamaIndex GraphStore](https://docs.llamaindex.ai/en/stable/community/integrations/graph_stores.html) for this and Kuzu has an implementation; see the [KuzuGraphStore demo here](https://docs.llamaindex.ai/en/stable/examples/index_structs/knowledge_graph/KuzuGraphDemo.html). The system extract entities using $Q_{NL}$, using some
 entity or keyword extractor. In the LlamaIndex demos, this is done by using an LLM. Specifically,
 LLM is prompted with the following [prompt](https://github.com/run-llama/llama_index/blob/ce82bd42329b56bca2a6a44e0f690ebedaf1f002/llama_index/prompts/default_prompts.py#L147): `A question is provided below. Given the question, extract up to {max_keywords}
 keywords from the text....` etc. These keywords are used
