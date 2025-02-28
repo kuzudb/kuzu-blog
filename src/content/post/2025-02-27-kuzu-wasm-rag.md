@@ -117,3 +117,15 @@ Looking ahead, **in-browser computing** will continue to improve, making this ap
 ### **Final Thoughts**  
 
 While the current implementation has limitations, **the core idea of fully local, private, and cost-free graph querying is promising**. As web technologies and LLM efficiency improve, an approach like this could become truly practical and widely usable in the future.
+
+## **Try It Yourself**  
+
+We have deployed the **LinkedIn Graph RAG demo** so you can test it in your browser:  
+
+🔗 **Live Demo:** [linkedin-wasm-demo.kuzudb.com](https://linkedin-wasm-demo.kuzudb.com)  
+
+You can also explore the **source code** and contribute to the project:  
+
+📂 **GitHub Repository:** [github.com/kuzudb/wasm-linkedin-example](https://github.com/kuzudb/wasm-linkedin-example)  
+
+Simply drag and drop your **LinkedIn data dump** into the app and start querying your personal graph—**all locally, with no servers involved!** 🚀
