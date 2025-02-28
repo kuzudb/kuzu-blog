@@ -63,3 +63,57 @@ We adapted the prompts from our **LangChain-Kùzu integration** ([GitHub Repo](h
 - **Added Background Information** – We provide additional details about the LinkedIn data source in the prompt, helping the LLM better understand the structure and relationships in the dataset.  
 - **Schema Representation in YAML** – Whenever possible, we represent the schema in **YAML instead of raw JSON**, as LLMs tend to parse and understand YAML more effectively.  
 
+
+## Results  
+
+We tested our **in-browser Graph RAG system** on a **MacBook Pro 2023 (M2 MAX, 32GB RAM)** using **Llama-3.1-8B-Instruct-q4f32_1-MLC**.  
+
+### **Performance**  
+- **Initial model fetch time**: ~300 seconds  
+- **Generation speed**:  
+  - **Prefill tokens**: 60-70 tokens/sec  
+  - **Decode tokens**: 15-20 tokens/sec  
+- **Average query generation time**: **10-15 seconds per user input**  
+
+### **Accuracy of Generated Queries**  
+
+For **simple queries**, the model performed well. It correctly generated Cypher queries for straightforward requests such as:  
+- *"How many companies did I follow?"*  
+- *"Which contacts work at Kùzu, Inc?"*  
+- *"Which skills do I have?"*  
+
+(Successful generations are shown below.)  
+<Image src="/img/2025-02-27-kuzu-wasm-rag/successful-generations.png">
+
+
+However, for **more complex queries** requiring **joins, filtering, and aggregation**, the model struggled. It often produced incorrect or incomplete Cypher queries for questions like:  
+- *"Who endorsed me the most times?"*  
+- *"Which contacts have worked with me at the same company?"*  
+
+## Conclusion  
+
+This experiment demonstrates the feasibility of **fully local, serverless Graph RAG** using **Kùzu-Wasm** and **WebLLM**. While the results are mixed, it highlights both the **advantages** and **challenges** of in-browser AI-powered graph querying.  
+
+### **Pros**  
+✅ **Privacy & Confidentiality** – All data remains on the user's device, ensuring complete privacy.  
+✅ **Zero Installation & Configuration** – Runs in the browser with no setup required.  
+✅ **Easy Deployment & Maintenance-Free** – Can be hosted on any static web service with **no need for database or LLM infrastructure**.  
+✅ **Low/Zero Operational Cost** – Since computation happens on the client’s machine, there’s **no cloud cost** for database queries or LLM calls. A CDN can serve a large number of users efficiently.  
+
+### **Cons**  
+❌ **Slow Initial Loading** – Kùzu-Wasm takes ~10 seconds to load, and WebLLM requires ~300 seconds for the first model load (though subsequent loads are faster).  
+❌ **Performance Depends on Client’s Device** – Query generation speed and execution depend on the user’s hardware.  
+❌ **WebLLM Model Limitations** – The **distilled LLM struggles with complex queries**, especially those requiring multiple joins or aggregation.  
+❌ **Limited Browser Compatibility** – Currently, some browsers (e.g., Safari) do not fully support WebLLM or WebGPU.  
+
+### **Future Potential**  
+
+Looking ahead, **in-browser computing** will continue to improve, making this approach more viable:  
+- **Better Web Standards** – Technologies like **WebGPU (for faster computation)** and **WASM64 (removing the 4GB memory limit for WebAssembly)** will improve browser performance.  
+- **Smaller, Smarter LLMs** – **More efficient distilled models** and **fine-tuning for query generation** could significantly improve Cypher query accuracy.  
+- **Hardware Advancements** – With AI acceleration becoming a focus in modern hardware, **future devices will run LLMs much faster**.  
+- **Broader Browser Support** – As browsers adopt these standards, compatibility issues will decrease.  
+
+### **Final Thoughts**  
+
+While the current implementation has limitations, **the core idea of fully local, private, and cost-free graph querying is promising**. As web technologies and LLM efficiency improve, an approach like this could become truly practical and widely usable in the future.
