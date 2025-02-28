@@ -122,7 +122,7 @@ While the current implementation has limitations, **the core idea of fully local
 
 We have deployed the **LinkedIn Graph RAG demo** so you can test it in your browser:  
 
-🔗 **Live Demo:** [linkedin-wasm-demo.kuzudb.com](https://linkedin-wasm-demo.kuzudb.com)  
+🔗 **Live Demo:** [wasm-linkedin-example.kuzudb.com](https://wasm-linkedin-example.kuzudb.com)  
 
 You can also explore the **source code** and contribute to the project:  
 
