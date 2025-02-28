@@ -104,12 +104,12 @@ This experiment demonstrates the feasibility of **fully local, serverless Graph 
 ❌ **Slow Initial Loading** – Kùzu-Wasm takes ~10 seconds to load, and WebLLM requires ~300 seconds for the first model load (though subsequent loads are faster).  
 ❌ **Performance Depends on Client’s Device** – Query generation speed and execution depend on the user’s hardware.  
 ❌ **WebLLM Model Limitations** – The **distilled LLM struggles with complex queries**, especially those requiring multiple joins or aggregation.  
-❌ **Limited Browser Compatibility** – Currently, some browsers (e.g., Safari) do not fully support WebLLM or WebGPU.  
+❌ **Limited Browser Compatibility** – Currently, some browsers (e.g., Safari) do not fully support WebLLM or WebGPU standards, making this application unusable on those platforms.
 
 ### **Future Potential**  
 
 Looking ahead, **in-browser computing** will continue to improve, making this approach more viable:  
-- **Better Web Standards** – Technologies like **WebGPU (for faster computation)** and **WASM64 (removing the 4GB memory limit for WebAssembly)** will improve browser performance.  
+- **Better Web Standards** – General Availability of **WebGPU (for faster computation)** and **WASM64 (removing the 4GB memory limit for WebAssembly)** will improve browser performance.  
 - **Smaller, Smarter LLMs** – **More efficient distilled models** and **fine-tuning for query generation** could significantly improve Cypher query accuracy.  
 - **Hardware Advancements** – With AI acceleration becoming a focus in modern hardware, **future devices will run LLMs much faster**.  
 - **Broader Browser Support** – As browsers adopt these standards, compatibility issues will decrease.  
