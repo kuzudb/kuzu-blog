@@ -18,9 +18,9 @@ relationships (edges) between them from the unstructured data.
 
 It's amply clear these days that LLMs are proving to be powerful and versatile at a variety of tasks. In this post, we will show how to use
 Kuzu in combination with [BAML](https://docs.boundaryml.com/home), a domain-specific language for generating clean, structured outputs from LLMs,
-to **scalably** and **reliably** transform unstructured data into a graph that can be used for downstream analysis and RAG. Using tools like BAML can help increase the
-reliability of your LLM workflows by adding some much-needed engineering rigour into the LLM-driven process. We'll also look at some evaluation results to validate the quality of the
-LLM's output. The key steps involved are summarized in the diagram below:
+to help transform the unstructured data into a graph that can be used for downstream analysis and RAG. Using tools like BAML can help increase the
+robustness and testability of your LLM workflows by adding some much-needed engineering rigour during the iteration process. We'll also look at
+some evaluation results to validate the quality of several LLMs' outputs. The key steps in the overall workflow are summarized in the diagram below:
 
 <Img src="/img/unstructured-data-to-graph-baml-kuzu/kuzu-baml-high-level.png" alt="High-level overview of the BAML-Kuzu workflow" />
 
@@ -72,7 +72,7 @@ Let's walk through the key steps in the following sections.
 
 ## 1. PDF -> Image
 
-[This simple FastAPI app](https://github.com/prrao87/pdf2image) is used to transform the PDF data of drugs into a series of PNG images.
+[This simple FastAPI app](https://github.com/prrao87/pdf2image) is used to transform the PDF data of drugs into a series of PNG images[^4].
 The images are transformed to their base64-encoded string representations, which multimodal LLMs like `gpt-4o-mini` can interpret
 well. Because each page of the PDF is represented as a separate image, we can easily scale up this approach to handle
 far larger PDFs than what is shown in this simple example, and concurrently process these images to speed things up.
@@ -127,6 +127,8 @@ The prompt in BAML is specified via a function definition:
 function ExtractFromImage(img: image) -> ConditionAndDrug[] {
   client OpenRouterGpt4oMini
   prompt #"
+    You are an expert at extracting healthcare and pharmaceutical information.
+
     Extract the condition, drug names and side effects from the provided table with these columns:
     - Reason for drug
     - Drug names: Generic name & (Brand name)
@@ -146,6 +148,8 @@ places, to guide the LLM to generate a valid output. Here's what the actual prom
 formatted by BAML:
 
 ```
+You are an expert at extracting healthcare and pharmaceutical information.
+
 Extract the condition, drug names and side effects from the provided table with these columns:
 - Reason for drug
 - Drug names: Generic name & (Brand name)
@@ -394,21 +398,20 @@ between entities.
 Because LLMs are not deterministic (and every LLM is different), it's always a good practice to
 quantitatively evaluate the LLM's output for the given prompt. As new LLMs become available and the
 prompts evolve alongside them, a sound evaluation suite gives you confidence that the required task is
-still being performed reliably.
+still being performed reliably. The code for the evaluation results shown below is available [here](https://github.com/kuzudb/baml-kuzu-demo/tree/main/src/evals).
 
-We defined 4 metrics based on set operations to evaluate the quality of the LLM's structured output:
+We defined 4 metrics based on set operations to evaluate the quality of the LLM's structured output.
 
 - $ \text{exact match} \rarr $ The LLM's value is an exact match to the human-annotated value
 - $ \text{mismatch} \rarr $ The LLM's value is different from the human-annotated value
 - $ \text{missing} \rarr $ The LLM missed the value and produced an empty result
-- $ \text{potential hallucination} \rarr $ The LLM produced a value, but the human-annotated data
-  is missing the value.
+- $ \text{potential hallucination} \rarr $ The LLM produced a value that is not present in the human-annotated data.
 
-The last case is named as a "potential" hallucination because the LLM may also have produced a value that is
-from it's memorization of the training data, but is not present in the human-annotated data. This isn't necessarily
-a _bad_ thing, because the LLM can actually help us enrich our data in certain scenarios. However, anything
-that's marked as a potential hallucination would need to be vetted and verified by a human and the
-experiment would need to be run hundreds of times to get a good sense of reproducibility in the LLM's memorized outputs.
+The last metric is named "_potential_" hallucination because the LLM could have also produced a correct value that's
+from its memorization of the training data (which isn't the same as an outright hallucination). This isn't necessarily
+a _bad_ thing, because the LLM can actually help us enrich our data in certain scenarios where the source may be missing it.
+However, anything that's marked as a potential hallucination would need to be vetted and verified by a human, so the
+fewer the better!
 
 ### Image extraction
 
@@ -418,8 +421,9 @@ Using the `gpt-4o-mini` model in the image extraction task, the following raw co
 |--- | --- | --- | --- | --- | --- |
 | `openai/gpt-4o-mini` | Mar 2025 | 168 | 4 | 2 | 9 |
 
-Upong inspecting the potential hallucinations, we see that the LLM produced many of them from its memorization of the training data.
-The memorization was perfect, because the model repeatedly produced the same result (upon tens of runs) for the same input.
+Upon inspecting the potential hallucinations, we see that the LLM produced many of them from its memorization of the training data.
+Because the memorization was so good, the model repeatedly produced the same correct result, even when running the same
+prompt dozens of times. See the full list of potential hallucinations below in the second page, `drugs_2.json`:
 
 ```
 File: drugs_2.json
@@ -434,18 +438,18 @@ File: drugs_2.json
     <Missing> (human annotated) --- 'Vasotec' (extracted)
     <Missing> (human annotated) --- 'Zestril' (extracted)
 ```
-Although the human annotated data from the PDF had empty values for ACE inhibitor drugs (that lower blood pressure),
-the LLM correctly associated that `Altace` is the brand name for the generic drug `Ramipril`, and so on.
-After human inspection, we can update the above table to reflect the correct values. `Trimethoprim` is
-the only value in the above list that was not correctly extracted -- it was present as `Sulfamethoxazole/Trimethoprim`
-in the image, and the formatting of the text in the image is possibly the reason the LLM missed it.
+Although the human annotated data did not contain brand names of ACE inhibitor drugs (that lower blood pressure),
+the LLM "extracted" them from its memorization, and _correctly_ associated that `Altace` is the brand name for the generic drug `Ramipril`, and so on.
+`Trimethoprim` is the only value in the above list that was incorrectly extracted -- it was present in the original image as `Sulfamethoxazole/Trimethoprim`,
+but the multiline formatting of this snippet of text in the image is possibly the reason the LLM missed it.
+All it took was a quick inspection of these 9 values, and we can remove 8 of them them from the list of potential hallucinations. Much better! 🚀
 
 | Model | Date | Exact Match | Mismatch | Missing | Potential Hallucination |
 |--- | --- | --- | --- | --- | --- |
-| `gpt-4o-mini` | Mar 2025 | 176 | 4 | 2 | 1 |
+| `gpt-4o-mini` | Mar 2025 | 168 | 4 | 2 | 1 |
 
-Much better! We can also inspect the missed and mismatched values to see if there are any patterns
-that can be exploited to improve the LLM's performance.
+Next, we'll inspect the missed and mismatched values to see if there are any common patterns
+that can be identified to understand the LLM's performance.
 
 ```
 File: drugs_2.json
@@ -461,80 +465,99 @@ File: drugs_2.json
     'Cozarr' (human annotated) --- 'Cozar' (extracted)
 ```
 
-The reason `gpt-4o-mini` got confused with the formatting of the text in the image where the diuretic drugs
+The reason for these mistakes is that `gpt-4o-mini` got confused with the formatting of the text in the image where the diuretic drugs
 `Furosemide`, `Hydrochlorothiazide` and `Spironolactone` are listed. Similarly, it didn't correctly extract
-the two brand names for `Digoxin` (it got `Digitek` but missed `Lanoxin`).
+the two brand names for `Digoxin` (it got `Digitek` but missed `Lanoxin`). Some simple prompt engineering
+with example few-shot prompts that show the LLM examples with the word "or" in the brand names could
+help address this.
 
 <Img src="/img/unstructured-data-to-graph-baml-kuzu/baml-eval.png" alt="gpt-4o-mini misses" />
 
-To compare the performance of larger models, we also ran the same prompt on three other (more expensive, more
-powerful) models: `gpt-4o`, `gemini-2.0-flash`, `claude-3.5-sonnet`. The results are shown below:
+How do larger models, like `openai/gpt-4o`, `google/gemini-2.0-flash` and `anthropic/claude-3.5-sonnet` perform
+with the same prompt on the same task? The results are shown below:
 
-| Model | Date | Exact Match | Mismatch | Missing | Potential<br> Hallucination | Cost | Cost<br> factor |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `openai/gpt-4o-mini` | Mar 2025 | 171 | 4 | 2 | 1 | $0.0040 | 1.0 |
+| Model | Date[^3] | Exact Match | Mismatch | Missing | Potential<br> Hallucination | Cost | Cost<br> factor |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `openai/gpt-4o-mini` | Mar 2025 | 168 | 4 | 2 | 1 | $0.0040 | 1.0 |
 | `openai/gpt-4o` | Mar 2025 | 168 | 4 | 4 | 2 | $0.0277 | 6.93 |
 | `anthropic/claude-3.5-sonnet` | Mar 2025 | 164 | 6 | 6 | 2 | $0.0551 | 13.78 |
 | `google/gemini-2.0-flash` | Mar 2025 | 136 | 1 | 15 | 8 | Free tier | N/A |
 
-Surprisingly, the smallest model of the lot, `openai/gpt-4o-mini`, gave the most exact matches in these
-experiments, while also being cheapest to run[^2]. The `google/gemini-2.0-flash` model
-seems to need a better prompt to perform as well on this task, but that's an exercise for another day!
+Surprisingly, the smallest model of the lot, `openai/gpt-4o-mini`, gave the most exact matches and made
+the fewest mistakes in these experiments, while also being more than 10x cheaper to run[^2]. The `google/gemini-2.0-flash` model
+was significantly less accurate in this case, but this could be due to the fact that it might
+need a bit more prompt engineering to perform as well on this task -- that's an exercise for another day!
 
 ### Text extraction
 
-For the text extraction task on the clinical notes, all models performed similarly, with **zero** error
-rate across multiple and all metrics.
+For the text extraction task on the clinical notes, all models performed excellently, with **zero** error
+rates across all metrics and over dozens of runs. Even though the LLMs themselves aren't deterministic,
+running evaluations with a sound understanding of the prompt's effects on the output can help
+increase developers' confidence in these sorts of workflows.
 
-| Model | Date | Exact Match | Mismatch | Missing | Potential<br> Hallucination | Cost | Cost<br> factor |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| Model | Date[^3] | Exact Match | Mismatch | Missing | Potential<br> Hallucination | Cost | Cost<br> factor |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | `openai/gpt-4o-mini` | Mar 2025 | 19 | 0 | 0 | 0 | $0.0003 | 1.0 |
 | `openai/gpt-4o` | Mar 2025 | 19 | 0 | 0 | 0 | $0.0044 | 14.67 |
 | `anthropic/claude-3.5-sonnet` | Mar 2025 | 19 | 0 | 0 | 0 | $0.0074 | 24.67 |
 | `google/gemini-2.0-flash` | Mar 2025 | 19 | 0 | 0 | 0 | Free tier | N/A |
 
-The text extraction task is a lot easier for the LLM, because the data is in raw text format and the
-LLM has to do a lot less reasoning over the input tokens. It's even worth pushing down these kinds
-of simpler tasks down to small (and practically free) open source models that are self-hosted.
+The text extraction task is likely a lot easier for LLMs, because a) this task is rather simple; and
+b) the LLM has to do a lot less reasoning when the input tokens are just short form texts. For notes
+extraction, it could be worth pushing this task down to even smaller (and practically free) open source
+models that are self-hosted, to make it even more cost-effective.
 
 ## Conclusions
 
 Let's digest the key takeaways from this post, because we've covered a lot! We've seen how to effectively use LLMs (via BAML) to
 extract structured data from unstructured data for the purposes of populating a Kuzu graph database.
-By processing images of PDF data (rather than the PDFs themselves), the LLM-based approach minimizes the need for extensive pre/postprocessing
+By processing images of PDF data (rather than the PDFs themselves)[^5], the LLM-based approach minimizes the need for extensive pre/postprocessing
 code because we can leverage the power of modern multimodal LLMs. BAML plays a key role in ensuring that the outputs from LLMs are structured
-and align with predefined graph schema that we need for Kuzu, and this enhances the overall reliability of the data transformation process.
+and align with predefined graph schema that we need for Kuzu, while also enhancing the developer's ability to iterate and thoroughly test the prompts
+themselves (not just the outputs).
 
-Polars DataFrames are utilized to handle the nested JSON data that came from BAML, which allows for quick and convenient ingestion into the
+Polars DataFrames are utilized to handle the nested JSON data that is produced by BAML, which allows for quick and convenient ingestion into the
 Kuzu database. The power of graphs and graph databases is quite clear from this exercise, where we are able
-to bring together separate datasets into a cohesive graph, thus enabling complex queries about
-drugs, patients, and side effects. Hopefully, this gives you a good starting point for thinking about your
-own data as a graph!
+to bring together separate datasets cohesively into a single database, enabling users to ask complex queries about
+drugs, patients, and side effects. Hopefully, this gets you thinking about how to
+structure your own data as a graph!
 
-Like in any other analytical task, an evaluation suite is required to check the quality of the LLM outputs.
-We defined 4 metrics based on set operations to evaluate the quality of the LLM's structured output, and
+From an evaluation standpoint,
+we defined 4 metrics based on set operations to gauge the quality of the LLM's structured outputs for image and text extraction, and
 found, rather surprisingly, that even small and low-cost models like `openai/gpt-4o-mini` can sometimes outperform
-larger models in specific tasks, offering a cost-effective solution without compromising on performance. Of course,
-some prompt engineering is still required to get the best out any given model, which we leave to you to explore further.
+larger models in extracting data from images, offering a cost-effective solution without compromising on performance.
+How can we improve the results across all models further? Some ideas include converting the PDF data into text, seeing as
+all models' performance on text extraction was markedly better than on the image extraction task. Additionally,
+using more elaborate system prompts could help generalize the instructions better across different models.
+For this study, we didn't do much prompt engineering, but that's something you can try out yourself!
 
-Now that we have a graph constructed, in an upcoming blog post, we will show how to use BAML to build a
-Graph RAG chatbot on top of the Kuzu database. More experiments and evaluations in Text-to-Cypher and
-prompt engineering will be covered in that post, so stay tuned!
+Now that we have a graph to work with, in an upcoming blog post, we will show how to use BAML to build a
+**Graph RAG chatbot** on top of the Kuzu database. More experiments and evaluations in Text-to-Cypher and
+its related prompt engineering will be covered in that post, so stay tuned!
 
 ## Code
 
-All code to reproduce the workflow end-to-end is available [here](https://github.com/kuzudb/baml-kuzu-demo).
-Give it a try, experiment with more LLMs and prompts, and let us know what you find!
+All code to reproduce the workflow end-to-end is available [on GitHub](https://github.com/kuzudb/baml-kuzu-demo).
+Give it a try with different LLMs/prompts, and let us know what you find!
 
 ---
 
-[^1]: The PDF file of drugs and side effectsused in this post is from
+[^1]: The PDF file of drugs and side effects used in this post is from
 [this flyer](https://www.medstarhealth.org/-/media/project/mho/medstar/services/pdf/medication_side_effect_flyer.pdf)
 from the MedStar health website.
 
 [^2]: The `openai/gpt-4o-mini` model producing the best results in this study doesn't necessarily mean it's a
 "better" model, but simply that the given prompts were more aligned with the capabilities of the model. More
-prompt engineering in the other models could have yielded better results. It's worth exploring further!
+prompt engineering in the other models could have yielded better results. It's definitely worth exploring further
+on your own data!
 
+[^3]: The date specified in the results table is the rough date when the experiments were run. As we know,
+models continually evolve over time so these numbers may not be reflective of the current state of the models
+as you're reading this.
 
+[^4]: The images are exported at a resolution of 200 DPI, which seems more than enough for most multimodal
+LLMs to disambiguate the terms in the image, while not adding significantly to the the token count.
 
+[^5]: In the future (if it's not happened already as you're reading this), it's possible that BAML
+will natively [support the `pdf` data type](https://github.com/BoundaryML/baml/issues/1543), which
+will make the image extraction step redundant.
