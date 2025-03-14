@@ -7,6 +7,7 @@ import CategoryIcon from '@icons/CategoryIcon.astro';
 import { Image } from 'astro:assets';
 import { slugify } from '@utils/slug';
 import allAuthors from '../config/allAuthors.json';
+import config from '@config/config.json';
 
 // Add this type definition
 type AuthorsRecord = Record<string, { name: string; image: string; bio: string }>;
@@ -14,9 +15,14 @@ type AuthorsRecord = Record<string, { name: string; image: string; bio: string }
 type Props = CollectionEntry<'post'>['data'];
 
 const { title, description, pubDate, heroImage, categories, tags, authors } = Astro.props;
+
+// Convert heroImage to full URL if it exists
+const fullHeroImage = heroImage 
+  ? `${config.site.base_url}${heroImage.startsWith('/') ? '' : '/'}${heroImage}` 
+  : undefined;
 ---
 
-<Base meta_title={title} description={description} image={heroImage} blogpost>
+<Base meta_title={title} description={description} image={fullHeroImage} blogpost>
   <article>
     <div class="md:col-10 mb-12">
       <h1 class="text-2xl font-bold md:text-4xl">{title}</h1>
