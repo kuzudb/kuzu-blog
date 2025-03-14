@@ -8,6 +8,9 @@ import { Image } from 'astro:assets';
 import { slugify } from '@utils/slug';
 import allAuthors from '../config/allAuthors.json';
 
+// Add this type definition
+type AuthorsRecord = Record<string, { name: string; image: string; bio: string }>;
+
 type Props = CollectionEntry<'post'>['data'];
 
 const { title, description, pubDate, heroImage, categories, tags, authors } = Astro.props;
@@ -23,20 +26,20 @@ const { title, description, pubDate, heroImage, categories, tags, authors } = As
             <div class="author-info__container mx-3 mt-2 flex flex-wrap font-medium" style="margin-left: 0; margin-right: 1.2em;">
               <figure>
                 <Image
-                  alt={typeof author === 'string' ? allAuthors[author].name : author.name}
+                  alt={typeof author === 'string' ? (allAuthors as AuthorsRecord)[author]?.name : author.name}
                   class="mr-2 rounded-full"
                   width={250}
                   height={250}
-                  src={typeof author === 'string' ? allAuthors[author].image : author.image}
+                  src={typeof author === 'string' ? (allAuthors as AuthorsRecord)[author]?.image : author.image}
                   decoding="async"
                   loading="lazy"
                   style={'height: 3rem; width: 3rem;'}
                 />
               </figure>
               <span style="max-width: 12rem;"
-              ><b>{typeof author === 'string' ? allAuthors[author].name : author.name}</b>
+              ><b>{typeof author === 'string' ? (allAuthors as AuthorsRecord)[author]?.name : author.name}</b>
                 <br />
-                <small style="font-weight: 300; white-space: pre">{typeof author === 'string' ? allAuthors[author].bio : author.bio}</small>
+                <small style="font-weight: 300; white-space: pre">{typeof author === 'string' ? (allAuthors as AuthorsRecord)[author]?.bio : author.bio}</small>
                 </span>
             </div>
           ))
