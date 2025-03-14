@@ -3,7 +3,7 @@ slug: "unstructured-data-to-graph-baml-kuzu"
 title: "Transforming unstructured data to a graph with BAML and Kuzu"
 description: "The first step towards building Graph RAG applications is to transform unstructured data into nodes and relationships. In this post,
 we show how to use LLMs and BAML, an AI engineering framework, to construct a Kuzu graph from a collection of unstructured data."
-pubDate: "Mar 13 2025"
+pubDate: "Mar 14 2025"
 heroImage: "/img/unstructured-data-to-graph-baml-kuzu/drug-patient-graph.png"
 categories: ["example"]
 authors: ["prashanth"]
@@ -16,17 +16,17 @@ stored in a variety of unstructured formats like text files, PDF files, images a
 Historically, this has created a barrier to graph database adoption due to the challenge of reliably extracting entities (nodes) and the
 relationships (edges) between them from the unstructured data.
 
-It's amply clear these days that LLMs are proving to be powerful and versatile at a variety of tasks. In this post, we will show how to use
+It's amply clear these days that LLMs are proving to be powerful and versatile at a large variety of tasks. In this post, we will show how to use
 Kuzu in combination with [BAML](https://docs.boundaryml.com/home), a domain-specific language for generating clean, structured outputs from LLMs,
-to help transform the unstructured data into a graph that can be used for downstream analysis and RAG. Using tools like BAML can help increase the
-robustness and testability of your LLM workflows by adding some much-needed engineering rigour during the iteration process. We'll also look at
-some evaluation results to validate the quality of several LLMs' outputs. The key steps in the overall workflow are summarized in the diagram below:
+to help transform the unstructured data into a graph that can be used for downstream analysis and RAG. Using tools like BAML can help increase
+trust in your LLMs' outputs by adding some much-needed engineering rigour downstream of the generation process. We'll also look at
+some evaluation results to validate the quality and robustness of several LLMs' outputs. The key steps in the overall workflow are summarized in the diagram below:
 
 <Img src="/img/unstructured-data-to-graph-baml-kuzu/kuzu-baml-high-level.png" alt="High-level overview of the BAML-Kuzu workflow" />
 
 We start with unstructured data upstream (it could be text, images, PDFs, etc.). BAML is used to prompt the LLM to generate a structured output
 in JSON format, which can then be persisted as a graph in a Kuzu database.
-Let's understand this in more detail through a concrete example!
+Let's understand this in more detail through a concrete example.
 
 ## Problem statement
 
@@ -54,10 +54,10 @@ to answer questions about patients, drugs and their side effects.
 We could go about transforming the PDF data into a structured form in a number of ways. The most obvious approach
 would be to use PDF parsing library like [PyMuPDF](https://github.com/pymupdf/PyMuPDF) or [pdfplumber](https://github.com/jsvine/pdfplumber)
 to extract the data as text, and then prompt an LLM to extract entities and relationships from the text.
-However, this approach requires a lot of custom code to handle the idiosyncrasies of the data shown above,
+However, this approach requires a lot of custom code to handle the idiosyncrasies of the nested data shown above,
 and even then, the output isn't guaranteed to be clean and consistent enough for an LLM to reason over.
 
-A far simpler and quicker way is to use a multimodal LLM like OpenAI's `gpt-4o`, or its smaller cousin `gpt-4o-mini`
+A simpler and quicker way is to use a multimodal LLM like OpenAI's `gpt-4o`, or its smaller cousin `gpt-4o-mini`
 that take in images as input. We can use BAML to prompt these models to extract the
 relevant entities and relationships from an _image_ of each page of the PDF, rather than writing a ton
 of custom code to preprocess the data as text.
@@ -75,7 +75,7 @@ Let's walk through the key steps in the following sections.
 [This simple FastAPI app](https://github.com/prrao87/pdf2image) is used to transform the PDF data of drugs into a series of PNG images[^4].
 The images are transformed to their base64-encoded string representations, which multimodal LLMs like `gpt-4o-mini` can interpret
 well. Because each page of the PDF is represented as a separate image, we can easily scale up this approach to handle
-PDFs with far more pages than what's shown in this blog post, and concurrently process each page to speed things up.
+PDFs with far more pages than what's shown in this example, concurrently processing each page to speed things up.
 
 The text data (clinical notes) is left as is, because it's already in a clean text format that can read by an LLM.
 
@@ -86,7 +86,8 @@ section, we'll break down the BAML prompts that are used for each task: informat
 
 ### Graph schema
 
-The first step, prior to any LLM prompting, is to sketch out a graph schema that we will use to model our domain.
+The preliminary step, prior to any LLM prompting, is to sketch out a graph schema that we will use to model our domain.
+This is what informs our BAML schema design, shown further below.
 
 <Img src="/img/unstructured-data-to-graph-baml-kuzu/drug-patient-graph-schema.png" alt="Drug-patient graph schema" />
 
@@ -122,7 +123,8 @@ In this case, we want to extract a `ConditionAndDrug` object, which contains a `
 and an array of `side_effects` strings. The `@description` annotation is used to provide a hint to the LLM about how to
 populate the data for the `brand_names` field.
 
-Prompts in BAML are specified as **functions**:
+Prompts in BAML are specified as **functions**. Here's the prompt for extracting the condition, drug names and side effects
+from the image of the PDF table:
 
 ```rs
 function ExtractFromImage(img: image) -> ConditionAndDrug[] {
@@ -175,7 +177,8 @@ Note the comment line beginning with `//` just before the  `brand_names` field -
 the LLM towards understanding that it needs to transform its output to strip the ® character at the end of the brand names,
 which is useless for our graph downstream. Normally, you would handle special characters like this
 during the postprocessing stage by writing custom code (say in Pydantic), but BAML allows you to push
-some of this logic into the prompt itself.
+some of this logic into the prompt itself. Because BAML _ensures types safety_ in the output, our level
+of confidence in the LLM's ability is higher.
 
 **To reiterate**: in BAML, functions are prompts, and classes are models (schemas). You then write tests that can be executed interactively or from
 the terminal to validate the structured output from the LLM. All of this is done in the comfort of the IDE, before you
@@ -184,8 +187,8 @@ even write a line of application code!
 <Img src="/img/unstructured-data-to-graph-baml-kuzu/baml-prompt-playground.png" alt="Testing the BAML prompt in VS Code or Cursor" />
 
 Below is a sample structured output from the BAML prompt (it's in JSON format). As can be seen, the LLM correctly captures both the structure
-and the content of the input image. BAML ensures that the LLM's output is valid JSON that can be parsed downstream.
-This is important for Kuzu, because it requires that the input data for the graph adheres to a strictly typed schema.
+and the content of the input image, including the nested fields. BAML's parser ensures that the LLM's output is valid, _parseable_ JSON
+so the downstream tools (Polars and Kuzu) can use it without any parsing errors.
 
 ```json
 [
@@ -217,8 +220,9 @@ This is important for Kuzu, because it requires that the input data for the grap
 
 ### Extract from text
 
-In the next step, we extract entities and relationships from the text data of clinical notes.
-We can write a BAML model and prompt for this task as follows:
+The second task is to extract entities and relationships from the text data of clinical notes.
+We can write a BAML model and prompt to extract side effects experienced by a patient, as well
+as useful metadata like a drug's dosage and frequency, all from the unstructured text.
 
 ```rs
 class Medication {
@@ -261,14 +265,13 @@ test TestNegation {
 }
 ```
 
-Note how we explicitly state in both the system prompt and the description annotation in BAML, that we only want the name of the side effect, not its intensity or frequency.
+Note how we explicitly state in both the system prompt and the description annotation in BAML, that we only want the _name_ of the side effect, not its intensity or frequency.
 LLMs tend to err on the side of verbosity and provide more information when it's available, as their goal is to be helpful. In this case, we only want
 the name of the side effect so that we can map it to the `Symptom` node in our graph. With BAML's schema design, we are easily able to 
 separate out the relevant metadata about the patient that can also be stored as properties in our nodes or relationships in the graph.
 
 In the result, we once again get a perfectly valid JSON output from the LLM. Note how the date format is correctly
-transformed by the LLM to ISO-8601 (`YYYY-MM-DD` format) thanks to the `@description` annotation in the BAML model
-that mentioned this as a hint.
+transformed by the LLM to ISO-8601 (`YYYY-MM-DD`) format thanks to the `@description` annotation in the BAML model.
 
 ```json
 [
@@ -291,7 +294,7 @@ That's it! We now have two sets of clean structured outputs from the LLM, which 
 
 ## 3. Polars transformations
 
-Kuzu uses a _structured_ property graph data model, where you have the concept of tables
+Kuzu implements a _structured_ property graph data model, where you have the concept of tables
 (rather than "labels" if you're coming from LPG). To bulk-ingest large amounts of data very quickly into Kuzu
 node and relationship tables, we can use [Polars](https://docs.pola.rs/), a fast Python DataFrame library
 to transform the nested JSON data from BAML into Polars
@@ -337,9 +340,9 @@ conn.execute("""CREATE REL TABLE IF NOT EXISTS HAS_BRAND (FROM DrugGeneric TO Dr
 conn.execute("""CREATE REL TABLE IF NOT EXISTS IS_TREATED_BY (FROM Condition TO DrugGeneric)""");
 ```
 
-Because our primary key in this case is the `name` field, and there are multiple occurrences
-of a condition for a particular class of drugs, we will need to use a `MERGE` operation rather than
-the normally used `COPY FROM` operation. The good news is, merging data is incredibly simple
+Because our primary key in this case is the `name` field, and there are multiple drugs
+that treat the same condition, we will need to use a `MERGE` operation rather than
+the normally used `COPY FROM` operation. The good news is, merging data is incredibly simple and _fast_
 when working with DataFrames! Here's a sample Cypher query that shows how to bulk-merge the
 relationsip data between the `Condition` and `DrugGeneric` nodes.
 
@@ -353,8 +356,8 @@ No `for` loops required!
 
 ## Query the graph using Cypher
 
-We now have the following graph, which we can display in its entirety. In [Kuzu Explorer](https://docs.kuzudb.com/visualization/),
-we can enter the following Cypher query:
+We now have a graph in Kuzu! Let's open [Kuzu Explorer](https://docs.kuzudb.com/visualization/),
+and enter the following Cypher query:
 
 ```cypher
 MATCH (a)-[b]->(c)
@@ -411,22 +414,31 @@ We defined 4 metrics based on set operations to evaluate the quality of the LLM'
 - $ \text{potential hallucination} \rarr $ The LLM produced a value that is not present in the human-annotated data.
 
 The last metric is named "_potential_" hallucination because the LLM could have also produced a correct value that's
-from its memorization of the training data (which isn't the same as an outright hallucination). This isn't necessarily
-a _bad_ thing, because the LLM can actually help us enrich our data in certain scenarios where the source may be missing it.
-However, anything that's marked as a potential hallucination would need to be vetted and verified by a human, so the
-fewer the better!
+from its memorization of the training data (which is different from an outright hallucination). This opens up
+an interesting thought exercise: In cases where the data was publicly available, can LLMs help us enrich our raw data
+with added knowledge that wasn't in the source?
+
+> In our experiments, we repeatedly found instances of "perfect" memorization in models like `gpt-4o-mini`
+> for this drug dataset because it's clearly seen it during its training. The model was biased towards correcting
+> the spellings of misspelled drug names from the image provided (thus enhancing the quality of the output),
+> and in other cases, the models outright produced the correct brand names for generic drugs, even though
+> those brand names were not mentioned in the source image.
+
+All this being said, anything that's marked as a potential hallucination during the evaluation stage
+needs to be vetted and verified by a human so the fewer the better!
 
 ### Image extraction
 
-Using the `gpt-4o-mini` model in the image extraction task, the following raw counts for each metric are obtained:
+Using the `gpt-4o-mini` model in the image extraction task, the following raw counts for each metric are obtained.
+The higher the number of exact matches, the better the model was at the task.
 
 | Model | Date | Exact Match | Mismatch | Missing | Potential Hallucination |
 |--- | --- | :---: | :---: | :---: | :---: |
 | `openai/gpt-4o-mini` | Mar 2025 | 170 | 0 | 2 | 11 |
 
 Upon inspecting the potential hallucinations, it's clear that the LLM produced many of them from its memorization of the training data.
-Because the memorization was so good, the model repeatedly produced the same correct result, even when running the same
-prompt dozens of times. See the full list of potential hallucinations from page 2 of the PDF:
+Because the memorization was so good, the model repeatedly produced the same correct result, even when running the
+code dozens of times. Below, we list the LLM's potential hallucinations from its extractions from page 2 of the PDF:
 ```
 File: drugs_2.json
   Potentially hallucinated items in extracted data (please verify):
@@ -441,7 +453,7 @@ File: drugs_2.json
     <Missing> (human annotated) --- 'Vasotec' (extracted)
     <Missing> (human annotated) --- 'Zestril' (extracted)
 ```
-Although the human annotated data did not mention brand names of ACE inhibitor drugs (that lower blood pressure),
+Although the human-annotated data did not mention brand names of ACE inhibitor drugs (that lower blood pressure),
 the LLM "extracted" them from its internal memorized knowledge, and _correctly_ associated that `Altace` is the brand name for the generic drug `Ramipril`, and so on.
 `Trimethoprim` from the above list was incorrectly extracted -- it was present in the original image as "`Co-Trimoxazole, Sulfamethoxazole/Trimethoprim`",
 but the multiline formatting of this snippet of text in the image is likely the reason the LLM missed it.
@@ -451,7 +463,7 @@ All it took was a quick inspection of these 11 values, and we can remove 9 of th
 |--- | --- | --- | --- | --- | --- |
 | `openai/gpt-4o-mini` | Mar 2025 | 170 | 0 | 2 | 2 |
 
-Next, we'll inspect the missed and mismatched values from `gpt-4o-mini` to see if there are any common patterns
+Next, we inspected the missed and mismatched values from `gpt-4o-mini` to see if there are any common patterns
 that can be identified to understand the LLM's performance.
 
 ```
@@ -476,8 +488,8 @@ help address this.
 
 <Img src="/img/unstructured-data-to-graph-baml-kuzu/baml-eval.png" alt="gpt-4o-mini misses" />
 
-How do larger models, like `openai/gpt-4o`, `google/gemini-2.0-flash` and `anthropic/claude-3.5-sonnet` perform
-with the same prompt on the same task? The results are shown below:
+How do larger models, like `openai/gpt-4o` and `anthropic/claude-3.5-sonnet` perform
+with the same prompt on the same task? They do expectedly well, but at an added cost.
 
 | Model | Date[^3] | Exact Match | Mismatch | Missing | Potential<br> Hallucination | Cost | Cost<br> factor |
 | --- | --- | :---: | :---: | :---: | :---: | ---: | ---: |
@@ -507,30 +519,40 @@ rates across all metrics and over dozens of runs.
 | `anthropic/claude-3.5-sonnet` | Mar 2025 | 19 | 0 | 0 | 0 | $0.0074 | 25x |
 | `google/gemini-2.0-flash` | Mar 2025 | 19 | 0 | 0 | 0 | Free tier | N/A |
 
-For tasks like this that are based on simple text extraction, it could be worth pushing this task down
-to even smaller (and practically free) open source models that are self-hosted, to make it even more cost-effective.
+> "Reports mild nausea after morning dose. Denies diarrhea. Blood sugar levels stable."
+
+In the above example, _all_ the LLMs tested were able to correctly (and reproducibly) detect negation, i.e.,
+"_denies_" means that the patient _did not_ experience diarrhea, and this side effect was excluded from the output.
+A more extensive evaluation test suite can be created this way using BAML to understand the capabilities of
+smaller, cheaper models on these kinds of tasks.
 
 ## Conclusions
 
 Let's digest the key takeaways from this post, because we've covered a lot!
-The power of graphs and graph databases is quite clear from this exercise, where we are able
-to bring together separate datasets cohesively into a single database, enabling users to ask complex queries about
-drugs, patients, and side effects. Hopefully, this gets you thinking about how to
+
+First, LLMs have long been viewed as "unreliable" and untrustworthy in their outputs, and the task of extracting structured data from
+unstructured data has long been entrusted to rule-based (or more recently, NLP-based) systems. By providing the
+LLM prompt a _schema_ and a _type system_, as we did in [BAML](https://www.boundaryml.com/), we are able to solve a non-trivial structured data extraction
+task from an image with a single prompt. The quality of the results were more than acceptable, and the cost was tiny
+relative to the amount of development effort. Granted, the results aren't perfect, but for any real-world use case, it's helpful to
+build an initial pipeline this way, learn how the prompt affects the output, and iterate on your ideas this way. You'd be surprised
+how good modern LLMs are at a variety of tasks, especially when prompted the BAML way!
+
+By processing _images_ of PDF data (rather than the PDFs themselves[^5]), the approach shown in this post minimizes the need for custom pre/postprocessing
+code on the client side. The BAML prompts themselves are concise, readable, maintainable, most importantly, _testable_. Using BAML, it was
+very easy to rapidly iterate on the prompts and build an understanding of various LLMs' performance on the task.
+
+From a Kuzu perspective, the benefits of using LLMs alongside graphs and graph databases have been made abundantly clear
+in this post -- we are able to bring together separate datasets cohesively into a single knowledge graph, enabling users
+to ask complex queries about drugs, patients, and side effects. Hopefully, this gets you thinking about how to
 structure your own data as a graph!
 
-We've seen how to effectively leverage the power of modern multimodal LLMs (via BAML) to
-extract structured data from unstructured data for the purposes of populating a Kuzu graph database.
-By processing images of PDF data (rather than the PDFs themselves[^5]), the LLM-based approach minimizes the need for extensive pre/postprocessing
-code on the client side because we can leverage the power of modern multimodal LLMs. BAML plays a key role in ensuring that the outputs from LLMs are structured
-and align with predefined graph schema that we need for Kuzu, while also enhancing the developer's ability to iterate and thoroughly test the prompts
-themselves (not just the outputs).
-
-From an evaluation standpoint, we defined 4 metrics based on set operations to gauge the
+Evaluation is an important step when developing with LLMs, and we defined 4 metrics based on set operations to gauge the
 quality of the LLM's structured outputs for image and text extraction, and
 found that even small and low-cost models like `openai/gpt-4o-mini` can often perform as well as
-much larger models in extracting data from images, offering a cost-effective solution without compromising on performance.
-The results obtained here can definitely be improved further with some prompt engineering and preprocessing of the data.
-For this study, we focus too much on optimizing those steps, but those are things you can try out yourself!
+much larger models in extracting data from images, offering a very cost-effective solution without compromising on performance.
+The results obtained here can definitely be improved further with some prompt engineering and pre/postprocessing.
+For this study, we didn't focus too much on optimizing these steps, but you can try this workflow out yourself, even using open source models!
 
 Now that we have a graph to work with in Kuzu, in an upcoming blog post, we will show how to use BAML to build a
 **Graph RAG chatbot** on top of the Kuzu database. More experiments and evaluations in Text-to-Cypher and
@@ -540,14 +562,6 @@ its related prompt engineering will be covered in that post, so stay tuned!
 
 All code to reproduce the workflow end-to-end is available [on GitHub](https://github.com/kuzudb/baml-kuzu-demo).
 Give it a try with different LLMs/prompts, and let us know what you find!
-
-## Tools
-
-Check out the following links for more information on the tools used for this study:
-
-- [BAML](https://docs.boundaryml.com/home): Everything to do with prompting LLMs to get better structured outputs from them
-- [Kuzu](https://docs.kuzudb.com/): Open source, embedded graph database that can power Graph RAG!
-- [Polars](https://docs.pola.rs/): Fast Python DataFrame library that can handle nested data
 
 ---
 
