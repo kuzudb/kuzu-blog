@@ -4,7 +4,7 @@ title: "Transforming unstructured data to a graph with BAML and Kuzu"
 description: "The first step towards building Graph RAG applications is to transform unstructured data into nodes and relationships. In this post,
 we show how to use LLMs and BAML, an AI engineering framework, to construct a Kuzu graph from a collection of unstructured data."
 pubDate: "Mar 14 2025"
-heroImage: "/img/unstructured-data-to-graph-baml-kuzu/drug-patient-graph.png"
+heroImage: "/img/unstructured-data-to-graph-baml-kuzu/baml-kuzu-banner.png"
 categories: ["example"]
 authors: ["prashanth"]
 tags: ["kuzu", "cypher", "graph", "rag", "llm"]
@@ -52,7 +52,7 @@ to answer questions about patients, drugs and their side effects.
 ## Methodology
 
 We could go about transforming the PDF data into a structured form in a number of ways. The most obvious approach
-would be to use PDF parsing library like [PyMuPDF](https://github.com/pymupdf/PyMuPDF) or [pdfplumber](https://github.com/jsvine/pdfplumber)
+would be to use a PDF parsing library like [PyMuPDF](https://github.com/pymupdf/PyMuPDF) or [pdfplumber](https://github.com/jsvine/pdfplumber)
 to extract the data as text, and then prompt an LLM to extract entities and relationships from the text.
 However, this approach requires a lot of custom code to handle the idiosyncrasies of the nested data shown above,
 and even then, the output isn't guaranteed to be clean and consistent enough for an LLM to reason over.
@@ -102,7 +102,7 @@ Our schema design effectively combines these two separate datasets into a single
 
 ### Extract from images
 
-BAML is a DSL that ensures type safety of an LLM's output, providing quality structured outputs that respect the
+BAML is a domain-specific language (DSL) that ensures type safety of an LLM's output, providing quality structured outputs that respect the
 desired schema. The BAML schema (or data model) is defined in a way that aligns with the expectations of our Kuzu graph schema
 that's shown [above](#graph-schema).
 
@@ -295,11 +295,10 @@ That's it! We now have two sets of clean structured outputs from the LLM, which 
 ## 3. Polars transformations
 
 Kuzu implements a _structured_ property graph data model, where you have the concept of tables
-(rather than "labels" if you're coming from LPG). To bulk-ingest large amounts of data very quickly into Kuzu
-node and relationship tables, we can use [Polars](https://docs.pola.rs/), a fast Python DataFrame library
-to transform the nested JSON data from BAML into Polars
-DataFrames, so that Kuzu can natively scan the contents of the Polars DataFrames (through the PyArrow interface)
-and ingest the data into the respective node and relationships tables.
+(rather than "labels" if you're coming from the labelled-property graph, or LPG world). To bulk-ingest large amounts of data very quickly into Kuzu
+node and relationship tables, we can use [Polars](https://docs.pola.rs/), a fast DataFrame library
+that transforms and cleans the nested JSON data from BAML. The transformed DataFrames can be scanned by Kuzu
+(through the PyArrow interface) and ingested into the respective node and relationships tables.
 
 The full code for the Polars transformations is available in the [GitHub repo](https://github.com/kuzudb/baml-kuzu-demo), but for
 reference, here's a snippet of code that shows how simple it is to transform JSON into Polars DataFrames (which
@@ -460,7 +459,7 @@ but the multiline formatting of this snippet of text in the image is likely the 
 All it took was a quick inspection of these 11 values, and we can remove 9 of them from the list of potential hallucinations. Much better! 🚀
 
 | Model | Date | Exact Match | Mismatch | Missing | Potential Hallucination |
-|--- | --- | --- | --- | --- | --- |
+|--- | --- | :---: | :---: | :---: | :---: |
 | `openai/gpt-4o-mini` | Mar 2025 | 170 | 0 | 2 | 2 |
 
 Next, we inspected the missed and mismatched values from `gpt-4o-mini` to see if there are any common patterns
@@ -576,8 +575,8 @@ released regularly. These numbers are just a measure of how cheap LLMs are becom
 models continually evolve over time so these numbers may not be reflective of the current state of the models
 as you're reading this.
 
-[^4]: The images are exported at a resolution of 200 DPI, which seems more than enough for most multimodal
-LLMs to disambiguate the terms in the image, while not adding significantly to the the token count.
+[^4]: The images are exported at a resolution of 200 DPI, which seems to be more than enough for most multimodal
+LLMs to disambiguate the text fields in the image, while also not adding significantly to the the token count.
 
 [^5]: In the future (if it's not happened already as you're reading this), it's possible that BAML
 will natively [support the `pdf` data type](https://github.com/BoundaryML/baml/issues/1543), which
