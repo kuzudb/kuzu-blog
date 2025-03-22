@@ -10,9 +10,9 @@ tags: ["kuzu", "mcp-server", "mcp", "llm"]
 
 Unless you've been living under a rock, you've probably been hearing a lot about the Model Context Protocol (MCP),
 introduced by Anthropic in late 2024. We're happy to announce that Kuzu now provides an MCP server that allows you to connect
-MCP clients like [Claude Desktop](https://www.anthropic.com/news/claude-desktop) and [Cursor](https://www.cursor.com/)
-agents to your Kuzu database! This blog post will introduce the basics of MCP, and briefly demonstrate how to connect
-your Kuzu databases via two popular MCP clients.
+MCP clients -- like [Claude Desktop](https://www.anthropic.com/news/claude-desktop) and [Cursor](https://www.cursor.com/)
+agents -- to your Kuzu database! In this post, we'll cover the basics of MCP and walk through how to connect
+your Kuzu databases using two popular MCP clients.
 
 ## What is MCP?
 
@@ -25,20 +25,19 @@ to the rapidly growing MCP ecosystem by providing an MCP server that allows you 
 to MCP clients.
 
 MCP follows a client/server architecture, where the client's role is to route requests from the host application to
-the server. The server is responsible for exposing resources, tools and prompts to the client. In the case
-of Kuzu, the MCP server we provide allows local access to the specified Kuzu database, and the client can
-be an application like Claude Desktop or Cursor, which each provide their MCP-compatible clients. The
-general layout is shown below.
+the server. The server is responsible for exposing resources, tools and prompts to the client. The MCP
+server we provide allows local access to a specified Kuzu database. On the client side, applications like 
+Claude Desktop and Cursor provide built-in MCP support. The overall architecture is below:
 
 <Image src="/img/kuzu-mcp-server/kuzu-mcp-server-to-client.png" alt="Kuzu MCP client-server overview" />
 
 ## Create the Kuzu database
 
-Let's first create a Kuzu database to use in this example. Let's use a simple example of football players
-from two countries, Argentina, who won the 2022 World Cup, and France, who won the 2018 World Cup.
-The first step is to define the schema in Kuzu that captures the relationships between players, the
-countries they play for, and the world cups those countries have won. This can be done by opening a Kuzu
-CLI and executing the following DDL commands:
+Let's first create a Kuzu database to use in this example. We'll use a simple dataset of football players
+from two countries: Argentina, who won the 2022 World Cup, and France, who won in 2018.
+We'll start by defining a schema that captures relationships between players, the
+countries they represent, and the World Cups their countries have won. Open a Kuzu
+CLI and execute the following DDL commands:
 
 ```sql
 CREATE NODE TABLE Player(name STRING PRIMARY KEY, goalsScored INT32);
@@ -48,7 +47,7 @@ CREATE REL TABLE PLAYS_FOR(FROM Player TO Country);
 CREATE REL TABLE WON(FROM Country TO WorldCup);
 ```
 
-Next, we can insert the data into the database using Cypher.
+Next, insert the data into the database using Cypher:
 ```cypher
 // Create Country nodes
 CREATE (argentina:Country {name: "Argentina", worldCupsWon: 3})
@@ -80,27 +79,25 @@ The database created using the above commands is stored in a directory named `fo
 ## MCP server
 
 The official MCP [specification](https://spec.modelcontextprotocol.io/specification/2024-11-05/architecture/)
-released by Anthropic describes the key design principles of an MCP server. If you're interested in more details,
-it's recommended to read the specification document in its entirety. The key qualities of an MCP server are summarized below:
+released by Anthropic describes the protocol’s design principles in detail. The key qualities of an MCP server include:
 
-- **Simple and easy to build**: it should focus on specific, well-defined capabilities
-- **Highly composable**: it should isolate capabilities such that multiple servers can be combined seamlessly
-- **Maintain isolation**: only the necessary contextual information should be exposed to the server
-- **Progressively add features**: Additional capabilities can be added without breaking existing clients
+- **Simple and easy to build**: It should focus on specific, well-defined capabilities.
+- **Highly composable**: It should isolate capabilities so that multiple servers can be combined seamlessly.
+- **Maintain isolation**: Only the necessary contextual information should be exposed to the server.
+- **Progressively add features**: Additional capabilities can be added without breaking existing clients.
 
-Kuzu's MCP server is implemented in Node.js using the above guidelines, and exposes the following functions:
+Kuzu's MCP server is implemented in Node.js using the above principles, and exposes the following functions:
 | Function | Description |
 |----------|-------------|
-| `getSchema` | Get the schema of the database |
-| `query` | Execute a Cypher query on the database |
+| `getSchema` | Returns the schema of the database |
+| `query` | Executes a Cypher query on the database |
 
 When you initialize a connection to the Kuzu MCP server, you open a read-write connection to the database,
-following which the client can send queries to the database via the server. The LLM that governs the MCP client
-decides what operations to perform based on the exposed functions in the MCP server.
+using which the client can send queries to the database via the server. The LLM that governs the MCP client
+decides which operations to perform based on the exposed functions in the MCP server.
 
-Note that Kuzu currently only supports connecting to local MCP servers running on
-your machine that connect to a local Kuzu database. Remote MCP connections and remote databases are not supported
-as of now.
+Note: Currently, Kuzu only supports MCP connections to local servers and databases. Remote databases are not yet supported.
+
 
 ## Example client 1: Claude Desktop
 
@@ -108,15 +105,15 @@ One of the most popular MCP clients is [Claude Desktop](https://www.anthropic.co
 which provides access to Anthropic's Sonnet 3.7 large language model, a highly capable LLM that can
 answer questions, write code, and more.
 
-To connect to the Kuzu MCP server from Claude Desktop, you need to follow these steps:
+To connect Claude Desktop to your Kuzu database via MCP:
 
-1. Install the Claude Desktop app from the [official website](https://claude.ai/download).
+1. Install the Claude Desktop app from [claude.ai](https://claude.ai/download).
 2. Open the Claude Desktop app and navigate to the "Settings" tab.
-3. Click on the "Developer" tab and then on "Edit config"
-4. This will open the directory containing the `claude_desktop_config.json` file.
+3. Click on the "Developer" tab and then on "Edit config".
+4. This opens the directory containing the `claude_desktop_config.json` file.
 
-Open the `claude_desktop_config.json`    file in a text editor and copy-paste the following configuration into it.
-This is basically a Docker command that will start the Kuzu MCP server, and connect it to the Kuzu database
+Open the `claude_desktop_config.json` file in a text editor and copy-paste the following configuration into it.
+This is a Docker command that will start the Kuzu MCP server, and connect it to the Kuzu database
 on your local machine.
 
 ```json
@@ -136,36 +133,34 @@ on your local machine.
     }
 }
 ```
-All you have to do is replace `/path/to/your/database/football_db` with the absolute path to the Kuzu
-database on your machine. Save the file, and restart the Claude Desktop app. You should now be able to
+Replace `/path/to/your/database/football_db` with the absolute path to your local Kuzu
+database. Save the file, and restart the Claude Desktop app. You should now be able to
 start querying the database via the MCP server!
 
 <Image src="/img/kuzu-mcp-server/mcp-kuzu-claude-1.png" alt="Claude Desktop MCP client chat window at open" />
 
 You should see a tool icon on the bottom right corner of the chat window, which indicates that the
-Claude Desktop app sees the available tools from the MCP server. To test it, we can begin asking
-questions about football players from Argentina.
+Claude Desktop app detects the available tools exposed from the MCP server. To test it, let’s ask a question about players from Argentina:
 
 <Image src="/img/kuzu-mcp-server/mcp-kuzu-claude-2.gif" alt="Asking the Claude Desktop MCP client to tell us about the players from Argentina" />
 
-The first query run is the `getSchema` function, which returns the schema of the database, following which
-another query is executed to get the players from Argentina via the `query` function. Each time the agent
-needs to send a query to the database, it will first ask for permission from the user. This is part
+Claude first runs getSchema to understand the database layout, then executes a query to find players from Argentina.
+Before each query, Claude first asks for permission from the user. This is part
 of the safety measures built into the MCP protocol, which every MCP client is responsible to maintain.
 
-As can be seen from the response, the players from Argentina in the database are Lionel Messi and Angel Di Maria.
+The response tells us that the players from Argentina are Lionel Messi and Angel Di Maria.
 
 ## Example client 2: Cursor
 
 Cursor is a popular IDE that supports MCP clients in its agents mode. To connect to the Kuzu MCP server from Cursor,
 you need to follow these steps:
 
-1. Install the Cursor app from the [official website](https://www.cursor.com/).
+1. Install the Cursor app from [cursor.com](https://www.cursor.com/).
 2. Open the Cursor app and navigate to the "Cursor" menu on the top left corner.
 3. Click on "Settings > Cursor Settings" and then click on the "MCP" tab.
 4. Click on "Add new global MCP server", which will open a new file called `mcp.json`.
 
-We will run the Kuzu MCP server inside Cursor via Node.js by entering the following configuration into the `mcp.json` file:
+We'll run the Kuzu MCP server inside Cursor via Node.js by entering the following configuration into the `mcp.json` file:
 
 ```json
 {
