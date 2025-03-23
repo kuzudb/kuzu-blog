@@ -12,12 +12,12 @@ Unless you've been living under a rock, you've probably been hearing a lot about
 introduced by Anthropic in late 2024. We're happy to announce that Kuzu now provides an MCP server that allows you to connect
 MCP clients -- like [Claude Desktop](https://www.anthropic.com/news/claude-desktop) and [Cursor](https://www.cursor.com/)
 agents -- to your Kuzu database! In this post, we'll cover the basics of MCP and walk through how to connect
-your Kuzu databases using two popular MCP clients.
+your Kuzu databases using these two popular MCP clients.
 
 ## What is MCP?
 
 [MCP](https://docs.anthropic.com/en/docs/agents-and-tools/mcp) is an open protocol developed by Anthropic
-that standardizes how tools and applications provide relevant context to large language models (LLMs). MCP has gained
+that standardizes how tools and applications provide relevant context to large language models (LLMs). It's gained
 popularity very rapidly of late, largely due to the fact that it provides a standardized way for any LLM to interact
 with a variety of external data sources and tools, including databases. At Kuzu, we're all about making it easier for
 developers to build and deploy AI workflows on top of graph databases, and we thought it apt to contribute
@@ -251,20 +251,23 @@ for us to verify that the new country was successfully added to the database.
 
 ## Key takeaways
 
-In this blog post, we introduced the basics of the Model Context Protocol (MCP) and the newly added Kuzu MCP server implementation
+We hope this blog post has been helpful for you to leverage the power of LLMs to easily interact with and query your Kuzu graphs.
+In this post, we introduced the basics of the Model Context Protocol (MCP) and the newly added Kuzu MCP server implementation
 (see [here](https://github.com/kuzudb/kuzu-mcp-server) for the source code).
 We show how to connect to a Kuzu database from two popular MCP clients, Claude Desktop and Cursor.
 Using just two simple functions from our MCP server: `getSchema` and `query`, we were able to
 use multiple MCP clients (and their associated LLMs) to answer questions about the data and
 even update the data by adding new data to the database!
 
-MCP is a rapidly evolving protocol, and like many other database developers, we are actively keeping an
-eye on the latest developments in the MCP ecosystem. The current MCP server implementation of Kuzu includes
+The current Kuzu MCP server implementation includes
 just one component: tools, though the core MCP specification includes additional components
 such as [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and [resources](https://modelcontextprotocol.io/docs/concepts/resources)
-that were not covered in this blog post. If you are
-interested in exploring other applications using MCP on top of Kuzu, please reach out to us on [Discord](https://kuzudb.com/chat).
+that were not covered in this blog post. The larger purpose of MCP servers is to make it easier for a variety of MCP clients
+(not just Claude Desktop and Cursor) to easily connect user-defined agents to tools/databases, prompts and resources.
+MCP is a rapidly evolving protocol, and we are actively keeping
+an eye on the latest developments in the ecosystem to learn from users how they intend to use MCP servers and clients
+in their applications.
 
-The primary purpose of MCP is to make it easier for numerous clients (other than just Claude Desktop and Cursor)
-to easily connect to tools and databases. We hope this blog post has been helpful for you to leverage
-the power of LLMs to easily interact with and query your Kuzu graphs!
+As the tools around Graph RAG, LLMs and AI agents continue to evolve, we'd love to work with our user community to develop more
+useful and productive ways to work with these systems. Please try out our MCP server, share your thoughts
+with on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
