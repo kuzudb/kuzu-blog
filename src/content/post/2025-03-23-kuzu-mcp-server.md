@@ -268,6 +268,6 @@ MCP is a rapidly evolving protocol, and we are actively keeping
 an eye on the latest developments in the ecosystem to learn from users how they intend to use MCP servers and clients
 in their applications.
 
-As the tools around Graph RAG, LLMs and AI agents continue to evolve, we'd love to work with our user community to develop more
+We'd love to work with our user community to develop more
 useful and productive ways to work with these systems. Please try out our MCP server, share your thoughts
 with on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
