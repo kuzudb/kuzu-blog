@@ -1,5 +1,5 @@
 ---
-title: "Debugging data, not just code: Using Claude with Kuzu-MCP"
+title: "Debugging data, not just code: Using Claude and Cursor with Kuzu-MCP"
 description: "Introducing Kuzu's MCP server that allows you to connect MCP clients like Claude Desktop and Cursor agents to your Kuzu graph database"
 pubDate: "Mar 26 2025"
 heroImage: "/img/kuzu-mcp-server/kuzu-mcp-banner.png"
