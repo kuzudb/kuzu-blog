@@ -74,7 +74,7 @@ run Kuzu-MPC in read-only mode (see [below](#launch-cursor-with-kuzu-mcp)), in w
 
 ## Demonstration scenario: A debugging session
 
-Kuzu-MCP is can be particularly useful to developers who want to use an LLM as an
+Kuzu-MCP can be particularly useful to developers who want to use an LLM as an
 advanced programming assistant while developing Kuzu applications. In this post, we assume a
 scenario of a software developer who is using Kuzu as the database of an application and debugging a Cypher query that is not returning
 an expected result. The developer will delegate the job of debugging to the LLM, which will do its own debugging
@@ -97,7 +97,7 @@ may be parents or subsidiaries of other companies. The schema of the database lo
 - `ParentOf(from Company, to Company)` relationships, which form a hierarchy of companies.
 - `Issues(from Company, to Bond)` relationships, indicating which company issued which bonds.
 
-<Image src="/img/kuzu-mcp-server/graph-schema.png" alt="Graph schema for the financial asset database" />
+<Image src="/img/kuzu-mcp-server/graph-schema.png" alt="Graph schema for the financial asset database" width="60%" />
 
 Next, suppose a developer is developing some analytics application on a dataset
 that consists of 3 companies: `A`, `B`,and `C`, where `A` is the parent of both `B` and `C`. 
@@ -129,7 +129,7 @@ to create the buggy database above and
 just replace occurences of `/path/to/your/local/financedb` with your local directory.
 
 ### Launch Cursor with Kuzu-MCP
-Cursor is a popular IDE that supports MCP clients in its agents mode. To connect to the Kuzu MCP server from Cursor,
+Cursor is a popular IDE that supports MCP clients in its "Agent" mode. To connect to the Kuzu MCP server from Cursor,
 you need to do following:
 
 1. Install the Cursor app from [cursor.com](https://www.cursor.com/).
@@ -163,9 +163,10 @@ this session, we only want to use the LLM to read data from the database. Save t
 
 ### Ask Cursor to debug the query
 Perhaps the coolest part of this demo is how we run the debugging session with a very simple question to Cursor.
-We start a new chat and ask this simple question:
-```text
-From the kuzu database, I expect the result of the following query to be true. Why do I get false?
+We start a new chat in Cursor's "Agent" and ask this simple question:
+> "From the kuzu database, I expect the result of the following query to be true. Why do I get false?"
+
+```cypher
 MATCH (a {name: "CompanyA"})-[e*]->(b:Bond) 
 WITH count(*) as bondsReachableByA 
 MATCH (b:Bond) 
@@ -173,20 +174,24 @@ WITH bondsReachableByA, count(*) as allBonds
 RETURN (bondsReachableByA = allBonds) as equal;
 ```
 
-Let's see what happens when we ask Cursor to debug this query. The LLM used is Claude 3.7 Sonnet.
+Note that we do not need to tell the LLM the name of the Kuzu database (this information is already in `mcp.json`).
+We will use Claude 3.7 Sonnet to debug this query.
 
 <Image src="/img/kuzu-mcp-server/kuzu-mcp-cursor.gif" alt="Cursor debugging the query" />
 
-After running a few queries via the `query` function, the LLM finds out that the 
+After a few queries to the MCP server, the final result looks like this in Cursor:
+<Image src="/img/kuzu-mcp-server/kuzu-mcp-results.png" alt="Cursor agents result using Kuzu-MCP" />
+
+Let's understand the sequence of events. Using the `query` function, the LLM (Claude 3.7 Sonnet, in this case) finds out that the 
 reason the query returns false is that not all bonds in the database are reachable from `CompanyA`.
 Specifically, `A` does not have an edge to `B` and suggests that as the solution. Although we know we are at the phase
 where we are very used to being surprised by the things LLMs can do, it is still cool
-to see that it did the entire debugging session successfully, with an extremely simple prompt *and only one prompt*.
+to see that it did the entire debugging session successfully, with an extremely simple prompt *and only one prompt*!
 
 Notice also that its reasoning is quite sound and really mimics what a human would do in a debugging session.
-First it looked at the database schema to understand the
+First, it looked at the database schema to understand the
 types of nodes and relationships. That's the first time it's seeing the database. Then it understood what the query is asking:
-"whya are all bonds not reachable from `CompanyA`". Then it inspected which nodes are connected to which other nodes
+"why are all bonds not reachable from `CompanyA`". Then, it inspected which nodes are connected to which other nodes
 to find that the graph is disconnected and suggested to add an edge from `A` to `B` (or alternatively change the query).
 That's how the human developer would approach this problem as well.
 
