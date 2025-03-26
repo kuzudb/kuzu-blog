@@ -36,25 +36,8 @@ For now, we just note that there is a proliferation of MCP servers (some are lis
 People are building different services that can be exposed to
 LLMs, each one giving more capabilities to LLMs to solve more complex and varied tasks automatically.
 You can point LLMs to fetch the latest stock and coin listings, to search nearby restaurants or help manage
-your Kubernetes cluster. Soon you may find yourself using an LLM to order your food, make doctor's appointments, 
-or perform bank transactions (if you trust LLMs to do so). Speaking of doctor's appointments:
-if you have read the initial [vision paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf) 
-of [the semantic web](https://en.wikipedia.org/wiki/Semantic_Web)
-articulated in the seminal paper by [Tim Berners-Lee](https://en.wikipedia.org/wiki/Tim_Berners-Lee), [James Hendler](https://en.wikipedia.org/wiki/James_Hendler), 
-and [Ora Lassila](https://en.wikipedia.org/wiki/Ora_Lassila), the proliferation of MCP servers should remind you
-of the imagined agentic application in the first paragraphs of that paper: an AI agent automatically
-talking to separate servers to make a doctor's appointment for your mom.
-There are of course vast differences between how the semantic web paper imagines such agents and 
-servers could work and how LLMs and MCP servers work. For example, the paper imagines
-the data exchanged between servers is RDF triples. Instead, LLMs exchange text, i.e., natural language,
-with servers[^1]. Nonetheless, one can see a different form of the semantic web 
-vision being realized in the proliferating MCP ecosystem.
-But let us leave this fascinating topic for another post.
-
-[^1]: If you look at the 2nd page of [the semantic web paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf),
-there is a quote: "The Semantic Web will  enable machines to COMPREHEND semantic documents and data, not human speech and writings."
-This was hinting that semantic agents would understand ontologies and knowledge represented in RDF instead of text in web documents.
-In contrast to this vision, LLMs, which are modern day agents, comprehend human writings.
+your Kubernetes cluster. Soon you may find yourself using an LLM to order your food, make doctor's appointments[^2], 
+or perform bank transactions (if you trust LLMs to do so).
 
 ## Kuzu MCP Server
 We did our share in contributing to the MCP ecosystem and built a Kuzu MCP server (henceforth Kuzu-MCP). You start the Kuzu-MCP server by pointing it 
@@ -253,3 +236,22 @@ So, please try out our MCP server, share your thoughts
 on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
 
 ---
+
+[^1]: If you look at the 2nd page of [the semantic web paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf),
+there is a quote: "The Semantic Web will  enable machines to COMPREHEND semantic documents and data, not human speech and writings."
+This was hinting that semantic agents would understand ontologies and knowledge represented in RDF instead of text in web documents.
+In contrast to this vision, LLMs, which are modern day agents, comprehend human writings.
+
+[^2]: Speaking of doctor's appointments:
+if you have read the initial [vision paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf) 
+of [the semantic web](https://en.wikipedia.org/wiki/Semantic_Web)
+articulated in the seminal paper by [Tim Berners-Lee](https://en.wikipedia.org/wiki/Tim_Berners-Lee), [James Hendler](https://en.wikipedia.org/wiki/James_Hendler), 
+and [Ora Lassila](https://en.wikipedia.org/wiki/Ora_Lassila), the proliferation of MCP servers should remind you
+of the imagined agentic application in the first paragraphs of that paper: an AI agent automatically
+talking to separate servers to make a doctor's appointment for your mom.
+There are of course vast differences between how the semantic web paper imagines such agents and 
+servers could work and how LLMs and MCP servers work. For example, the paper imagines
+the data exchanged between servers is RDF triples. Instead, LLMs exchange text, i.e., natural language,
+with servers[^1]. Nonetheless, one can see a different form of the semantic web 
+vision being realized in the proliferating MCP ecosystem.
+But let us leave this fascinating topic for another post.
