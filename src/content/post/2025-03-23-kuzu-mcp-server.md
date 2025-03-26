@@ -163,7 +163,7 @@ this session, we only want to use the LLM to read data from the database. Save t
 
 ### Ask Cursor to debug the query
 Perhaps the coolest part of this demo is how we run the debugging session with a very simple question to Cursor.
-We start a new chat in Cursor's "Agent" and ask this simple question:
+We start a new chat in Cursor's "Agent" mode and ask this simple question:
 > "From the kuzu database, I expect the result of the following query to be true. Why do I get false?"
 
 ```cypher
