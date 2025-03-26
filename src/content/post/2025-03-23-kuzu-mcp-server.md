@@ -246,9 +246,10 @@ We plan to cover more demonstrative examples in future posts.
 
 The MCP ecosystem is progressing fast
 and we are actively keeping
-an eye on the latest developments in the ecosystem.
+an eye on the latest developments.
 We'd love to work with our user community  to learn about how they intend to use MCP servers and clients
-in their applications. So, please try out our MCP server, share your thoughts
+in their applications. Just like Kuzu itself, Kuzu-MCP is free and open source and available on [GitHub](https://github.com/kuzudb/kuzu-mcp-server).
+So, please try out our MCP server, share your thoughts
 on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
 
 ---
