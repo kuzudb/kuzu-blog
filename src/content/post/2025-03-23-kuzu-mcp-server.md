@@ -1,111 +1,207 @@
 ---
-title: "MCP meets Kuzu: Bringing AI to your graph databases"
+title: "Using MCP to debug database applications"
 description: "Introducing Kuzu's MCP server that allows you to connect MCP clients like Claude Desktop and Cursor agents to your Kuzu database"
-pubDate: "Mar 24 2025"
+pubDate: "Mar 25 2025"
 heroImage: "/img/kuzu-mcp-server/kuzu-mcp-banner.png"
 categories: ["example"]
-authors: ["prashanth", "chang"]
+authors: ["prashanth", "chang", "semih"]
 tags: ["kuzu", "mcp-server", "mcp", "llm"]
 ---
 
 Unless you've been living under a rock, you've probably been hearing a lot about the Model Context Protocol (MCP),
 introduced by Anthropic in late 2024. We're happy to announce that Kuzu now provides an MCP server that allows you to connect
-MCP clients -- like [Claude Desktop](https://www.anthropic.com/news/claude-desktop) and [Cursor](https://www.cursor.com/)
-agents -- to your Kuzu database! In this post, we'll cover the basics of MCP and walk through how to connect
-your Kuzu databases using these two popular MCP clients.
+MCP clients -- such as [Claude Desktop](https://www.anthropic.com/news/claude-desktop) and [Cursor](https://www.cursor.com/)
+agents -- to your Kuzu databases! This post has two goals. First, we'll cover the basics of MCP and walk through how to connect
+your Kuzu databases to these two popular MCP clients using Kuzu's MCP server. 
+Second, we'll demonstrate how this can benefit developers using a simple scenario: a software developer
+debugging the output of a Cypher query with the help of an agent. But first, let's review MCP.
 
 ## What is MCP?
 
 [MCP](https://docs.anthropic.com/en/docs/agents-and-tools/mcp) is an open protocol developed by Anthropic
-that standardizes how tools and applications provide relevant context to large language models (LLMs). It's gained
-popularity very rapidly of late, largely due to the fact that it provides a standardized way for any LLM to interact
-with a variety of external data sources and tools, including databases. At Kuzu, we're all about making it easier for
-developers to build and deploy AI workflows on top of graph databases, and we thought it apt to contribute
-to the rapidly growing MCP ecosystem by providing an MCP server that allows you to connect your graph database
-to MCP clients.
+that standardizes how LLMs can interact with external data sources and services
+to obtain external data and/or take actions in the real world. 
+MCP is a standardized client-server protocol where the client and server have the following roles:
 
-MCP follows a client/server architecture, where the client's role is to route requests from the host application to
-the server. The server is responsible for exposing resources, tools and prompts to the client. The MCP
-server we provide allows local access to a specified Kuzu database. On the client side, applications like 
-Claude Desktop and Cursor provide built-in MCP support. The overall architecture is below:
+- Client is a "host application" that uses an LLM, such as Cursor or Claude Desktop. Client can
+read data from the server and/or make remote procedure calls to some functions exposed by the server. Through these
+function calls, an LLM can take actions in the real world when it is prompted to perform a task by a human.
+- Server is a tool or service that exposes external data and/or functions to the LLM. 
 
+Here is an example of how this architecture looks like with Kuzu MCP server in the role of the server.
 <Image src="/img/kuzu-mcp-server/kuzu-mcp-server-to-client.png" alt="Kuzu MCP client-server overview" />
 
-## Create the Kuzu database
+We will make this architecture very concrete in our demonstration scenario later in this post.
+For now, we just note that there is a proliferation of MCP servers (some are listed [here](https://github.com/punkpeye/awesome-mcp-servers)).
+People are building different services that can be exposed to
+LLMs, each one giving more capabilities to LLMs to solve more complex and varied tasks automatically.
+You can point LLMs to fetch the latest stock and coin listings, to search nearby restaurants or help manage
+your Kubernetes cluster. Soon you may find yourself using an LLM to order your food, make doctor's appointments, 
+or perform bank transactions (if you trust LLMs to do so). Speaking of doctor's appointments:
+if you have read the initial [vision paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf) 
+of [the semantic web](https://en.wikipedia.org/wiki/Semantic_Web)
+articulated in the seminal paper by [Tim Berners-Lee](https://en.wikipedia.org/wiki/Tim_Berners-Lee), [James Hendler](https://en.wikipedia.org/wiki/James_Hendler), 
+and [Ora Lassila](https://en.wikipedia.org/wiki/Ora_Lassila), the proliferation of MCP servers should remind you
+of the imagined agentic application in the first paragraphs of that paper: an AI agent automatically
+talking to separate servers to make a doctor's appointment for your mom.
+There are of course vast differences between how the semantic web paper imagines such agents and 
+servers could work and how LLMs and MCP servers work. For example, the paper imagines
+the data exchanged between servers is RDF triples. Instead, LLMs exchange text, i.e., natural language,
+with servers[^1]. Nonetheless, one can see a different form of the semantic web 
+vision being realized in the proliferating MCP ecosystem.
+But let us leave this fascinating topic for another post.
 
-Let's first create a Kuzu database to use in this example. We'll use a simple dataset of football players
-from two countries: Argentina, who won the 2022 World Cup, and France, who won in 2018.
-We'll start by defining a schema that captures relationships between players, the
-countries they represent, and the World Cups their countries have won. Open a Kuzu
-CLI and execute the following DDL commands:
+[^1]: If you look at the 2nd page of [the semantic web paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf),
+there is a quote: "The Semantic Web will  enable machines to COMPREHEND semantic documents and data, not human speech and writings."
+This was hinting that semantic agents would understand ontologies and knowledge represented in RDF instead of text in web documents.
+In contrast to this vision, LLMs, which are modern day agents, comprehend human writings.
 
-```sql
-CREATE NODE TABLE Player(name STRING PRIMARY KEY, goalsScored INT32);
-CREATE NODE TABLE Country(name STRING PRIMARY KEY, worldCupsWon INT32);
-CREATE NODE TABLE WorldCup(year INT32 PRIMARY KEY, host STRING);
-CREATE REL TABLE PLAYS_FOR(FROM Player TO Country);
-CREATE REL TABLE WON(FROM Country TO WorldCup);
-```
-
-Next, insert the data into the database using Cypher:
-```cypher
-// Create Country nodes
-CREATE (argentina:Country {name: "Argentina", worldCupsWon: 3})
-CREATE (france:Country {name: "France", worldCupsWon: 2})
-
-// Create Player nodes
-CREATE (messi:Player {name: "Lionel Messi", goalsScored: 112})
-CREATE (dimaria:Player {name: "Angel Di Maria", goalsScored: 31})
-CREATE (mbappe:Player {name: "Kylian Mbappe", goalsScored: 48})
-CREATE (griezmann:Player {name: "Antoine Griezmann", goalsScored: 44})
-
-// Create WorldCup nodes
-CREATE (wc2022:WorldCup {year: 2022, host: "Qatar"})
-CREATE (wc2018:WorldCup {year: 2018, host: "Russia"})
-
-// Create PLAYS_FOR relationships
-CREATE (messi)-[:PLAYS_FOR]->(argentina)
-CREATE (dimaria)-[:PLAYS_FOR]->(argentina)
-CREATE (mbappe)-[:PLAYS_FOR]->(france)
-CREATE (griezmann)-[:PLAYS_FOR]->(france)
-
-// Create WON relationships
-CREATE (argentina)-[:WON]->(wc2022)
-CREATE (france)-[:WON]->(wc2018)
-```
-
-The database created using the above commands is stored in a directory named `football_db` on the local disk.
-
-## MCP server
-
-The official MCP [specification](https://spec.modelcontextprotocol.io/specification/2024-11-05/architecture/)
-released by Anthropic describes the protocol’s design principles in detail. The key qualities of an MCP server include:
-
-- **Simple and easy to build**: It should focus on specific, well-defined capabilities.
-- **Highly composable**: It should isolate capabilities so that multiple servers can be combined seamlessly.
-- **Maintain isolation**: Only the necessary contextual information should be exposed to the server.
-- **Progressively add features**: Additional capabilities can be added without breaking existing clients.
-
-Kuzu's MCP server is implemented in Node.js using the above principles, and exposes the following functions:
+## Kuzu MCP Server
+We did our share in contributing to the MCP ecosystem and built a Kuzu MCP server (henceforth Kuzu-MCP). You start the Kuzu-MCP server by pointing it 
+to a database. To be accurate, you do not start the MCP Server yourself. Instead, as we will show momentarily,
+you configure Cursor or Claude Desktop to start the server as they start themselves.
+Kuzu-MCP exposes the following two functions to LLMs:
 | Function | Description |
 |----------|-------------|
 | `getSchema` | Returns the schema of the database |
 | `query` | Executes a Cypher query on the database |
 
-When you initialize a connection to the Kuzu MCP server, you open a read-write connection to the database,
-using which the client can send queries to the database via the server. The LLM that governs the MCP client
-decides which operations to perform based on the exposed functions in the MCP server.
+Using these functions, the LLM can read the node and relationship tables in Kuzu and run Cypher queries on the database
+to perform actions. In both Cursor and Claude Desktop, each time the LLM wants to run one of these functions,
+it asks your permission and you can choose to provide permission or not. 
+If you are worried about the LLM accidentally modifying your database, you can also
+run Kuzu-MPC in read-only mode (see [below](#launch-cursor-with-kuzu-mcp)), in which case, Kuzu-MCP will not run any queries that modify the database.
 
-Note: Currently, Kuzu only supports MCP connections to local servers and databases. Remote databases are not yet supported.
+## Demonstration scenario: A debugging session
 
+Kuzu-MCP can be particularly useful to developers who want to use an LLM as an
+advanced programming assistant while developing Kuzu applications. In this post, we assume a
+scenario of a software developer who is using Kuzu as the database of an application and debugging a Cypher query that is not returning
+an expected result. The developer will delegate the job of debugging to the LLM, which will do its own debugging
+session until it finds the root cause of the problem. 
 
-## Example client 1: Claude Desktop
+[//]: # (through its own debuggig sessions interacting with the database.)
+[//]: # (The example bug in the scenario is admittedly simple but the important thing to take away is this:)
+[//]: # (The LLM will really do the debugging for you by issuing multiple queries to the database,)
+[//]: # (and will do so without any detailed prompting at all.)
+[//]: # (We will simply give it the Cypher query and say it is not returning the expected)
+[//]: # (result. We will not interpret to the LLM what we are trying to do with the query. It will understand the query)
+[//]: # (and go through a few possibilities to find the cause. Let's get through the scenario.)
 
-One of the most popular MCP clients is [Claude Desktop](https://www.anthropic.com/news/claude-desktop),
-which provides access to Anthropic's Sonnet 3.7 large language model, a highly capable LLM that can
-answer questions, write code, and more.
+### A bug in a hierarchical financial asset database 
 
-To connect Claude Desktop to your Kuzu database via MCP:
+Our example consists of a simple database of companies and the bonds they issue, where companies
+may be parents or subsidiaries of other companies. The schema of the database looks as follows:
+- `Company(cID serial, name string, primary key (cid))` nodes.
+- `Bond(bID serial, name string, yield float, primary key (bID))` nodes.
+- `ParentOf(from Company, to Company)` relationships, which form a hierarchy of companies.
+- `Issues(from Company, to Bond)` relationships, indicating which company issued which bonds.
+
+<Image src="/img/kuzu-mcp-server/graph-schema.png" alt="Graph schema for the financial asset database" width="60%" />
+
+Next, suppose a developer is developing some analytics application on a dataset
+that consists of 3 companies: `A`, `B`,and `C`, where `A` is the parent of both `B` and `C`. 
+Therefore, the developer expects that `A` is the root of the company hierarchy.
+Further, each company issues two bonds. So there are 6 bonds in total in the database.
+Suppose the developer has a test case that checks that the number of total bonds is equal to the number of bonds issued by `A`
+or any of its direct or indirect subsidiaries. 
+The test case is the following:
+```cypher
+MATCH (a {name: "CompanyA"})-[e*]->(b:Bond)
+WITH count(*) as bondsReachableByA 
+MATCH (b:Bond) 
+WITH bondsReachableByA, count(*) as allBonds
+RETURN (bondsReachableByA = allBonds) as equal;
+```
+The result of the query must be `true` if `A` is the root of the company hierarchy because
+the root company can reach every company in the database, and through them it can reach every bond in the database.
+For the purpose of demonstration, suppose the database has a bug and is missing the `(A)-[:ParentOf]->(B)` relationship. 
+Therefore, the database actually looks as follows:
+
+<Image src="/img/kuzu-mcp-server/graph-viz.png" alt="Graph visualization for the financial asset database" />
+
+As a result of this bug the developer observes that the test is failing.
+We will next show how to use Cursor along with Kuzu-MCP to debug this issue. 
+We will assume in the rest of
+the post that the Kuzu database is in directory `/path/to/your/local/financedb`.
+If you want to replicate the rest of the steps in this post, use the Cypher queries [here](https://gist.github.com/prrao87/ed0711a2339b75e462f0e1a31c766e7b)
+to create the buggy database above and
+just replace occurences of `/path/to/your/local/financedb` with your local directory.
+
+### Launch Cursor with Kuzu-MCP
+Cursor is a popular IDE that supports MCP clients in its "Agent" mode. To connect to the Kuzu MCP server from Cursor,
+you need to do following:
+
+1. Install the Cursor app from [cursor.com](https://www.cursor.com/).
+2. Open the Cursor app and navigate to the "Cursor" menu on the top left corner.
+3. Click on "Settings > Cursor Settings" and then click on the "MCP" tab.
+4. Click on "Add new global MCP server", which will open a new file called `mcp.json`.
+
+To start Kuzu-MCP as Cursor starts, enter the following configuration into the `mcp.json` file:
+
+```json
+{
+    "mcpServers": {
+        "kuzu": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-v",
+                "/path/to/your/local/financedb:/database",
+                "-e",
+                "KUZU_READ_ONLY=true",
+                "--rm",
+                "-i",
+                "kuzudb/mcp-server"
+            ]
+        }
+    }
+}
+```
+Note that we set `-e KUZU_READ_ONLY=true` to run Kuzu-MCP in read-only mode, because in
+this session, we only want to use the LLM to read data from the database. Save the file, and restart the Cursor app.
+
+### Ask Cursor to debug the query
+Perhaps the coolest part of this demo is how we run the debugging session with a very simple question to Cursor.
+We start a new chat in Cursor's "Agent" and ask this simple question:
+> "From the kuzu database, I expect the result of the following query to be true. Why do I get false?"
+
+```cypher
+MATCH (a {name: "CompanyA"})-[e*]->(b:Bond) 
+WITH count(*) as bondsReachableByA 
+MATCH (b:Bond) 
+WITH bondsReachableByA, count(*) as allBonds
+RETURN (bondsReachableByA = allBonds) as equal;
+```
+
+Note that we do not need to tell the LLM the name of the Kuzu database (this information is already in `mcp.json`).
+We will use Claude 3.7 Sonnet to debug this query.
+
+<Image src="/img/kuzu-mcp-server/kuzu-mcp-cursor.gif" alt="Cursor debugging the query" />
+
+After a few queries to the MCP server, the final result looks like this in Cursor:
+<Image src="/img/kuzu-mcp-server/kuzu-mcp-results.png" alt="Cursor agents result using Kuzu-MCP" />
+
+Let's understand the sequence of events. Using the `query` function, the LLM (Claude 3.7 Sonnet, in this case) finds out that the 
+reason the query returns false is that not all bonds in the database are reachable from `CompanyA`.
+Specifically, `A` does not have an edge to `B` and suggests that as the solution. Although we know we are at the phase
+where we are very used to being surprised by the things LLMs can do, it is still cool
+to see that it did the entire debugging session successfully, with an extremely simple prompt *and only one prompt*!
+
+Notice also that its reasoning is quite sound and really mimics what a human would do in a debugging session.
+First, it looked at the database schema to understand the
+types of nodes and relationships. That's the first time it's seeing the database. Then it understood what the query is asking:
+"why are all bonds not reachable from `CompanyA`". Then, it inspected which nodes are connected to which other nodes
+to find that the graph is disconnected and suggested to add an edge from `A` to `B` (or alternatively change the query).
+That's how the human developer would approach this problem as well.
+
+If you already use Cursor, you'll know that it's really good at debugging code, since it can see your entire code base.
+With MCP servers of databases, clients like Cursor can also help you debug problems _in your data itself_!
+
+### Use Kuzu-MCP in Claude Desktop
+You can also use Kuzu-MCP with [Claude Desktop](https://www.anthropic.com/news/claude-desktop), which is also completely able to go through a similar debugging session
+and get to the root cause of the problem. We will not present the Claude Desktop interaction here but only show you
+how you can start Claude Desktop with Kuzu-MCP. The steps are as follows:
 
 1. Install the Claude Desktop app from [claude.ai](https://claude.ai/download).
 2. Open the Claude Desktop app and navigate to the "Settings" tab.
@@ -113,8 +209,8 @@ To connect Claude Desktop to your Kuzu database via MCP:
 4. This opens the directory containing the `claude_desktop_config.json` file.
 
 Open the `claude_desktop_config.json` file in a text editor and copy-paste the following configuration into it.
-This is a Docker command that will start the Kuzu MCP server, and connect it to the Kuzu database
-on your local machine.
+This is a Docker command that will start the Kuzu MCP server, and connect via a read-only connection to the Kuzu database
+on your local machine. 
 
 ```json
 {
@@ -124,150 +220,35 @@ on your local machine.
             "args": [
                 "run",
                 "-v",
-                "/path/to/your/database/football_db:/database",
+                "/path/to/your/local/financedb:/database",
+                "-e",
+                "KUZU_READ_ONLY=true",
                 "--rm",
                 "-i",
-                "kuzu-mcp-server"
+                "kuzudb/mcp-server"
             ]
         }
     }
 }
 ```
-Replace `/path/to/your/database/football_db` with the absolute path to your local Kuzu
-database. Save the file, and restart the Claude Desktop app. You should now be able to
-start querying the database via the MCP server!
-
-<Image src="/img/kuzu-mcp-server/mcp-kuzu-claude-1.png" alt="Claude Desktop MCP client chat window at open" />
-
-You should see a tool icon on the bottom right corner of the chat window, which indicates that the
-Claude Desktop app detects the available tools exposed from the MCP server. To test it, let’s ask a question about players from Argentina:
-
-<Image src="/img/kuzu-mcp-server/mcp-kuzu-claude-2.gif" alt="Asking the Claude Desktop MCP client to tell us about the players from Argentina" />
-
-Claude first runs getSchema to understand the database layout, then executes a query to find players from Argentina.
-Before each query, Claude first asks for permission from the user. This is part
-of the safety measures built into the MCP protocol, which every MCP client is responsible to maintain.
-
-The response tells us that the players from Argentina are Lionel Messi and Angel Di Maria.
-
-## Example client 2: Cursor
-
-Cursor is a popular IDE that supports MCP clients in its agents mode. To connect to the Kuzu MCP server from Cursor,
-you need to follow these steps:
-
-1. Install the Cursor app from [cursor.com](https://www.cursor.com/).
-2. Open the Cursor app and navigate to the "Cursor" menu on the top left corner.
-3. Click on "Settings > Cursor Settings" and then click on the "MCP" tab.
-4. Click on "Add new global MCP server", which will open a new file called `mcp.json`.
-
-We'll run the Kuzu MCP server inside Cursor via Node.js by entering the following configuration into the `mcp.json` file:
-
-```json
-{
-    "mcpServers": {
-        "kuzu": {
-            "command": "docker",
-            "args": [
-                "run",
-                "-v",
-                "/path/to/your/local/football_db:/database",
-                "--rm",
-                "-i",
-                "kuzu-mcp-server"
-            ]
-        }
-    }
-}
-```
-The above configuration is similar to the one we used in the Claude Desktop example. Once again, ensure that
-you replace `/path/to/your/local/football_db` with the absolute path to the Kuzu database on your machine
-in order for the Cursor client to be able to access the database. Save the file, and restart the Cursor app.
-
-You should now be able to query and update the database using a Cursor agent by opening a new chat window!
-
-<Image src="/img/kuzu-mcp-server/mcp-kuzu-cursor-1.png" alt="Cursor MCP client chat window at open" />
-
-To test it, let's ask the agent to tell us about the players from France.
-
-<Image src="/img/kuzu-mcp-server/mcp-kuzu-cursor-2.gif" alt="Asking the Cursor MCP client to tell us about the players from France" />
-
-The MCP client will route the query to the Kuzu MCP server, which will ask for permission to execute the query.
-The Claude 3.7 Sonnet model decides to first get the database schema via the `getSchema` function, and then
-executes another Cypher query to get the players from France via the `query` function. Each time the agent
-needs to send a query to the database, it will first ask for permission from the user. This is part
-of the safety measures built into the MCP protocol, which every MCP client is responsible to maintain.
-
-As per its response, we can see that the players from France are Kylian Mbappe and Antoine Griezmann.
-Here's the query that was executed by the Cursor agent:
-
-```json
-{
-  "cypher": "MATCH (p:Player)-[:PLAYS_FOR]->(c:Country)\nWHERE c.name = 'France'\nRETURN p.name, p.goalsScored"
-}
-```
-
-```
-The French players in your Kuzu database are:
-Kylian Mbappe (48 goals scored)
-Antoine Griezmann (44 goals scored)
-```
-
-Let's ask a follow-up question: 
-"_Which French player has scored the most goals for his country?_"
-
-<Image src="/img/kuzu-mcp-server/mcp-kuzu-cursor-3.gif" alt="Asking the Cursor MCP client to tell us about the French player with the most goals" />
-
-The Cursor chat retains the recent history of the conversation, and the agent can continue to answer questions
-about the data it already retrieved. Claude 3.7 Sonnet, the LLM that governs the Cursor agent, decides that it doesn't need to
-send another query to the database because it's able to reason about the data it already has. Not bad!
-
-```
-Based on the previous query results, Kylian Mbappe scored 48 goals, which is more than Antoine
-Griezmann's 44 goals. So Kylian Mbappe is the French player who scored the most goals for his country.
-```
-
-As shown, the LLM is able to make certain decisions on behalf of the user, either through its own
-reasoning ability, or through simple queries that it can issue to the database.
-
-## Update the database via MCP client
-
-Using a given MCP client, you can also issue queries that modify or update the database. Let's say we want to add a new
-country, Germany along with the number of world cups they have won (4). We could, of course, do this
-by opening the Kuzu CLI and executing the following command:
-
-```sql
-CREATE (germany:Country {name: "Germany", worldCupsWon: 4})
-```
-
-But to make it more interesting, let's use the Cursor MCP client to do this!
-
-<Image src="/img/kuzu-mcp-server/mcp-kuzu-cursor-4.gif" alt="Asking the Cursor MCP client to add a new country to the database" />
-
-As can be seen, the Cursor agent checks the database schema, ensures that the new country is not already
-present in the database, and then issues a Cypher query to add the new country to the database. Because
-it knows the database schema, it knows that there exists a property `worldCupsWon` that is an `INT32`
-type, and then uses the correct value for the `worldCupsWon` property. In the end, it even runs a query
-for us to verify that the new country was successfully added to the database.
+Save the file, and restart the Claude Desktop app. You should now be able to
+start querying the database via the MCP server.
 
 ## Key takeaways
 
-We hope this blog post has been helpful for you to leverage the power of LLMs to easily interact with and query your Kuzu graphs.
-In this post, we introduced the basics of the Model Context Protocol (MCP) and the newly added Kuzu MCP server implementation
-(see [here](https://github.com/kuzudb/kuzu-mcp-server) for the source code).
-We show how to connect to a Kuzu database from two popular MCP clients, Claude Desktop and Cursor.
-Using just two simple functions from our MCP server: `getSchema` and `query`, we were able to
-use multiple MCP clients (and their associated LLMs) to answer questions about the data and
-even update the data by adding new data to the database!
+In this post we demonstrated how Kuzu-MCP can be useful when developing applications with Kuzu. We used
+a simple debugging session as an example. Since Kuzu-MCP allows LLMs to execute arbitrary Cypher queries
+on your databases, you can also get LLMs to modify or populate your database. All of this can be done 
+with very simple prompts, instead of writing detailed prompt instructions with your schema or contents of your database. 
+You can of course get a lot more creative and get LLMs to do many other tasks, such as ETL across databases, 
+advanced data analytics or visualizations, by exposing them to MCP servers of multiple data systems.
+We plan to cover more demonstrative examples in future posts.
 
-The current Kuzu MCP server implementation includes
-just one component: tools, though the core MCP specification includes additional components
-such as [prompts](https://modelcontextprotocol.io/docs/concepts/prompts) and [resources](https://modelcontextprotocol.io/docs/concepts/resources)
-that were not covered in this blog post. The larger purpose of MCP servers is to make it easier for a variety of MCP clients
-(not just Claude Desktop and Cursor) to easily connect user-defined agents to tools/databases, prompts and resources.
-MCP is a rapidly evolving protocol, and we are actively keeping
-an eye on the latest developments in the ecosystem to learn from users how they intend to use MCP servers and clients
-in their applications.
+The MCP ecosystem is progressing fast
+and we are actively keeping
+an eye on the latest developments in the ecosystem.
+We'd love to work with our user community  to learn about how they intend to use MCP servers and clients
+in their applications. So, please try out our MCP server, share your thoughts
+on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
 
-We'd love to work with our user community to develop more
-useful and productive ways to work with these systems. Please try out our MCP server, share your thoughts
-with on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
+---
