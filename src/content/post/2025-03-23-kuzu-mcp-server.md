@@ -37,7 +37,7 @@ People are building different services that can be exposed to
 LLMs, each one giving more capabilities to LLMs to solve more complex and varied tasks automatically.
 You can point LLMs to fetch the latest stock and coin listings, to search nearby restaurants or help manage
 your Kubernetes cluster. Soon you may find yourself using an LLM to order your food, make doctor's appointments[^2], 
-or perform bank transactions (if you trust LLMs to do so).
+or perform bank transactions (if you trust LLMs to do so)[^1].
 
 ## Kuzu MCP Server
 We've built an MCP server for Kuzu -- let's call it Kuzu-MCP in the rest of this post. Rather than starting the MCP server yourself,
@@ -86,7 +86,7 @@ may be parents or subsidiaries of other companies. The schema of the database lo
 Next, suppose a developer is developing some analytics application on a dataset
 that consists of 3 companies: `A`, `B`,and `C`, where `A` is the parent of both `B` and `C`. 
 Therefore, the developer expects that `A` is the root of the company hierarchy.
-Further, each company issues two bonds. So there are 6 bonds in total in the database.
+Further, each company issues two bonds. So, there are 6 bonds in total in the database.
 Suppose the developer has a test case that checks that the number of total bonds is equal to the number of bonds issued by `A`
 or any of its direct or indirect subsidiaries. 
 The test case is the following:
@@ -97,14 +97,14 @@ MATCH (b:Bond)
 WITH bondsReachableByA, count(*) as allBonds
 RETURN (bondsReachableByA = allBonds) as equal;
 ```
-The result of the query must be `true` if `A` is the root of the company hierarchy because
+The result of the query must be `true` if `A` is the root of the company hierarchy, because
 the root company can reach every company in the database, and through them it can reach every bond in the database.
 For the purpose of demonstration, suppose the database has a bug and is missing the `(A)-[:ParentOf]->(B)` relationship. 
 Therefore, the database actually looks as follows:
 
 <Image src="/img/kuzu-mcp-server/graph-viz.png" alt="Graph visualization for the financial asset database" />
 
-As a result of this bug the developer observes that the test is failing.
+As a result of this bug, the developer observes that the test is failing.
 We'll next show how to use Cursor along with Kuzu-MCP to debug this issue. 
 We'll assume in the rest of
 the post that the Kuzu database is in directory `/path/to/your/local/financedb`.
@@ -222,7 +222,7 @@ start querying the database via the MCP server.
 
 In this post we introduced the Kuzu MCP server and demonstrated how it can be useful when developing applications with Kuzu. We used
 a simple debugging session as an example.
-Since Kuzu-MCP allows LLMs to execute arbitrary Cypher queries on your database, you can go beyond debugging — enabling agents to read from, modify, or even populate your database using nothing more than natural language prompts. This eliminates the need for long, detailed prompt engineering that includes schema or table dumps — the agent can access that context directly via MCP.
+Since Kuzu-MCP allows LLMs to execute arbitrary Cypher queries on your database, you can even go beyond debugging — enabling agents to read from, modify, or even populate your database using nothing more than natural language prompts. This eliminates the need for long, detailed prompt engineering that includes schema or table dumps — the agent can access that context directly via MCP.
 
 
 And this is just the beginning. By exposing multiple data systems through their own MCP servers, you can unlock powerful agentic workflows for tasks like ETL across databases, advanced analytics, or even automated data visualizations. 
@@ -250,6 +250,6 @@ talking to separate servers to make a doctor's appointment for your mom.
 There are of course vast differences between how the semantic web paper imagines such agents and 
 servers could work and how LLMs and MCP servers work. For example, the paper imagines
 the data exchanged between servers is RDF triples. Instead, LLMs exchange text, i.e., natural language,
-with servers[^1]. Nonetheless, one can see a different form of the semantic web 
+with servers (see footnote 2 below for more on this). Nonetheless, one can see a different form of the semantic web 
 vision being realized in the proliferating MCP ecosystem.
 But let us leave this fascinating topic for another post.
