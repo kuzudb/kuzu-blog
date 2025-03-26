@@ -1,20 +1,20 @@
 ---
-title: "Using MCP to debug database applications"
-description: "Introducing Kuzu's MCP server that allows you to connect MCP clients like Claude Desktop and Cursor agents to your Kuzu database"
-pubDate: "Mar 25 2025"
+title: "Debugging data, not just code: Using Claude with Kuzu-MCP"
+description: "Introducing Kuzu's MCP server that allows you to connect MCP clients like Claude Desktop and Cursor agents to your Kuzu graph database"
+pubDate: "Mar 26 2025"
 heroImage: "/img/kuzu-mcp-server/kuzu-mcp-banner.png"
 categories: ["example"]
 authors: ["prashanth", "chang", "semih"]
 tags: ["kuzu", "mcp-server", "mcp", "llm"]
 ---
 
-Unless you've been living under a rock, you've probably been hearing a lot about the Model Context Protocol (MCP),
+Unless you've been living under a rock, you've probably heard a lot about the Model Context Protocol (MCP),
 introduced by Anthropic in late 2024. We're happy to announce that Kuzu now provides an MCP server that allows you to connect
 MCP clients -- such as [Claude Desktop](https://www.anthropic.com/news/claude-desktop) and [Cursor](https://www.cursor.com/)
 agents -- to your Kuzu databases! This post has two goals. First, we'll cover the basics of MCP and walk through how to connect
 your Kuzu databases to these two popular MCP clients using Kuzu's MCP server. 
-Second, we'll demonstrate how this can benefit developers using a simple scenario: a software developer
-debugging the output of a Cypher query with the help of an agent. But first, let's review MCP.
+Second, we'll demonstrate how debugging data issues can become a lot easier when you expose your database to an LLM through an MCP server. 
+But first, let's review MCP.
 
 ## What is MCP?
 
@@ -31,36 +31,20 @@ function calls, an LLM can take actions in the real world when it is prompted to
 Here is an example of how this architecture looks like with Kuzu MCP server in the role of the server.
 <Image src="/img/kuzu-mcp-server/kuzu-mcp-server-to-client.png" alt="Kuzu MCP client-server overview" />
 
-We will make this architecture very concrete in our demonstration scenario later in this post.
+We'll make this architecture very concrete in our demonstration scenario later in this post.
 For now, we just note that there is a proliferation of MCP servers (some are listed [here](https://github.com/punkpeye/awesome-mcp-servers)).
 People are building different services that can be exposed to
 LLMs, each one giving more capabilities to LLMs to solve more complex and varied tasks automatically.
 You can point LLMs to fetch the latest stock and coin listings, to search nearby restaurants or help manage
-your Kubernetes cluster. Soon you may find yourself using an LLM to order your food, make doctor's appointments, 
-or perform bank transactions (if you trust LLMs to do so). Speaking of doctor's appointments:
-if you have read the initial [vision paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf) 
-of [the semantic web](https://en.wikipedia.org/wiki/Semantic_Web)
-articulated in the seminal paper by [Tim Berners-Lee](https://en.wikipedia.org/wiki/Tim_Berners-Lee), [James Hendler](https://en.wikipedia.org/wiki/James_Hendler), 
-and [Ora Lassila](https://en.wikipedia.org/wiki/Ora_Lassila), the proliferation of MCP servers should remind you
-of the imagined agentic application in the first paragraphs of that paper: an AI agent automatically
-talking to separate servers to make a doctor's appointment for your mom.
-There are of course vast differences between how the semantic web paper imagines such agents and 
-servers could work and how LLMs and MCP servers work. For example, the paper imagines
-the data exchanged between servers is RDF triples. Instead, LLMs exchange text, i.e., natural language,
-with servers[^1]. Nonetheless, one can see a different form of the semantic web 
-vision being realized in the proliferating MCP ecosystem.
-But let us leave this fascinating topic for another post.
-
-[^1]: If you look at the 2nd page of [the semantic web paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf),
-there is a quote: "The Semantic Web will  enable machines to COMPREHEND semantic documents and data, not human speech and writings."
-This was hinting that semantic agents would understand ontologies and knowledge represented in RDF instead of text in web documents.
-In contrast to this vision, LLMs, which are modern day agents, comprehend human writings.
+your Kubernetes cluster. Soon you may find yourself using an LLM to order your food, make doctor's appointments[^2], 
+or perform bank transactions (if you trust LLMs to do so).
 
 ## Kuzu MCP Server
-We did our share in contributing to the MCP ecosystem and built a Kuzu MCP server (henceforth Kuzu-MCP). You start the Kuzu-MCP server by pointing it 
-to a database. To be accurate, you do not start the MCP Server yourself. Instead, as we will show momentarily,
-you configure Cursor or Claude Desktop to start the server as they start themselves.
+We've built an MCP server for Kuzu -- let's call it Kuzu-MCP in the rest of this post. Rather than starting the MCP server yourself,
+you configure Cursor or Claude Desktop clients to start the server.
+
 Kuzu-MCP exposes the following two functions to LLMs:
+
 | Function | Description |
 |----------|-------------|
 | `getSchema` | Returns the schema of the database |
@@ -84,8 +68,8 @@ session until it finds the root cause of the problem.
 [//]: # (The example bug in the scenario is admittedly simple but the important thing to take away is this:)
 [//]: # (The LLM will really do the debugging for you by issuing multiple queries to the database,)
 [//]: # (and will do so without any detailed prompting at all.)
-[//]: # (We will simply give it the Cypher query and say it is not returning the expected)
-[//]: # (result. We will not interpret to the LLM what we are trying to do with the query. It will understand the query)
+[//]: # (We'll simply give it the Cypher query and say it is not returning the expected)
+[//]: # (result. We'll not interpret to the LLM what we are trying to do with the query. It will understand the query)
 [//]: # (and go through a few possibilities to find the cause. Let's get through the scenario.)
 
 ### A bug in a hierarchical financial asset database 
@@ -121,8 +105,8 @@ Therefore, the database actually looks as follows:
 <Image src="/img/kuzu-mcp-server/graph-viz.png" alt="Graph visualization for the financial asset database" />
 
 As a result of this bug the developer observes that the test is failing.
-We will next show how to use Cursor along with Kuzu-MCP to debug this issue. 
-We will assume in the rest of
+We'll next show how to use Cursor along with Kuzu-MCP to debug this issue. 
+We'll assume in the rest of
 the post that the Kuzu database is in directory `/path/to/your/local/financedb`.
 If you want to replicate the rest of the steps in this post, use the Cypher queries [here](https://gist.github.com/prrao87/ed0711a2339b75e462f0e1a31c766e7b)
 to create the buggy database above and
@@ -175,7 +159,7 @@ RETURN (bondsReachableByA = allBonds) as equal;
 ```
 
 Note that we do not need to tell the LLM the name of the Kuzu database (this information is already in `mcp.json`).
-We will use Claude 3.7 Sonnet to debug this query.
+We'll use Claude 3.7 Sonnet to debug this query.
 
 <Image src="/img/kuzu-mcp-server/kuzu-mcp-cursor.gif" alt="Cursor debugging the query" />
 
@@ -200,7 +184,7 @@ With MCP servers of databases, clients like Cursor can also help you debug probl
 
 ### Use Kuzu-MCP in Claude Desktop
 You can also use Kuzu-MCP with [Claude Desktop](https://www.anthropic.com/news/claude-desktop), which is also completely able to go through a similar debugging session
-and get to the root cause of the problem. We will not present the Claude Desktop interaction here but only show you
+and get to the root cause of the problem. We won't present the Claude Desktop interaction here but only show you
 how you can start Claude Desktop with Kuzu-MCP. The steps are as follows:
 
 1. Install the Claude Desktop app from [claude.ai](https://claude.ai/download).
@@ -236,20 +220,36 @@ start querying the database via the MCP server.
 
 ## Key takeaways
 
-In this post we demonstrated how Kuzu-MCP can be useful when developing applications with Kuzu. We used
-a simple debugging session as an example. Since Kuzu-MCP allows LLMs to execute arbitrary Cypher queries
-on your databases, you can also get LLMs to modify or populate your database. All of this can be done 
-with very simple prompts, instead of writing detailed prompt instructions with your schema or contents of your database. 
-You can of course get a lot more creative and get LLMs to do many other tasks, such as ETL across databases, 
-advanced data analytics or visualizations, by exposing them to MCP servers of multiple data systems.
+In this post we introduced the Kuzu MCP server and demonstrated how it can be useful when developing applications with Kuzu. We used
+a simple debugging session as an example.
+Since Kuzu-MCP allows LLMs to execute arbitrary Cypher queries on your database, you can go beyond debugging — enabling agents to read from, modify, or even populate your database using nothing more than natural language prompts. This eliminates the need for long, detailed prompt engineering that includes schema or table dumps — the agent can access that context directly via MCP.
+
+
+And this is just the beginning. By exposing multiple data systems through their own MCP servers, you can unlock powerful agentic workflows for tasks like ETL across databases, advanced analytics, or even automated data visualizations. 
 We plan to cover more demonstrative examples in future posts.
 
-The MCP ecosystem is progressing fast
-and we are actively keeping
-an eye on the latest developments.
-We'd love to work with our user community  to learn about how they intend to use MCP servers and clients
+We'd love to work with our developer community to learn about how they intend to use MCP servers and clients
 in their applications. Just like Kuzu itself, Kuzu-MCP is free and open source and available on [GitHub](https://github.com/kuzudb/kuzu-mcp-server).
 So, please try out our MCP server, share your thoughts
 on [Discord](https://kuzudb.com/chat), and check out our [GitHub](https://github.com/kuzudb/kuzu). Till next time!
 
 ---
+
+[^1]: If you look at the 2nd page of [the semantic web paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf),
+there is a quote: "The Semantic Web will  enable machines to COMPREHEND semantic documents and data, not human speech and writings."
+This was hinting that semantic agents would understand ontologies and knowledge represented in RDF instead of text in web documents.
+In contrast to this vision, LLMs, which are modern day agents, comprehend human writings.
+
+[^2]: Speaking of doctor's appointments:
+if you have read the initial [vision paper](https://www-sop.inria.fr/acacia/cours/essi2006/Scientific%20American_%20Feature%20Article_%20The%20Semantic%20Web_%20May%202001.pdf) 
+of [the semantic web](https://en.wikipedia.org/wiki/Semantic_Web)
+articulated in the seminal paper by [Tim Berners-Lee](https://en.wikipedia.org/wiki/Tim_Berners-Lee), [James Hendler](https://en.wikipedia.org/wiki/James_Hendler), 
+and [Ora Lassila](https://en.wikipedia.org/wiki/Ora_Lassila), the proliferation of MCP servers should remind you
+of the imagined agentic application in the first paragraphs of that paper: an AI agent automatically
+talking to separate servers to make a doctor's appointment for your mom.
+There are of course vast differences between how the semantic web paper imagines such agents and 
+servers could work and how LLMs and MCP servers work. For example, the paper imagines
+the data exchanged between servers is RDF triples. Instead, LLMs exchange text, i.e., natural language,
+with servers[^1]. Nonetheless, one can see a different form of the semantic web 
+vision being realized in the proliferating MCP ecosystem.
+But let us leave this fascinating topic for another post.
