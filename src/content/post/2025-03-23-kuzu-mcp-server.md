@@ -69,7 +69,7 @@ Using these functions, the LLM can read the node and relationship tables in Kuzu
 to perform actions. In both Cursor and Claude Desktop, each time the LLM wants to run one of these functions,
 it asks your permission and you can choose to provide permission or not (and choose to provide permission for
 the current chat session as well). If you are worried about the LLM accidentally modifying your database, you can also
-run Kuzu-MPC in read-only mode (see [below](#launch-cursor-with-kuzu-mcp)), in which case, Kuzu-MCP will not be able torun any queries that modify the database.
+run Kuzu-MPC in read-only mode (see [below](#launch-cursor-with-kuzu-mcp)), in which case, Kuzu-MCP will not be able to run any queries that modify the database.
 
 ## Demonstration scenario: A debugging session
 
@@ -101,10 +101,10 @@ and the bonds they issue. The schema of the database looks as follows:
 <Image src="/img/kuzu-mcp-server/graph-schema.png" alt="Graph schema for the financial asset database" />
 
 Next, suppose a user is developing some analytics application on this database and is working on a dataset
-that consists of 3 companies: A, B, and C, where A is the parent of both B and C and each
-company issues two bonds. Therefore, the developer expects that A is the root of the company hierarchy
-and has a test case that checks that the number of total bonds is equal to the number of bonds issued by A
-or any of its direct or indirect subsidiaries (which must be true if A is the root of the company hierarchy).
+that consists of 3 companies: `A`, `B`,and `C`, where `A` is the parent of both `B` and `C` and each
+company issues two bonds. Therefore, the developer expects that `A` is the root of the company hierarchy
+and has a test case that checks that the number of total bonds is equal to the number of bonds issued by `A`
+or any of its direct or indirect subsidiaries (which must be true if `A` is the root of the company hierarchy).
 The test asserts that the following Cypher query returns true:
 ```cypher
 MATCH (a {name: "CompanyA"})-[e*]->(b:Bond)
@@ -114,7 +114,7 @@ WITH bondsReachableByA, count(*) as allBonds
 RETURN (bondsReachableByA = allBonds) as equal;
 ```
 
-For the purpose of demonstration, suppose the database has a bug and misses the `(A)-[:ParentOf]->(B)` relationship,
+For the purpose of demonstration, suppose the database has a bug and is missing the `(A)-[:ParentOf]->(B)` relationship,
 and the developer observes that the test is failing. Therefore, the database actually looks as follows:
 
 <Image src="/img/kuzu-mcp-server/graph-viz.png" alt="Graph visualization for the financial asset database" />
@@ -158,11 +158,11 @@ To start Kuzu-MCP as Cursor starts, enter the following configuration into the `
 }
 ```
 When running Kuzu-MCP on your own databases, replace `/path/to/your/database/finance` with the absolute path to your 
-local Kuzu database. Note that we set `KUZU_READ_ONLY=true` to run Kuzu-MCP in read-only mode, because in
+local Kuzu database. Note that we set `-e KUZU_READ_ONLY=true` to run Kuzu-MCP in read-only mode, because in
 this session, we only want to use the LLM to read data from the database. Save the file, and restart the Cursor app.
 
 ### Ask Cursor to debug the query
-Perhaps the coolest part of this demo is that we will ask a very simple question to Cursor in a new chat.
+Perhaps the coolest part of this demo is how we run the debugging session with a very simple question to Cursor in a new chat.
 The question we ask is:
 ```sql
 I expect the result of the following query to be true in my kuzu database. Why do I get false?
@@ -205,7 +205,7 @@ how you can start Claude Desktop with Kuzu-MCP. The steps are as follows:
 
 Open the `claude_desktop_config.json` file in a text editor and copy-paste the following configuration into it.
 This is a Docker command that will start the Kuzu MCP server, and connect via a read-only connection to the Kuzu database
-on your local machine. If you want to run a read-write connection, you can remove the `-e KUZU_READ_ONLY=true` flag
+on your local machine. If you want to run a read-write connection to modify the database, you can remove the `-e KUZU_READ_ONLY=true` flag
 from the Docker command.
 
 ```json
@@ -237,9 +237,9 @@ In this post we demonstrate how Kuzu-MCP can be useful to developers who are dev
 a simple debugging session as an example. Since Kuzu-MCP allows LLMs to execute arbitrary Cypher queries
 on your databases, you can also get clients like Cursor or Claude Desktop to modify or populate your database with very simple prompts,
 instead of writing detailed prompt instructions with your schema or contents of your database. You can of course 
-get a lost more creative and get LLMs to do many other tasks, such as ETL across databases, 
+get a lot more creative and get LLMs to do many other tasks, such as ETL across databases, 
 advanced data analytics or visualizations, by exposing them to MCP servers of multiple data systems.
-We will provide a few demonstrative examples in future posts.
+We will provide more such demonstrative examples in future posts.
 
 The MCP ecosystem is progressing fast
 and we are actively keeping
