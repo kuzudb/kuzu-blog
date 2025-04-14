@@ -9,10 +9,9 @@ tags: ["sqlite", "kuzu", "duckdb", "lancedb", "embedded dbms", "in-process dbms"
 ---
 
 
-[SQLite](https://sqlite.org/), which is the mother of all in-process (aka embedded, embeddable, or serverless) DBMSs, has been wildly popular for over two decades.
-SQLite is in fact *the most popular DBMS in the world* by the number of deployments: over 1 trillion according to this [article](xxx)! 
-So, in-process DBMSs are not new. Yet, starting with [DuckDB](https://github.com/duckdb/duckdb) and later by [Kuzu](https://github.com/kuzudb/kuzu) and [LanceDB](https://github.com/lancedb/lancedb), there is 
-renewed interest in using in-process DBMSs in a wide range of data-intensive application domains: 
+[SQLite](https://sqlite.org/), the mother of all in-process (aka embedded, embeddable, or serverless) DBMSs, has been wildly popular for over two decades. SQLite is in fact *the most popular DBMS in the world* by the number of deployments: over 1 trillion according to this [article](xxx)!  
+So, in-process DBMSs are hardly new. Yet, starting with [DuckDB](https://github.com/duckdb/duckdb) and later by [Kuzu](https://github.com/kuzudb/kuzu) and [LanceDB](https://github.com/lancedb/lancedb), there is a 
+renewed interest in using in-process DBMSs within a wide range of data-intensive application domains: 
 relational analytics, graph querying and analytics, and vector search.
 As a co-founder of [Kuzu Inc.](https://kuzudb.com/) that develops and commercializes the Kuzu graph DBMS, 
 I get to answer several frequently asked questions about in-process DBMSs:
