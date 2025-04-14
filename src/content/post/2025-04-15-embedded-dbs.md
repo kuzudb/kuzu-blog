@@ -1,7 +1,7 @@
 ---
 title: "What every developer should know about in-process DBMSs"
-description: ""
-pubDate: "April 8 2025"
+description: "A deep dive into embedded or in-process DBMSs, and how they differ from client-server DBMSs."
+pubDate: "April 15 2025"
 heroImage: "/og.png"
 categories: ["example"]
 authors: ["semih"]
@@ -32,11 +32,11 @@ In process DBMSs are libraries that are statically imported in a host applicatio
 the DBMS software is bundled together with the application in a single
 OS process (hence the term "in-process").
 Therefore, in-process DBMSs are used exactly the same way data science libraries, such as [Pandas](https://pandas.pydata.org/) or [NetworkX](https://networkx.org/), are used in applications.
-This contrasts with client-server DBMSs, such as [Postgres](https://www.postgresql.org/), [MySQL](https://www.mysql.com/) or [Neo4j](https://neo4j.com/),
+This contrasts with client-server DBMSs, such as Postgres, MySQL or Neo4j,
 which run as separate server processes with which your (client) application communicates through a network protocol.
 The following figure demonstrates this difference:
 
-<Img src="/img/embedded-dbs/inprocess-vs-client-server.png" alt="Application deployment with an in-process DBMS vs a client-server DBMS." width="700"/>
+<Img src="/img/embedded-dbs/inprocess-vs-client-server.png" alt="Application deployment with an in-process DBMS vs a client-server DBMS." width="800"/>
 
 To demonstrate how in-process DBMSs are used, consider an application code that asks a Cypher query using Kuzu:
 ```python
@@ -72,7 +72,7 @@ In light of this difference, in-process DBMSs have two very appealing features:
      manage necessary access permissions.
 2. **Versatility in application architectures**: In-process DBMSs can be deployed pretty much anywhere. You can put
   them into your Python scripts, into your [AWS lambda functions](https://aws.amazon.com/lambda/), your iPhone and Android phones,
-  and even into your browsers (see [SQlite-WASM](https://sqlite.org/wasm/doc/trunk/index.md), [DuckDB-WASM](https://duckdb.org/docs/stable/clients/wasm/overview.html), and [Kuzu-WASM](https://docs.kuzudb.com/client-apis/wasm/)) . This has a very important consequence: you can develop
+  and even into your browsers (see [SQlite-Wasm](https://sqlite.org/wasm/doc/trunk/index.md), [DuckDB-Wasm](https://duckdb.org/docs/stable/clients/wasm/overview.html), and [Kuzu-Wasm](https://docs.kuzudb.com/client-apis/wasm/)) . This has a very important consequence: you can develop
   data-intensive applications anywhere using in-process DBMSs. I highly recommend listening to 
   Hannes Mühleisen's (co-creator of DuckDB) ["Going Beyond Two-tier Data Architectures" talk](https://youtu.be/bi0XhmbkqU8?t=1359)
   where he articulates this point very nicely. "Two-tier" here refers to application architectures that use client-server DBMSs, 
@@ -104,9 +104,9 @@ Aside from the above two advantages, in-process DBMSs can also have some perform
    and [Kuzu docs](https://docs.kuzudb.com/cypher/query-clauses/load-from/#polars)). For example, consider extending the example from above using Kuzu in Python:
    ```python
    import kuzu
-   import polars
+   import polars as pl
    ...
-   df = polars.DataFrame({
+   df = pl.DataFrame({
         "name": ["Adam", "Karissa", "Zhang"],
         "age": [30, 40, 50]
    })
@@ -133,7 +133,7 @@ The below picture summarizes how to think of (in-process vs client-server) and (
 I placed some example systems in their corresponding quadrants and puts the DBMSs with both ephemeral and persistent modes to cross two
 quadrants[^4].
 
-<Img src="/img/embedded-dbs/framework.png" alt="Being in-process vs client-server is orthogonal to persisting your data." width="400"/>
+<Img src="/img/embedded-dbs/framework.png" alt="Being in-process vs client-server is orthogonal to persisting your data." width="700"/>
 
 ## Does in-process mean "small data"?
 
@@ -195,7 +195,7 @@ G = conn.execute("MATCH (a:User)-[e:Follows]->(b:User) WHERE e.date > '2025-04-0
 # Step 3: Run PageRank graph algorithm in NetworkX. This assigns an importance score to each node.
 prs = nx.pagerank(G)
 # Step 4: Export PageRank results back to a Pandas dataframe.
-pr_df = pd.dataFrame.fromDict(prs)
+pr_df = pd.DataFrame.from_dict(prs)
 # Step 5: Write computed PageRank value of each node back to Kuzu.
 conn.execute("LOAD FROM pr_df MERGE (u:User {pID: id) ON MATCH SET u.pr = pagerank")
 ...
@@ -264,7 +264,7 @@ and place this in front of the Node servers. The Node servers no longer embed th
 send their requests to the API server. Therefore, the API server takes the role of the DBMS server process in the client-server DBMS architecture.
 The workaround for this picture looks as below:
 
-<Img src="/img/embedded-dbs/api-server.png" alt="Workaround for when a server DBMS is needed." width="600"/>
+<Img src="/img/embedded-dbs/api-server.png" alt="Workaround for when a server DBMS is needed." width="500"/>
 
 There are other cases when developers need a server and that is why some in-process DBMSs have a
 a server version of their DBMS either in the cloud or deployable on-premise, e.g., [MotherDuck](https://motherduck.com/)
@@ -275,9 +275,9 @@ I hope this post was helpful to position in-process DBMSs against client-server 
 misconceptions about them.
 For many applications, especially analytical ones, using in-process DBMSs as libraries
 instead of maintaining intimidating DBMS servers can significantly simplify your lives. 
-Do not forget that *in-process DBMSs are DBMSs*, i.e., they provide all of the advanced DBMS features you
-expect from a DBMS, and they can be state-of-the-art in their performance and the amount of data they can manage. 
-For example, I encourage you to try Kuzu on very large graph databases and be impressed with its data ingestion and querying
+Remember that in-process DBMSs are, *first and foremost, DBMSs* -- i.e., they provide all of the advanced
+features you expect from a DBMS, and they can be state-of-the-art in their performance and the amount of data they can manage. 
+I encourage you to try Kuzu on very large graph databases and be impressed with its data ingestion and querying
 speed. As I mentioned above, being in-process is merely a deployment feature and should not be associated with
 how optimized the system is for some workload.
 Finally, the takeaway from this post should not be that in-process DBMSs can handle any workload and are suitable
