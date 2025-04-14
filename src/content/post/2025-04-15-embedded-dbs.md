@@ -180,20 +180,20 @@ import kuzu
 import pandas as pd
 import networkx as nx
 # Step 1: Perform some data transformation steps over some records using Pandas.
-...
+# ...
 df = pd.DataFrame(data)
 # Step 2.1: Write the Pandas dataframe contents to Kuzu (conn here is a Kuzu connection).
 conn.execute("COPY User FROM df")
-...
+# ...
 # Step 2.2: # Extract who-follows-whom subgraph since April 4th, 2025 into NetworkX.
-G = conn.execute("MATCH (a:User)-[e:Follows]->(b:User) WHERE e.date > '2025-04-04'RETURN *").get_as_networkx()
+G = conn.execute("MATCH (a:User)-[e:Follows]->(b:User) WHERE e.date > '2025-04-04' RETURN *").get_as_networkx()
 # Step 3: Run PageRank graph algorithm in NetworkX. This assigns an importance score to each node.
 prs = nx.pagerank(G)
 # Step 4: Export PageRank results back to a Pandas dataframe.
 pr_df = pd.DataFrame.from_dict(prs)
 # Step 5: Write computed PageRank value of each node back to Kuzu.
 conn.execute("LOAD FROM pr_df MERGE (u:User {pID: id}) ON MATCH SET u.pr = pagerank")
-...
+# ...
 ```
 Note the seamless passing of Python objects in and out of
 Kuzu, which can directly scan in-memory Python data objects as well as output them in several formats (e.g., Pandas, Polars, NetworkX).
