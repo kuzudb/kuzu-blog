@@ -124,7 +124,7 @@ you'll create an ephemeral database that is stored only in memory and not persis
 Although I don't know of any client-server DBMS
 that supports ephemeral databases, this is in principle possible[^3].
 The below picture summarizes how to think of (in-process vs client-server) and (ephemeral vs persistent) features of DBMSs. 
-I've put some example systems in their corresponding quadrants. DBMSs with both ephemeral and persistent modes cross two
+I've put a few example systems in their corresponding quadrants. DBMSs with both ephemeral and persistent modes I put across two
 quadrants[^4].
 
 <Img src="/img/embedded-dbs/framework.png" alt="Being in-process vs client-server is orthogonal to persisting your data." width="700"/>
@@ -204,14 +204,14 @@ The below figure summarizes the steps of the pipeline.
 
 ### Use case 2: On-demand ephemeral databases
 Data-intensive applications generally build their databases upfront and ready to be queried when the demand appears.
-In contrast, applications can use in-process DBMSs to construct an ephemeral databases on-demand, i.e., when the application requires it
+In contrast, applications can use in-process DBMSs to construct an ephemeral database on-demand, i.e., when the application requires it
 (recall that many in-process DMBSs have an "in-memory/ephemeral" mode).
 There are several scenarios when this is beneficial (see this [blog post](https://blog.kuzudb.com/post/how-bauplan-leverages-kuzu/) 
 for a detailed case study). One common case is to create on-demand databases over a small subset of data
 from other large data sources. 
 
 Suppose you are working at a game company and
-one of your systems keep track of the IPs users login from in a large Postgres database (say billions of records). Suppose 
+one of your systems keeps track of the IPs users login from in a large Postgres database (say billions of records). Suppose 
 another system collects daily information about each game each user was part of and stores a separate parquet
 file per-user in S3. 
 Suppose a fraud detection application analyzes which IPs a user X has used,
@@ -278,7 +278,7 @@ Remember that in-process DBMSs are, *first and foremost, DBMSs* -- i.e., they pr
 features you expect from a DBMS, and they can be state-of-the-art in their performance and the amount of data they can manage. 
 If you'll excuse a small plug, I encourage you to try Kuzu on very large graph databases and be impressed with its data ingestion and querying
 speed. As I mentioned above, being in-process is merely a deployment feature and should not be associated with
-how optimized the system is for some workload.
+how well-optimized the system is for some workload.
 Finally, the takeaway from this post should not be that in-process DBMSs can handle any workload and are suitable
 for any application. For many applications, some of which I covered above, they can be the right choice to use as the main DBMS.
 For other applications, they can also be useful to complement client-server ones.
