@@ -9,7 +9,7 @@ tags: ["sqlite", "kuzu", "duckdb", "lancedb", "embedded dbms", "in-process dbms"
 ---
 
 
-[SQLite](https://sqlite.org/), the mother of all in-process (aka embedded, embeddable, or serverless) DBMSs, has been wildly popular for over two decades. SQLite is in fact *the most popular DBMS in the world* by the number of deployments: over 1 trillion according to this [article](xxx)!  
+[SQLite](https://sqlite.org/), the mother of all in-process (aka embedded, embeddable, or serverless) DBMSs, has been wildly popular for over two decades. SQLite is in fact *the most popular DBMS in the world* by the number of deployments: over 1 trillion according to this [article](xxx)!
 So, in-process DBMSs are hardly new. Yet, starting with [DuckDB](https://github.com/duckdb/duckdb) and later by [Kuzu](https://github.com/kuzudb/kuzu) and [LanceDB](https://github.com/lancedb/lancedb), there is a 
 renewed interest in using in-process DBMSs within a wide range of data-intensive application domains: 
 relational analytics, graph querying and analytics, and vector search.
@@ -22,7 +22,7 @@ I get asked a lot of questions about this new generation of in-process databases
 - Does "in-process" mean it can only handle small data?  (No!) 
 - What do I do if my application requires a DBMS server?
 
-My goal in this post is to answer these questions and help developers understand where in-process DBMSs fit in contrast to traditional client-server architectures.
+My goal in this post is to answer these questions and help developers understand where in-process DBMSs fit in contrast to traditional client-server ones.
 
 ## In-process vs client-server is a deployment feature
 The most important takeaway from this post is this: the difference between in-process and client-server DBMSs is primarily about **deployment**. 
@@ -52,7 +52,7 @@ using a network protocol. The DBMS server receives and evaluates the query
 and sends the results back to the application over the network. 
 
 In light of this difference, in-process DBMSs have two appealing features: 
-1. **Simplicity**: In-process DBMS are very easy to get started with and use.  Many of the typical 
+1. **Simplicity**: In-process DBMSs are very easy to get started with and use.  Many of the typical 
   setup steps required by client-server systems are completely eliminated:
      - **No server maintenance:** In-process DBMSs automatically start and shut down with your application. 
      You  don't need to set up, configure, start, stop, and maintain a separate DBMS server process. 
@@ -72,14 +72,14 @@ In light of this difference, in-process DBMSs have two appealing features:
   them into your Python scripts, into your [AWS lambda functions](https://aws.amazon.com/lambda/), your iPhone and Android phones,
   and even into your browsers (see [SQlite-Wasm](https://sqlite.org/wasm/doc/trunk/index.md), [DuckDB-Wasm](https://duckdb.org/docs/stable/clients/wasm/overview.html), and [Kuzu-Wasm](https://docs.kuzudb.com/client-apis/wasm/)). This has a very important consequence -- you can develop
   data-intensive applications anywhere using in-process DBMSs. I highly recommend listening to 
-  Hannes Mühleisen's (co-creator of DuckDB) ["Going Beyond Two-tier Data Architectures" talk](https://youtu.be/bi0XhmbkqU8?t=1359)
+  Hannes Mühleisen's (co-creator of DuckDB) ["Going Beyond Two-tier Data Architectures"](https://youtu.be/bi0XhmbkqU8?t=1359) talk 
   where he articulates this point very nicely. "Two-tier" refers to application architectures that use client-server DBMSs, 
   which limit how and where data can be processed.
   With in-process DBMSs you don't have to move your data into another process in order to do something with it. 
   For example, you can analyze your data at the location it resides, e.g., directly in a browser or 
   inside a car's Android system without sending data to the cloud. This can be critical for privacy and performance. 
   
-in-process DBMSs aren't scary, monolithic systems that require constant maintenance and database administration.
+In short, in-process DBMSs aren't scary, monolithic systems that require constant maintenance and database administration.
 Instead, they are DBMS libraries that can be deployed anywhere -- giving you a lot of flexibility in how you achitect 
 your data-intensive applications.
 In fact, you can often observe that users of in-process and client-server DBMSs refer to different things 
@@ -119,12 +119,12 @@ Because in-process DBMSs are Pandas-like data science libraries and because thes
 The answer is: **No!** Just like any other DBMS, all the in-process systems I’ve mentioned—SQLite, DuckDB, Kuzu, LanceDB—persist your databases on disk.
 That said, many in-process DBMSs also offer an “in-memory” mode[^2] if you don’t want to persist your data. 
 For example, in Kuzu, if you create a `Database` object with an empty string like this: `db = kuzu.Database("")`,
-you'll create an ephemeral database that is not persisted on disk. 
+you'll create an ephemeral database that is stored only in memory and not persisted on disk. 
 
 Although I don't know of any client-server DBMS
 that supports ephemeral databases, this is in principle possible[^3].
 The below picture summarizes how to think of (in-process vs client-server) and (ephemeral vs persistent) features of DBMSs. 
-I've put some example systems in their corresponding quadrants and puts the DBMSs with both ephemeral and persistent modes to cross two
+I've put some example systems in their corresponding quadrants. DBMSs with both ephemeral and persistent modes cross two
 quadrants[^4].
 
 <Img src="/img/embedded-dbs/framework.png" alt="Being in-process vs client-server is orthogonal to persisting your data." width="700"/>
@@ -132,9 +132,10 @@ quadrants[^4].
 ## Does in-process mean "small data?"
 
 Another common question is: "Should in-process DBMSs
-be used to process small data?". This is in fact related to the previous association that 
-some developers think these databases are only stored in RAM and are not persisted. The answer is also no here. 
-In fact, modern in-process DBMS all pride themselves for also being able to handle very large databases.
+be used to process small data?". This is in fact related to the previous misconception that 
+in-process DBMSs only store your data in RAM so cannot manage databases that don't fit in your RAM. 
+The answer is also no here. 
+In fact, modern in-process DBMSs all pride themselves for also being able to handle very large databases.
 I will not say a lot about this because every DBMS vendor claims to handle very large databases, 
 so you should test them yourself. However, the general point is that
 how optimized a system is to handle large databases or to handle some workloads depends on
@@ -191,7 +192,7 @@ prs = nx.pagerank(G)
 # Step 4: Export PageRank results back to a Pandas dataframe.
 pr_df = pd.DataFrame.from_dict(prs)
 # Step 5: Write computed PageRank value of each node back to Kuzu.
-conn.execute("LOAD FROM pr_df MERGE (u:User {pID: id) ON MATCH SET u.pr = pagerank")
+conn.execute("LOAD FROM pr_df MERGE (u:User {pID: id}) ON MATCH SET u.pr = pagerank")
 ...
 ```
 Note the seamless passing of Python objects in and out of
@@ -203,7 +204,8 @@ The below figure summarizes the steps of the pipeline.
 
 ### Use case 2: On-demand ephemeral databases
 Data-intensive applications generally build their databases upfront and ready to be queried when the demand appears.
-In contrast, applications can use in-process DBMSs to construct an ephemeral databases on-demand, i.e., when the application requires it.
+In contrast, applications can use in-process DBMSs to construct an ephemeral databases on-demand, i.e., when the application requires it
+(recall that many in-process DMBSs have an "in-memory/ephemeral" mode).
 There are several scenarios when this is beneficial (see this [blog post](https://blog.kuzudb.com/post/how-bauplan-leverages-kuzu/) 
 for a detailed case study). One common case is to create on-demand databases over a small subset of data
 from other large data sources. 
@@ -211,19 +213,19 @@ from other large data sources.
 Suppose you are working at a game company and
 one of your systems keep track of the IPs users login from in a large Postgres database (say billions of records). Suppose 
 another system collects daily information about each game each user was part of and stores a separate parquet
-file per-user in S3. So your primary large data sources look as below:
+file per-user in S3. 
 Suppose a fraud detection application analyzes which IPs a user X has used,
 which other users have used similar IPs, and which games these users were part of. Specifically,
 let's suppose the application searches for graph patterns, e.g., cliques of users who
 participate in the same games and use similar IPs.
 As a solution, you can architect your 
-system as follows.
+system as follows:
 
 <Img src="/img/embedded-dbs/on-demand-ephemeral-graphs.png" alt="Using an embedded DBMS to create ephemeral databases." width="600"/>
 
 When the fraud detection application needs to search these patterns 
-you spin off an AWS lambda function that scans the data related to the suspicious user (u1 in the above figure) from Postgres and S3 
-and creates an ephemeral graph database in Kuzu. Instead of AWS lambda, this step can happen in a dedicated application process as well.
+you spin off an AWS lambda function. The lambda function scans the data related to the suspicious user (u1 in the above figure) from Postgres and S3 
+and creates an ephemeral graph database in Kuzu[^5]. 
 Then the application searches for the graph patterns in Kuzu and sends the results of these graph queries back to
 the application. 
 
@@ -236,6 +238,7 @@ that co-mingle all users' data. Therefore,
 they need to create per-user smaller databases and instead of persisting and maintaining thousands of databases, they
 prefer to create them on-demand and throw them away.  
 
+[^5]: Instead of AWS lambda, this step can happen in a dedicated application process as well.
 
 ## What if you need a DBMS server?
 
@@ -246,14 +249,16 @@ You would probably put an [nginx server](https://nginx.org/en/) in front of thes
 The point is that you cannot embed an in-process DBMS in each of the Node servers. This is because each Node server
 is a different process and in-process DBMSs do not support
 multiple writes to happen to a database file from multiple processes. This is because for safe concurrency control,
-DBMSs need to somehow coordinate concurrent writes. However, in this case there is no
+DBMSs need to coordinate concurrent writes. However, in this case there is no
 central DBMS software to coordinate the writes from different Node servers. Instead, 
-In this case, each Node server runs its own copy of the DBMS software, each of which wants to write
+each Node server in this scenario runs its own copy of the DBMS software, each of which wants to write
 to the same database file, but there is no
 central DBMS software to coordinate these writes.
 Therefore, you really need a client-server DBMS.
 
-The common workaround to this scenario is to mimic a client-server DBMS architecture as follows. You wrap the in-process DBMSs around another API server, say a [REST](xxx) or [FastAPI](xxx) server.
+
+The common workaround to this scenario is to mimic a client-server DBMS architecture as follows. 
+You wrap the in-process DBMSs around another API server, say a [REST](xxx) or [FastAPI](xxx) server
 and place this in front of the Node servers. The Node servers no longer embed the in-process DBMS and instead
 send their requests to the API server. Therefore, the API server takes the role of the DBMS server process in the client-server DBMS architecture.
 The workaround for this picture looks as below:
@@ -268,10 +273,10 @@ is the cloud version of DuckDB offered as a managed service.
 I hope this post was helpful to position in-process DBMSs against client-server ones and clarify some of the 
 misconceptions about them.
 For many applications, especially analytical ones, using in-process DBMSs as libraries
-instead of maintaining intimidating DBMS servers can significantly simplify your lives. 
+instead of maintaining DBMS servers can significantly simplify your lives. 
 Remember that in-process DBMSs are, *first and foremost, DBMSs* -- i.e., they provide all of the advanced
 features you expect from a DBMS, and they can be state-of-the-art in their performance and the amount of data they can manage. 
-I encourage you to try Kuzu on very large graph databases and be impressed with its data ingestion and querying
+If you'll excuse a small plug, I encourage you to try Kuzu on very large graph databases and be impressed with its data ingestion and querying
 speed. As I mentioned above, being in-process is merely a deployment feature and should not be associated with
 how optimized the system is for some workload.
 Finally, the takeaway from this post should not be that in-process DBMSs can handle any workload and are suitable
