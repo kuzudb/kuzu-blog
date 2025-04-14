@@ -29,7 +29,7 @@ The most important takeaway from this post is this: the difference between in-pr
 In-process DBMSs are libraries that are statically imported in a host application. That is, 
 the DBMS software is bundled together with the application in a single
 OS process (hence the term "in-process").
-Therefore, in-process DBMSs are used exactly the same way data science libraries, such as [Pandas](https://pandas.pydata.org/) or [NetworkX](https://networkx.org/), are used in applications.
+Therefore, in-process DBMSs are used just like how data science libraries such as [Pandas](https://pandas.pydata.org/) or [NetworkX](https://networkx.org/), are used.
 This contrasts with client-server DBMSs, such as Postgres, MySQL or Neo4j,
 which run as separate server processes with which your (client) application communicates through a network protocol.
 The following figure demonstrates this difference:
@@ -66,7 +66,7 @@ In light of this difference, in-process DBMSs have two appealing features:
      you can manage this at the file system level. In-process DBMSs persist the databases as files on disk.
      If you don't want user Alice to read or write to a database, you can set the file system permissions
      on those database files or directory to limit any process that Alice runs to not read or write to those files.
-     If your databases are stored on the cloud, say in S3 buckets, then you can use the cloud provider's IAM permissions to
+     If your databases are stored in the cloud, say in S3 buckets, then you can use the cloud provider's IAM permissions to
      manage necessary access permissions.
 2. **Versatility in application architectures**: In-process DBMSs can be deployed pretty much anywhere. You can put
   them into your Python scripts, into your [AWS lambda functions](https://aws.amazon.com/lambda/), your iPhone and Android phones,
@@ -80,7 +80,7 @@ In light of this difference, in-process DBMSs have two appealing features:
   inside a car's Android system without sending data to the cloud. This can be critical for privacy and performance. 
   
 In short, in-process DBMSs aren't scary, monolithic systems that require constant maintenance and database administration.
-Instead, they are DBMS libraries that can be deployed anywhere -- giving you a lot of flexibility in how you achitect 
+Instead, they are DBMS libraries that can be deployed anywhere -- giving you a lot of flexibility in how you architect 
 your data-intensive applications.
 In fact, you can often observe that users of in-process and client-server DBMSs refer to different things 
 when they use the word _"database."_ When a Postgres user refers to a _Postgres database,_ they're usually talking 
@@ -95,7 +95,7 @@ architecting your data-intensive applications.
 Aside from the above two advantages, in-process DBMSs can also have performance advantages:
 
 3. **Performance advantages:** In-process DBMSs make moving data between the database and your application very cheap — sometimes even zero-cost. This also extends to interactions between the DBMS and other libraries your application uses. For instance, DuckDB and Kuzu can directly scan Pandas or Polars 
-   data frames, which are in-memory Python objects, without any copy or serializing costs  (see [DuckDB docs](https://duckdb.org/docs/stable/guides/python/sql_on_pandas.html)
+   data frames, which are in-memory Python objects, without any copying or serializing costs  (see [DuckDB docs](https://duckdb.org/docs/stable/guides/python/sql_on_pandas.html)
    and [Kuzu docs](https://docs.kuzudb.com/cypher/query-clauses/load-from/#polars)). Let’s extend our earlier example using Kuzu in Python to illustrate how this works in practice:
    ```python
    import kuzu
@@ -110,12 +110,12 @@ Aside from the above two advantages, in-process DBMSs can also have performance 
    The `COPY User FROM df` is a Kuzu query that inserts the contents of `df`, which is a Polars data frame 
    stored as an in-memory Python object. Since Kuzu also runs as part of the same Python process, it can
    directly access and scan the contents of the data frame 
-   without incurring any real data movement costs, e.g., any serialization/deserialization or data copies[^1].
+   without incurring any data movement costs, e.g., any serialization/deserialization or data copies[^1].
 
 ##  Does in-process mean databases are "ephemeral"?
 
 I'll next address a common misconception about in-process DBMSs. 
-Because in-process DBMSs are Pandas-like data science libraries and because these libraries don't persist you data, a question I often get is: "Are the databases I create using in-process DMBSs also ephemeral?"
+Because in-process DBMSs are Pandas-like data science libraries and because these libraries don't persist your data, a question I often get is: "Are the databases I create using in-process DMBSs also ephemeral?"
 The answer is: **No!** Just like any other DBMS, all the in-process systems I’ve mentioned—SQLite, DuckDB, Kuzu, LanceDB—persist your databases on disk.
 That said, many in-process DBMSs also offer an “in-memory” mode[^2] if you don’t want to persist your data. 
 For example, in Kuzu, if you create a `Database` object with an empty string like this: `db = kuzu.Database("")`,
