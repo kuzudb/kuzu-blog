@@ -9,8 +9,8 @@ tags: ["sqlite", "kuzu", "duckdb", "lancedb", "embedded dbms", "in-process dbms"
 ---
 
 
-[SQLite](https://sqlite.org/), the mother of all in-process (aka embedded, embeddable, or serverless) DBMSs, has been wildly popular for over two decades. SQLite is in fact *the most popular DBMS in the world* by the number of deployments: over 1 trillion according to this [article](xxx)!
-So, in-process DBMSs are hardly new. Yet, starting with [DuckDB](https://github.com/duckdb/duckdb) and later by [Kuzu](https://github.com/kuzudb/kuzu) and [LanceDB](https://github.com/lancedb/lancedb), there is a 
+[SQLite](https://sqlite.org/), the mother of all in-process (aka embedded, embeddable, or serverless) DBMSs, has been wildly popular for over two decades. SQLite is, in fact, *the most popular DBMS in the world* by the number of deployments: over 1 trillion according to this [article](xxx)!
+So, in-process DBMSs are hardly new. Yet, starting with [DuckDB](https://github.com/duckdb/duckdb) and later with [Kuzu](https://github.com/kuzudb/kuzu) and [LanceDB](https://github.com/lancedb/lancedb), there has been a 
 renewed interest in using in-process DBMSs within a wide range of data-intensive application domains: 
 relational analytics, graph querying and analytics, and vector search.
 As a co-founder of [Kuzu Inc.](https://kuzudb.com/), the team behind the Kuzu graph DBMS, 
@@ -26,7 +26,7 @@ My goal in this post is to answer these questions and help developers understand
 
 ## In-process vs client-server is a deployment feature
 The most important takeaway from this post is this: the difference between in-process and client-server DBMSs is primarily about **deployment**. 
-In process DBMSs are libraries that are statically imported in a host application. That is, 
+In-process DBMSs are libraries that are statically imported in a host application. That is, 
 the DBMS software is bundled together with the application in a single
 OS process (hence the term "in-process").
 Therefore, in-process DBMSs are used exactly the same way data science libraries, such as [Pandas](https://pandas.pydata.org/) or [NetworkX](https://networkx.org/), are used in applications.
@@ -94,7 +94,7 @@ architecting your data-intensive applications.
 
 Aside from the above two advantages, in-process DBMSs can also have performance advantages:
 
-3. **Performance advantages:** In process DBMSs make moving data between the database and your application very cheap — sometimes even zero-cost. This also extends to interactions between the DBMS and other libraries your application uses. For instance, DuckDB and Kuzu can directly scan Pandas or Polars 
+3. **Performance advantages:** In-process DBMSs make moving data between the database and your application very cheap — sometimes even zero-cost. This also extends to interactions between the DBMS and other libraries your application uses. For instance, DuckDB and Kuzu can directly scan Pandas or Polars 
    data frames, which are in-memory Python objects, without any copy or serializing costs  (see [DuckDB docs](https://duckdb.org/docs/stable/guides/python/sql_on_pandas.html)
    and [Kuzu docs](https://docs.kuzudb.com/cypher/query-clauses/load-from/#polars)). Let’s extend our earlier example using Kuzu in Python to illustrate how this works in practice:
    ```python
