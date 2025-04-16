@@ -175,10 +175,14 @@ I will continue picking my examples from Kuzu but similar scenarios exist for ot
 Modern in-process DBMSs are very Python-friendly, which
 has become the prominent language for implementing data science and engineering pipelines. I also mentioned that these
 systems can seamlessly pass in-memory data objects from one library to another often without any data movement costs.
-This makes them very convenient to use in conjunction with other Python libraries, such as [Pandas](https://pandas.pydata.org/), 
-[Polars](https://pola.rs/), [Arrow](https://arrow.apache.org/), [NetworkX](https://networkx.org/),
-[NumPy](https://numpy.org/), [Pytorch](https://pytorch.org/), etc., as well as with each other (e.g., DuckDB and Kuzu). 
-That is, the in-process DBMS is used as a component of a larger pipeline that consists of multiple data libraries. Consider the below code as an example:
+This makes them very convenient to use in conjunction with other Python libraries, such as
+[NetworkX](https://networkx.org/), [Pytorch Geometric](https://pytorch-geometric.readthedocs.io/en/latest/),
+[Pandas](https://pandas.pydata.org/), 
+[Polars](https://pola.rs/), [Arrow](https://arrow.apache.org/), etc., as well as with each other (e.g., DuckDB and Kuzu). 
+For example, Kuzu can directly scan Pandas, Polars, Arrow data frame objects, and output
+query results directly as data frames as well as NetworkX or Pytorch Geometric graphs.
+That allows the in-process DBMS to be used as a component of a larger pipeline that consists of multiple data libraries. 
+Consider the below code as an example:
 ```python
 import kuzu
 import pandas as pd
@@ -277,8 +281,9 @@ is the cloud version of DuckDB offered as a managed service.
 ## Final thoughts
 I hope this post was helpful to position in-process DBMSs against client-server ones and clarify some of the 
 misconceptions about them.
-For many applications, especially analytical ones, using in-process DBMSs as libraries
-instead of maintaining DBMS servers can significantly simplify your lives. 
+For many applications, especially graph applications, which are often analytical in nature, 
+using an in-process DBMS as a library
+instead of maintaining a DBMS server can significantly simplify your lives. 
 Remember that in-process DBMSs are, *first and foremost, DBMSs* -- i.e., they provide all of the advanced
 features you expect from a DBMS, and they can be state-of-the-art in their performance and the amount of data they can manage. 
 If you'll excuse a small plug, I encourage you to try Kuzu on very large graph databases and be impressed with its data ingestion and querying
