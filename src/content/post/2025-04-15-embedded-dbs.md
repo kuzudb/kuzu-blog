@@ -17,12 +17,13 @@ As a co-founder of [Kuzu Inc.](https://kuzudb.com/), the team behind the Kuzu gr
 I get asked a lot of questions about this new generation of in-process databases, such as:
 
 - What are the advantages and disadvantages of in-process DBMSs?
-- What are their common usage scenarios? 
+- What are their common use cases (we'll focus on graph use cases)? 
 - Does "in-process" mean the databases are ephemeral? (Short answer: No--but many offer an "in-memory" mode where databases are ephemeral)
 - Does "in-process" mean it can only handle small data?  (No!) 
 - What do I do if my application requires a DBMS server?
 
 My goal in this post is to answer these questions and help developers understand where in-process DBMSs fit in contrast to traditional client-server ones.
+My example use cases use Kuzu, so I hope I can also showcase when graph applications can benefit from in-process DBMS.
 
 ## In-process vs client-server is a deployment feature
 The most important takeaway from this post is this: the difference between in-process and client-server DBMSs is primarily about **deployment**. 
@@ -84,7 +85,7 @@ Instead, they are DBMS libraries that can be deployed anywhere -- giving you a l
 your data-intensive applications.
 In fact, you can often observe that users of in-process and client-server DBMSs refer to different things 
 when they use the word _"database."_ When a Postgres user refers to a _Postgres database,_ they're usually talking 
-about the DBMS server running somewhere. In contrast, a SQlite user
+about the DBMS server running somewhere. In contrast, a SQLite user
 referring to a _SQLite database_ usually means the actual file on disk, similar to how they refer to 
 a parquet or CSV file, since there is no separate "SQLite software" running somewhere.
 Thinking of databases as files that your applications generate and share with
@@ -115,7 +116,7 @@ Aside from the above two advantages, in-process DBMSs can also have performance 
 ##  Does in-process mean databases are "ephemeral"?
 
 I'll next address a common misconception about in-process DBMSs. 
-Because in-process DBMSs are Pandas-like data science libraries and because these libraries don't persist your data, a question I often get is: "Are the databases I create using in-process DMBSs also ephemeral?"
+Because in-process DBMSs are Pandas or NetworkX-like data science libraries and because these libraries don't persist your data, a question I often get is: "Are the databases I create using in-process DMBSs also ephemeral?"
 The answer is: **No!** Just like any other DBMS, all the in-process systems I’ve mentioned—SQLite, DuckDB, Kuzu, LanceDB—persist your databases on disk.
 That said, many in-process DBMSs also offer an “in-memory” mode[^2] if you don’t want to persist your data. 
 For example, in Kuzu, if you create a `Database` object with an empty string like this: `db = kuzu.Database("")`,
@@ -163,8 +164,11 @@ that the databases are kept in-memory and they are also ephemeral, i.e., lost wh
 ## Some common use cases
 
 I already mentioned that a unique use case of in-process DBMSs is that they can be deployed anywhere, e.g., AWS lambda functions, 
-your phones, or browsers. Let me give two examples (out of many others) to demonstrate some concrete application scenarios.
-I will pick my examples from Kuzu but similar scenarios exist for other in-process DBMSs
+your phones, or browsers. So for graph users, you can build an on-device personal knowledge graph with Kuzu.
+You can even build a chatbot that retrieves facts through Graph RAG completely inside a browser
+(see details in this [blog post](https://blog.kuzudb.com/post/kuzu-wasm-rag/)). 
+Let me give two examples (out of many others) to demonstrate some concrete application scenarios.
+I will continue picking my examples from Kuzu but similar scenarios exist for other in-process DBMSs
 (and see [Hannes's talk](https://www.youtube.com/watch?v=bi0XhmbkqU8&t=1152s) for similar points).
 
 ### Use case 1: Component in a large data processing pipeline (especially in Python) 
@@ -208,7 +212,8 @@ In contrast, applications can use in-process DBMSs to construct an ephemeral dat
 (recall that many in-process DMBSs have an "in-memory/ephemeral" mode).
 There are several scenarios when this is beneficial (see this [blog post](https://blog.kuzudb.com/post/how-bauplan-leverages-kuzu/) 
 for a detailed case study). One common case is to create on-demand databases over a small subset of data
-from other large data sources. 
+from other large data sources. This case is especially common for graph databases because
+graph databases are often created by ingesting records from other tabular data sources.
 
 Suppose you are working at a game company and
 one of your systems keeps track of the IPs users login from in a large Postgres database (say billions of records). Suppose 
