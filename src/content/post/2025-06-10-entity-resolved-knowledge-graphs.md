@@ -43,7 +43,7 @@ The data is sourced from two providers:
 who are known to be associated with financial crimes.
 - [OpenOwnership](https://www.openownership.org/): Provides data about the ultimate beneficial ownership details, linking entities in the data.
 A "beneficial owner" is a natural person or persons who ultimately owns or controls an interest in a legal entity or arrangement,
-such as a company, a trust, or a foundation.
+such as a company, a trust, or a foundation[^5].
 
 <Img src="/img/creating-high-quality-knowledge-graphs/kgc-er-1.png" width=600 alt="Open Ownership and OpenSanctions data schema">
 
@@ -71,14 +71,14 @@ in a typical entity resolution workflow using the Senzing Python SDK.
 docker run -it --rm --volume ./data:/tmp/data senzing/demo-senzing
 ```
 
-Launching via this command utilizes the Senzing API's base layer in Docker, and also includes a set of
-Python utilities which source from the [this public repo](https://github.com/senzing-garage/) on GitHub.
-These utilities are located in the `/opt/senzing/g2/python` directory within the container.
+Launching the engine via this command utilizes Senzing's base layer in Docker, and also includes a set of
+Python utilities from the [this public repo](https://github.com/senzing-garage/) on GitHub.
+These utilities are located within the container, in the `/opt/senzing/g2/python` directory.
 
-We'll run the Senzing configuration tool to create a namespace for the two JSON files (from Open Ownership and OpenSanctions)
-which we'll load later:
+We run the Senzing configuration tool `G2ConfigTool.py` to create a namespace for the two JSON files (from Open Ownership and OpenSanctions)
+that is loaded later:
 ```bash
-G2ConfigTool.py
+$ G2ConfigTool.py
 >>> addDataSource OPEN-SANCTIONS
 >>> addDataSource OPEN-OWNERSHIP
 >>> save
@@ -86,8 +86,8 @@ save changes? (y/n)
 >>> y
 >>> exit
 ```
-Each input file has a `DATA_SOURCE` field (as shown below) that specifies the source of the data, which tells the Senzing
-engine what namespace to load the data into.
+The `DATA_SOURCE` field from the OpenSanctions and Open Ownership data JSON files (as shown below) specify the source of the data, whose
+values are the same as those shown above in the config tool commands. This way, the Senzing engine what knows namespace to load the data into.
 
 ```json
 {
@@ -96,33 +96,36 @@ engine what namespace to load the data into.
 }
 ```
 
-Next, we can load the two files from the local machine into the running Docker container:
+Next, we load the two input data files from the local machine into the running Docker container:
 ```bash
 G2Loader.py -f ./data/open-sanctions.json
 G2Loader.py -f ./data/open-ownership.json
 ```
 
-Once loaded, Senzing processes the records on-the-fly, i.e., it can process multiple records in parallel
+The moment the files are loaded, Senzing processes the records on-the-fly, i.e., it can process multiple records in parallel
 and all temporary files generated during the entity resolution process are stored in the running Docker
-container's volume. Once the two files have been loaded, we obtain a "resolved" version of the data
-that contains a unique Senzing entity ID for each entity in the dataset.
+container's storage volume. Once finished, we obtain a "resolved" file containing the data,
+with a unique Senzing entity ID for each entity in the dataset.
 
-The resolved data can be exported to a JSON file that we can access locally, using the `G2Export.py` tool:
+The resolved data can be exported to another JSON file that we can access locally, using the `G2Export.py` tool:
 
 ```bash
 G2Export.py -F JSON -o ./data/export.json
 ```
 
-How is this data used to create a high-quality knowledge graph? The entity resolution workflow from Senzing produces an "overlay"
+This data can now used to create a high-quality knowledge graph as follows: The Senzing entities form an "overlay"
 subgraph that connects like-for-like entities between the two sources. The two otherwise disjoint subgraphs
 (from Open Ownership and OpenSanctions) are brought together to create a _single graph_ with edges
-between the entities when they represent the same real-world entity.
+between the entities when they represent the same real-world entity. No source data is removed or changed
+in the process -- Senzing simply bridges them together with its overlaid entities, as per the following schema:
 
 <Img src="/img/creating-high-quality-knowledge-graphs/kgc-er-3.png" width=600 alt="Senzing entity resolution output">
 
 This is the entity resolution workflow in a nutshell! We're now ready to preprocess all the data for ingestion into Kuzu.
 
 ## Kuzu pipeline
+
+Once we have the source data and the entity-resolved data from Senzing, we are ready to ingest them into Kuzu.
 
 ### Data transformations
 
@@ -160,7 +163,7 @@ The above code snippet processes the nested JSON data from the Open Ownership da
 country of nationality of the entity. Note that instead of using vanilla Python functions, we're using
 the [when-then-otherwise](https://docs.pola.rs/api/python/dev/reference/expressions/api/polars.when.html)
 expression to handle the different cases. This is much more efficient than mapping a custom Python
-function over the entire DataFrame, while also being more readable[^2].
+function over the entire DataFrame, while also being more readable and concise[^2].
 
 Similar operations are performed on the remaining fields from the Open Ownership as well
 as the OpenSanctions data to preprocess the data that will be used to create the individual
@@ -181,7 +184,7 @@ with different addresses in the UK.
 
 ### Bulk-ingest data
 
-Kuzu can natively scan and copy from DataFrames from Polars. There are several advantages to copying data
+Kuzu can natively scan and copy from Polars DataFrames. There are several advantages to copying data
 directly from DataFrames:
 
 - There's no need to write out transformed data to external files -- under the hood, the Polars DataFrame object is
@@ -240,7 +243,7 @@ Using this approach, we can incrementally bring in large amounts of data via Pol
 to build the graph in Kuzu. For this sample dataset, we obtain the following graph around the vicinity of the entity
 "Abassin Badshah":
 
-```py
+```cypher
 MATCH (a:Entity)-[b *1..3]-(c)
 WHERE a.descrip CONTAINS "Abassin"
 RETURN * LIMIT 50
@@ -248,30 +251,33 @@ RETURN * LIMIT 50
 
 <Img src="/img/creating-high-quality-knowledge-graphs/kgc-er-4.png" alt="Kuzu graph around the vicinity of the entity 'Abassin Badshah'">
 
-- Yellow nodes represent the entities obtained from the Senzing entity resolution workflow, 
-- Green nodes represent OpenSanctions entities
-- Red nodes represent Open Ownership entities
-- Blue nodes represent the risks associated with OpenSanctions entities
+- Yellow nodes represent the entities obtained from the Senzing entity resolution workflow
+- Green nodes represent `OpenSanctions` entities
+- Red nodes represent `OpenOwnership` entities
+- Blue nodes represent the risks associated with `OpenSanctions` entities
 
 As can be seen, entity resolution works by _overlaying_ the resolved entities on top of the original
-graph (rather than physically merging the two graphs). By writing an undirected Cypher query to
+graph (rather than physically merging entities in the two subgraphs), and does not delete any source data in the process.
+By writing an undirected Cypher query to
 traverse paths around the vicinity of entities that contain the string "Abassin", we can find all
 the relevant data relevant to the entity Abassin Badshah. A number of shell companies are identified
-as "related" to Abassin Badshah, and his spouse, Rehana Badshah, who worked together in a tax evasion scheme[^4].
-This demonstrates the power of bringing together multiple data sources to analyze financial crimes.
+as "related" to Abassin and his spouse, Rehana Badshah, who colluded in a tax evasion scheme[^4].
+This demonstrates the power of bringing together multiple data sources as a graph to help analyze financial crimes.
 
 ## Network analysis
 
-Writing simple Cypher queries to visually explore the graph is good enough for a local understanding of an entity
+Writing simple Cypher queries to visually explore the graph is good enough for a _local_ understanding of an entity
 and what it's connected to. However, we can do better than that! In this section, we'll cover an example
-of running a graph algorithm (betweenness centrality) to identify central players in the network.
+of running a graph algorithm (betweenness centrality) to identify influential nodes in the network.
 
-Betweenness centrality is a useful algorithm for identifying key players in fraud rings because it measures
-how often a node appears on the shortest paths between other nodes. Nodes with high betweenness centrality could
-indicate potential money laundering or other suspicious financial activities.
+[Betweenness centrality](https://en.wikipedia.org/wiki/Betweenness_centrality) is a useful algorithm for identifying the key players in fraud rings because it measures
+how often a node appears on the shortest paths between other nodes. A high betweenness centrality score could
+indicate a connection to potential money laundering or other suspicious financial activities, which helps domain
+experts narrow down on important entities as they analyze the data.
 
 Kuzu makes it simple to run graph algorithms on the graph via NetworkX or via a native
-graph algorithms package[^3].
+graph algorithms package[^3]. The code below shows how to easily transform a Kuzu subgraph into a
+NetworkX graph, run a graph algorithm on it, and then bring the results back into Kuzu.
 
 ```py
 import polars as pl
@@ -314,9 +320,6 @@ conn.execute(
 )
 ```
 
-The above code shows how to easily transform a Kuzu subgraph into a NetworkX graph, run a graph algorithm
-on it, and then bring the results back into Kuzu.
-
 We can now visualize the neighbourhood of the node with the highest betweenness centrality in the graph
 using the following Cypher query:
 
@@ -337,10 +340,11 @@ The node with the highest betweenness centrality is Victor Nyland Poulsen.
 └───────────┴───────────────────────┴──────────────────────────┘
 ```
 
-With the node ID identified via the above query, we can now visualize the neighbourhood of the node
-as follows:
+With the Senzing entity ID identified via the above query, we can now visualize the neighbourhood of the node
+by using a recursive path-finding query in Cypher.
 
 ```cypher
+// Pass through the bridge node of Victor Nyland Poulsen and find other downstream nodes
 MATCH (a)-[b]->(c:Entity)-[d *1..4]->(e)
 WHERE c.id = "sz_100036"
 RETURN * LIMIT 200;
@@ -348,40 +352,40 @@ RETURN * LIMIT 200;
 
 <Img src="/img/creating-high-quality-knowledge-graphs/kgc-er-5.png" alt="Kuzu graph around the vicinity of the entity 'Victor Nyland Poulsen'">
 
-The high betweenness centrality score of the entity named "Victor Nyland Poulsen" is due to the fact that
-he is a key bridge node between entities, appearing  on the shortest paths between several other entities.
-Using the power of graph algorithms, we are able to identify key players in the data to uncover
-relevant insights!
+The high betweenness centrality score of the entity named "Victor Nyland Poulsen" and the resulting graph visulization shows that
+he is a key bridge node between entities, appearing on the shortest paths between several other entities.
+Using the power of graph algorithms, we are able to uncover further useful insights to guide the investigation!
 
 ## Conclusions
 
-In this post, we covered a sequence of steps to create a high-quality knowledge graph from multiple data sources,
-using Kuzu and Senzing. Entity resolution is a key step in this process, as there could be duplicate entities
-in the data that could hinder the efforts of analysts who are looking to discover insights from the connected
+In this post, we covered a sequence of steps to create a high-quality knowledge graph from multiple data sources
+using Kuzu and Senzing. Entity resolution is a key enabler to the process, as there could be duplicate entities
+in the data that could hinder the efforts of analysts looking to uncover insights from the connected
 data. Performing entity resolution using Senzing's Python SDK and persisting the resolved entities to a Kuzu database
 allows for efficient and scalable investigative graph analyses downstream.
 
-To summarize, the following key steps were covered in this post:
+The following key steps were discussed in this post:
 
-- Using Senzing's Python SDK to perform entity resolution on the data from two independent data sources: OpenOwnership and OpenSanctions
-- Using Polars to preprocess the data for ingestion into Kuzu
-- Ingesting the Senzing entities, OpenSanctions and OpenOwnership subgraphs into a single Kuzu database
-- Querying the graph to find relevant insights about entities of interest (e.g., "Abassin Badshah")
-- Using NetworkX to run graph algorithms on the graph to discover key players in the network
+- Use Senzing's Python SDK to perform entity resolution on the data from two independent data sources: Open Ownership and OpenSanctions
+- Use Polars to preprocess the data for ingestion into Kuzu
+- Ingest the Senzing entities, OpenSanctions and Open Ownership subgraphs into a single Kuzu database
+- Query the graph to find relevant insights about entities of interest (e.g., "Abassin Badshah")
+- Use NetworkX to run graph algorithms on the graph to discover key players in the network
 
-The benefits of Senzing are that it's a real-time, powerful entity resolution engine that can be used
+Senzing is a real-time, powerful entity resolution engine that can be used
 in high-impact scenarios like financial crime investigations, providing domain experts with high-quality
-data sourced from multiple providers. The benefits of Kuzu are that it's fast, easy-to-use, open source,
+data sourced from multiple providers. Kuzu is a fast, easy-to-use, open source, embedded graph database
 and interoperates well with other frameworks and tools to help rapidly transform your existing data
-into useful insights through the power of graphs. Combining these two technologies enables organizations
+into graphs that can be analyzed with Cypher and advanced visualization techniques downstream.
+Combining these two technologies can enable your organization
 to build robust, high-quality and **scalable** knowledge graphs to help uncover insights in
 all sorts of interesting domains. We hope you found this hands-on demo useful!
 
 ## Code and data
 
-You can reproduce the entire workflow shown in this post using the code that was demonstrated
-at the Knowledge Graph Conference 2025 in NYC. See this [GitHub repository](https://github.com/kuzudb/kgc-2025-workshop-high-quality-graphs).
-
+The workflow shown in this post was demonstrated live at the Knowledge Graph Conference 2025 in NYC.
+See this [GitHub repository](https://github.com/kuzudb/kgc-2025-workshop-high-quality-graphs) to reproduce
+the visualizations shown, and feel free to repurpose the code to your own use cases!
 
 
 ---
@@ -404,4 +408,9 @@ Badshah under-declared income, evading £669,000 in Income Tax, National Insuran
 The data for OpenSanctions marks Badshah as a "sanctions risk" and his name is one of several other examples of financial misconduct
 that can be revealed by analyzing the connected information in these datasets.
 
+[^5]: For more information on how Open Ownership data can provide information on corporate structures, see [this
+blog post](https://stephenabbottpugh.medium.com/how-the-beneficial-ownership-data-standard-can-help-to-share-information-on-corporate-structures-6a12193bcfc6)
+by Stephen Abbott Pugh, former CTO of Open Ownership and the product owner for the [Beneficial Ownership Data Standard](https://standard.openownership.org/en/0.4.0/) (BODS).
+Stephen now leads a consultancy called Understand Beneficial Ownership and is well known for thought leadership and technical guidance on frontier issues relating
+to beneficial ownership transparency around the world.
 
