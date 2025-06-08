@@ -113,11 +113,11 @@ The resolved data can be exported to another JSON file that we can access locall
 G2Export.py -F JSON -o ./data/export.json
 ```
 
-This data can now used to create a high-quality knowledge graph as follows: The Senzing entities form an "overlay"
+This data can now be used to create a high-quality knowledge graph as follows: The Senzing entities form an "overlay"
 subgraph that connects like-for-like entities between the two sources. The two otherwise disjoint subgraphs
 (from Open Ownership and OpenSanctions) are brought together to create a _single graph_ with edges
 between the entities when they represent the same real-world entity. No source data is removed or changed
-in the process -- Senzing simply bridges them together with its overlaid entities, as per the following schema:
+in the process -- Senzing simply bridges the two subgraphs, as per the following schema:
 
 <Img src="/img/creating-high-quality-knowledge-graphs/kgc-er-3.png" width=600 alt="Senzing entity resolution output">
 
@@ -125,7 +125,8 @@ This is the entity resolution workflow in a nutshell! We're now ready to preproc
 
 ## Kuzu pipeline
 
-Once we have the source data and the entity-resolved data from Senzing, we are ready to ingest them into Kuzu.
+Once we have the source data and the entity-resolved data from Senzing, we are ready to ingest them into Kuzu so that we
+can query the graph in Cypher.
 
 ### Data transformations
 
@@ -162,14 +163,13 @@ print(df.filter(pl.col("name") == "Abassin Badshah"))
 The above code snippet processes the nested JSON data from the Open Ownership dataset to extract the
 country of nationality of the entity. Note that instead of using vanilla Python functions, we're using
 the [when-then-otherwise](https://docs.pola.rs/api/python/dev/reference/expressions/api/polars.when.html)
-expression to handle the different cases. This is much more efficient than mapping a custom Python
-function over the entire DataFrame, while also being more readable and concise[^2].
+expression API in Polars to handle the different cases. This is _much_ more efficient than mapping vanilla Python
+functions over the DataFrame using loops, while also being more readable and concise[^2].
 
 Similar operations are performed on the remaining fields from the Open Ownership as well
 as the OpenSanctions data to preprocess the data that will be used to create the individual
 subgraphs for each source in Kuzu downstream. Here's the subset of the Open Ownership data
-that contains information about the entity "Abassin Badshah": there are two records for this entity,
-with different addresses in the UK.
+that contains information about the entity "Abassin Badshah":
 
 ```
 ┌─────────────────┬──────────────────────┬─────────┬─────────────────────────────────┐
@@ -181,10 +181,11 @@ with different addresses in the UK.
 │ Abassin Badshah ┆ 6747548100436839873  ┆ GB      ┆ 3, Market Parade, 41 East Stre… │
 └─────────────────┴──────────────────────┴─────────┴─────────────────────────────────┘
 ```
+There are two records for this entity, with different addresses in the UK.
 
 ### Bulk-ingest data
 
-Kuzu can natively scan and copy from Polars DataFrames. There are several advantages to copying data
+During data ingestion, Kuzu can natively scan and copy from Polars DataFrames. There are several advantages to copying data
 directly from DataFrames:
 
 - There's no need to write out transformed data to external files -- under the hood, the Polars DataFrame object is
@@ -239,7 +240,7 @@ conn.execute("COPY Matched FROM df_sz_os (from='Entity', to='OpenSanctions')");
 conn.execute("COPY Matched FROM df_sz_oo (from='Entity', to='OpenOwnership')");
 ```
 
-Using this approach, we can incrementally bring in large amounts of data via Polars transformations
+Using this approach, we can bring in large amounts of data via Polars transformations
 to build the graph in Kuzu. For this sample dataset, we obtain the following graph around the vicinity of the entity
 "Abassin Badshah":
 
@@ -260,9 +261,9 @@ As can be seen, entity resolution works by _overlaying_ the resolved entities on
 graph (rather than physically merging entities in the two subgraphs), and does not delete any source data in the process.
 By writing an undirected Cypher query to
 traverse paths around the vicinity of entities that contain the string "Abassin", we can find all
-the relevant data relevant to the entity Abassin Badshah. A number of shell companies are identified
-as "related" to Abassin and his spouse, Rehana Badshah, who colluded in a tax evasion scheme[^4].
-This demonstrates the power of bringing together multiple data sources as a graph to help analyze financial crimes.
+the relevant data relevant to the entity "Abassin Badshah". A number of shell companies are identified
+as related to Abassin and his spouse, Rehana Badshah, both of whom colluded in a tax evasion scheme[^4].
+This example demonstrates the power of bringing together multiple data sources as a graph to help analyze financial crimes.
 
 ## Network analysis
 
@@ -352,8 +353,6 @@ RETURN * LIMIT 200;
 
 <Img src="/img/creating-high-quality-knowledge-graphs/kgc-er-5.png" alt="Kuzu graph around the vicinity of the entity 'Victor Nyland Poulsen'">
 
-The high betweenness centrality score of the entity named "Victor Nyland Poulsen" and the resulting graph visulization shows that
-he is a key bridge node between entities, appearing on the shortest paths between several other entities.
 Using the power of graph algorithms, we are able to uncover further useful insights to guide the investigation!
 
 ## Conclusions
@@ -370,7 +369,7 @@ The following key steps were discussed in this post:
 - Use Polars to preprocess the data for ingestion into Kuzu
 - Ingest the Senzing entities, OpenSanctions and Open Ownership subgraphs into a single Kuzu database
 - Query the graph to find relevant insights about entities of interest (e.g., "Abassin Badshah")
-- Use NetworkX to run graph algorithms on the graph to discover key players in the network
+- Use NetworkX to run graph algorithms on the graph to discover key players in the network (e.g., "Victor Nyland Poulsen")
 
 Senzing is a real-time, powerful entity resolution engine that can be used
 in high-impact scenarios like financial crime investigations, providing domain experts with high-quality
@@ -383,29 +382,31 @@ all sorts of interesting domains. We hope you found this hands-on demo useful!
 
 ## Code and data
 
-The workflow shown in this post was demonstrated live at the Knowledge Graph Conference 2025 in NYC.
+The example shown in this post was presented as a workshop at the 2025 Knowledge Graph Conference in NYC.
 See this [GitHub repository](https://github.com/kuzudb/kgc-2025-workshop-high-quality-graphs) to reproduce
-the visualizations shown, and feel free to repurpose the code to your own use cases!
+the workflow, and feel free to repurpose the code to your own use cases!
 
 
 ---
 
 [^1]: Senzing blog: [What is entity resolution?](https://senzing.com/what-is-entity-resolution/)
+
 [^2]: Polars' `when-then-otherwise` expressions are similar to `if-elif-else`
 blocks in vanilla Python: `when -> if`, `then -> elif`, `otherwise -> else`. In Polars, expressions
-are executed in a vectorized manner (rather than row-by-row when using vanilla Python functions
-with `map_rows`), which is why Polars expressions are _much_ faster, and recommended for processing larger datasets.
-See the [Polars documentation](https://docs.pola.rs/api/python/dev/reference/expressions/api/polars.when.html)
+are executed at the Rust level in a vectorized manner (rather than row-by-row when using vanilla Python functions
+with `map_rows`), which is why Polars expressions are _much_ faster than Python functions, and recommended for processing larger datasets.
+See their [docs](https://docs.pola.rs/api/python/dev/reference/expressions/api/polars.when.html)
 for more examples on `when-then-otherwise` expressions.
 
 [^3]: Kuzu's native [graph algorithms package](https://docs.kuzudb.com/extensions/algo/) is available as
-an extension in Kuzu, and contains several popular graph algorithms, with more being added as of writing this blog post.
+an extension, and contains several popular graph algorithms, with more being added as of writing this blog post.
 For algorithms that are not yet availabe natively in Kuzu, NetworkX is a good alternative, as it contains
-an extensive suite of graph algorithms and converting between a Kuzu subgraph and a NetworkX graph is straightforward.
+an extensive suite of graph algorithms. Converting between a Kuzu subgraph and a NetworkX graph is also straightforward.
 
-[^4]: Abassin Badshah is infamous for his 2021 conviction for tax fraud while operating a Papa John’s takeaway in London.
-Badshah under-declared income, evading £669,000 in Income Tax, National Insurance, and Corporation Tax. He was sentenced to four years in prison following an investigation by HM Revenue and Customs (HMRC), which highlighted his suppression of sales figures.
-The data for OpenSanctions marks Badshah as a "sanctions risk" and his name is one of several other examples of financial misconduct
+[^4]: Abassin Badshah is infamous for his 2021 conviction for tax fraud while operating a Papa John’s pizza restaurant in London.
+Badshah under-declared income, evading £669,000 in Income Tax, National Insurance, and Corporation Tax. He was sentenced to four years in prison
+following an investigation by HM Revenue and Customs (HMRC), which highlighted his suppression of sales figures.
+The data for OpenSanctions marked Badshah as a "sanctions risk" and his name is one of several other examples of financial misconduct
 that can be revealed by analyzing the connected information in these datasets.
 
 [^5]: For more information on how Open Ownership data can provide information on corporate structures, see [this
