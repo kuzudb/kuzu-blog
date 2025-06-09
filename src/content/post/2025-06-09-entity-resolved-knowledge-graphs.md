@@ -7,7 +7,7 @@ heroImage: "/img/creating-high-quality-knowledge-graphs/er-banner.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Principal DevRel Engineer at Senzing"}]
 tags: ["entity-resolution", "senzing", "high-quality"]
-draft: false
+draft: true
 ---
 
 Investigative graph analyses involve using a variety of graph queries and network analysis techniques to uncover
@@ -41,7 +41,7 @@ The data is sourced from two providers:
 
 - [OpenSanctions](https://www.opensanctions.org/): Provides the "risk" category of sanctions targets and persons of interest
 who are known to be associated with financial crimes.
-- [OpenOwnership](https://www.openownership.org/): Provides data about the ultimate beneficial ownership details, linking entities in the data.
+- [Open Ownership](https://www.openownership.org/): Provides data about the ultimate beneficial ownership details, linking entities in the data.
 A "beneficial owner" is a natural person or persons who ultimately owns or controls an interest in a legal entity or arrangement,
 such as a company, a trust, or a foundation[^5].
 
@@ -378,14 +378,16 @@ and interoperates well with other frameworks and tools to help rapidly transform
 into graphs that can be analyzed with Cypher and advanced visualization techniques downstream.
 Combining these two technologies can enable your organization
 to build robust, high-quality and **scalable** knowledge graphs to help uncover insights in
-all sorts of interesting domains. We hope you found this hands-on demo useful!
+all sorts of interesting domains.
+
+We hope you found this hands-on demo useful! Please give Kuzu a star [on GitHub](https://github.com/kuzudb/kuzu),
+and reach out to us on [Discord](https://kuzudb.com/chat) to learn more about building entity-resolved knowledge graphs.
 
 ## Code and data
 
-The example shown in this post was presented as a workshop at the 2025 Knowledge Graph Conference in NYC.
+The example shown in this post was presented as a workshop at the 2025 Knowledge Graph Conference in New York City.
 See this [GitHub repository](https://github.com/kuzudb/kgc-2025-workshop-high-quality-graphs) to reproduce
 the workflow, and feel free to repurpose the code to your own use cases!
-
 
 ---
 
