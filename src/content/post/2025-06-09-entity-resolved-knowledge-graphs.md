@@ -7,7 +7,7 @@ heroImage: "/img/creating-high-quality-knowledge-graphs/er-banner.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Principal DevRel Engineer at Senzing"}]
 tags: ["entity-resolution", "senzing", "high-quality"]
-draft: true
+draft: false
 ---
 
 Investigative graph analyses involve using a variety of graph queries and network analysis techniques to uncover
