@@ -2,7 +2,7 @@
 slug: "entity-resolved-knowledge-graphs"
 title:  "From data to insights: Entity-resolved knowledge graphs with Kuzu & Senzing"
 description: "Walkthrough of using Kuzu with Senzing, an entity resolution engine, to combine data from Open Ownership and OpenSanctions to uncover financial crimes"
-pubDate: "June 10 2025"
+pubDate: "June 09 2025"
 heroImage: "/img/creating-high-quality-knowledge-graphs/er-banner.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Principal DevRel Engineer at Senzing"}]
@@ -241,7 +241,7 @@ conn.execute("COPY Matched FROM df_sz_oo (from='Entity', to='OpenOwnership')");
 ```
 
 Using this approach, we can bring in large amounts of data via Polars transformations
-to build the graph in Kuzu. For this sample dataset, we obtain the following graph around the vicinity of the entity
+to build the graph in Kuzu. For this sample dataset, we can visualize nodes[^6] around the vicinity of the entity
 "Abassin Badshah":
 
 ```cypher
@@ -415,3 +415,6 @@ by Stephen Abbott Pugh, former CTO of Open Ownership and the product owner for t
 Stephen now leads a consultancy called Understand Beneficial Ownership and is well known for thought leadership and technical guidance on frontier issues relating
 to beneficial ownership transparency around the world.
 
+[^6]: The graph visualizations in this post are created using [yFiles Graphs for Jupyter](https://www.yworks.com/products/yfiles-graphs-for-jupyter),
+a free graphing diagram extension for Jupyter notebooks and interactive Python environments. yFiles can connect directly to your local Kuzu database
+and visualize the graph on the fly, with a variety of custom layout algorithms and styling options, which is very useful for exploratory analysis.
