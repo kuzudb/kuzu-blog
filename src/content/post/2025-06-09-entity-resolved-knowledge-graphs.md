@@ -2,7 +2,7 @@
 slug: "entity-resolved-knowledge-graphs"
 title:  "From data to insights: Entity-resolved knowledge graphs with Kuzu & Senzing"
 description: "Walkthrough of using Kuzu with Senzing, an entity resolution engine, to combine data from Open Ownership and OpenSanctions to uncover financial crimes"
-pubDate: "June 10 2025"
+pubDate: "June 09 2025"
 heroImage: "/img/creating-high-quality-knowledge-graphs/er-banner.png"
 categories: ["example"]
 authors: ["prashanth", {"name": "Paco Nathan", "image": "/img/authors/paco-xander-nathan-e1713802414444-150x150.png", "bio": "Principal DevRel Engineer at Senzing"}]
