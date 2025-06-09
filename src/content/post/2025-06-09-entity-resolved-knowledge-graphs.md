@@ -241,7 +241,7 @@ conn.execute("COPY Matched FROM df_sz_oo (from='Entity', to='OpenOwnership')");
 ```
 
 Using this approach, we can bring in large amounts of data via Polars transformations
-to build the graph in Kuzu. For this sample dataset, we obtain the following graph around the vicinity of the entity
+to build the graph in Kuzu. For this sample dataset, we can visualize nodes[^6] around the vicinity of the entity
 "Abassin Badshah":
 
 ```cypher
@@ -415,3 +415,6 @@ by Stephen Abbott Pugh, former CTO of Open Ownership and the product owner for t
 Stephen now leads a consultancy called Understand Beneficial Ownership and is well known for thought leadership and technical guidance on frontier issues relating
 to beneficial ownership transparency around the world.
 
+[^6]: The graph visualizations in this post are created using [yFiles Graphs for Jupyter](https://www.yworks.com/products/yfiles-graphs-for-jupyter),
+a free graphing diagram extension for Jupyter notebooks and interactive Python environments. yFiles can connect directly to your local Kuzu database
+and visualize the graph on the fly, with a variety of custom layout algorithms and styling options, which is very useful for exploratory analysis.
