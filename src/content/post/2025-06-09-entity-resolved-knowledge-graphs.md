@@ -391,7 +391,7 @@ the workflow, and feel free to repurpose the code to your own use cases!
 
 ---
 
-[^1]: Senzing blog: [What is entity resolution?](https://senzing.com/what-is-entity-resolution/)
+[^1]: See Senzing's blog post: [What is entity resolution?](https://senzing.com/what-is-entity-resolution/)
 
 [^2]: Polars' `when-then-otherwise` expressions are similar to `if-elif-else`
 blocks in vanilla Python: `when -> if`, `then -> elif`, `otherwise -> else`. In Polars, expressions
@@ -400,9 +400,9 @@ with `map_rows`), which is why Polars expressions are _much_ faster than Python 
 See their [docs](https://docs.pola.rs/api/python/dev/reference/expressions/api/polars.when.html)
 for more examples on `when-then-otherwise` expressions.
 
-[^3]: Kuzu's native [graph algorithms package](https://docs.kuzudb.com/extensions/algo/) is available as
-an extension, and contains several popular graph algorithms, with more being added as of writing this blog post.
-For algorithms that are not yet availabe natively in Kuzu, NetworkX is a good alternative, as it contains
+[^3]: Kuzu provides a native [graph algorithms package](https://docs.kuzudb.com/extensions/algo/) (available as
+an extension), which contains several popular graph algorithms, with more being added as of writing this blog post.
+For algorithms that are not yet available natively in Kuzu, NetworkX is a good alternative as it contains
 an extensive suite of graph algorithms. Converting between a Kuzu subgraph and a NetworkX graph is also straightforward.
 
 [^4]: Abassin Badshah is infamous for his 2021 conviction for tax fraud while operating a Papa John’s pizza restaurant in London.
