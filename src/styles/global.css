@@ -75,7 +75,16 @@
   /* Add responsive behavior instead */
   @media (max-width: 1280px) {
     .prose table {
-      @apply block overflow-x-auto max-w-full;
+      @apply w-full overflow-x-auto table-auto !important;
+      width: 100% !important;
+    }
+  }
+
+  /* Simple mobile table fix - keep table structure, ensure full width with horizontal scroll */
+  @media (max-width: 768px) {
+    .prose table {
+      @apply w-full overflow-x-auto table-auto !important;
+      width: 100% !important;
     }
   }
 }
@@ -190,9 +199,5 @@ nav.toc ol li a {
   /* Hide toc */
   nav.toc {
     display: none;
-  }
-
-  .prose table {
-    @apply block overflow-x-auto max-w-full border border-zinc-200 dark:border-zinc-700 rounded-md;
   }
 }
