@@ -514,7 +514,7 @@ that newer-generation LLMs can be significantly better than older ones, even if 
 
 To write a syntactically correct Cypher query, it's important that the LLM has sufficient reasoning ability
 to understand the property names and the relationship directions -- this explains why the smaller, open source
-models like `mistralai/mistral-medium`, `micrisoft/phi4` and `qwen/qwen3-30b-a3b` perform so much worse
+models like `mistralai/mistral-medium`, `microsoft/phi4` and `qwen/qwen3-30b-a3b` perform so much worse
 (they have less reasoning capabilities than the larger, proprietary models).
 
 A common concern with using large, proprietary LLMs is cost. The following table compares the cost implications
