@@ -38,7 +38,7 @@ system is not binary). These systems are typically a combination of autonomous a
 and deterministic components that involve hardcoded logic.
 - **Agents 🤝🏽 Graph RAG**: Graph RAG is an inherently agentic problem, because the system needs to be able to recover from
 incorrect Cypher queries or retrieval failures at various stages.
-- **Text2Cypher capabilities**: Recent LLMs from popular commercial providers, for e.g., `openai/gpt-4.1` and `google/gemini-2.0-flash`), are quite
+- **Text2Cypher capabilities**: Recent LLMs from popular commercial providers, for e.g., `openai/gpt-4.1` and `google/gemini-2.0-flash`, are quite
 capable at translating natural language questions into valid Cypher queries by inspecting the given graph schema.
 - **Performance**: Graph RAG performance can be significantly enhanced by using a simple tool-calling router agent that can leverage
 vector search alongside graph queries.
@@ -172,8 +172,9 @@ conn.execute(
 ```
 The code shown above gathers all the `name` property values for the `Symptom` node table and embeds them using
 an embedding model from the `sentence-transformers` library in Python. A new `symptoms_embedding` property
-is added to the existing node table, and the embeddings are bulk-ingested into the `Symptom` node table.
-A similar approach is followed to ingest embeddings for the `Condition` node table as well.
+is added to the existing node table, and the embeddings are bulk-ingested into the `Symptom` node table via Polars.
+A similar approach is followed to ingest embeddings for the `Condition` node table as well. If you're
+interested in the code that does this, you can find it [here](https://github.com/kuzudb/baml-kuzu-demo/blob/main/src/03_create_vector_index.py).
 
 Once the embeddings are in the Kuzu database, it's simple to create a vector index as follows:
 
@@ -235,8 +236,8 @@ on the user's question. Let's look at how these parts come together.
 BAML is a programming language that makes it very simple to get
 structured outputs from LLMs. In the [previous post](/post/unstructured-data-to-graph-baml-kuzu/),
 I showed how BAML's clean, concise syntax, its type  system, and its strong emphasis on prompt
-testing makes the entire development process a breeze. In this post, I'll continue the exercise by using BAML
-prompts to create the following tools:
+testing makes the entire development process with LLMs a breeze. In this post, I'll continue the exercise by creating a BAML
+prompt that can call the following tools:
 
 1. `Text2Cypher`: Convert the user's question into a valid Cypher query, based on the provided graph schema
 2. `PickTool`: Based on the terms used in the user's question, perform tool-calling to select the right vector search tool
@@ -337,14 +338,15 @@ The main advantages of specifying the schema as "full paths" are the following:
 - The directions of the relationships are made explicitly visible to the LLM, in the fewest tokens possible
 - The property names and their data types are _right next to the node and relationship labels_. This means
 that the LLM's attention window can focus on the information relevant to a path's nodes and
-relationships **in the same place** in the token space (in contrast, stringified JSON schemas can
-be verbose, and the property information is separated from the node/edge labels in token space).
+relationships **in the same area** of the model's token space. In contrast, stringified JSON schemas can
+be overly verbose, and the property information may be separated from the node/edge labels in token space.
 
 ### Router agent with tool calling
 
-From an agentic standpoint, BAML provides an `enum` type that makes it simple to specify tools that an LLM can call.
+For the router agent, BAML provides an `enum` type that makes it simple to specify tools that an LLM can call.
 In this case, three tools are defined: `Text2Cypher`, `VectorSearchSymptoms` and `VectorSearchConditions`,
 that are each custom Python functions wrapped as FastAPI endpoints that can be called by the application.
+The `PickTool` function is shown below.
 
 ```rs
 enum Tool {
@@ -376,27 +378,29 @@ function PickTool(schema: string, query: string) -> Tool {
 }
 ```
 
-Note how the `PickTool` function's prompt clearly mentions that a prior attempt at Text2Cypher failed
-to generate a response -- the LLM is asked to pick a tool if, and only if, the first attempt returns an
-empty result (which is all too common in vanilla Graph RAG).
+Note how the `PickTool` function's prompt clearly states that a prior attempt at Text2Cypher failed
+to generate a response -- the LLM router kicks in and picks a tool if, and only if, the first attempt
+at Text2Cypher returns an empty result (which is all too common in vanilla Graph RAG).
 
-For the example mentioned earlier (where the user asks for drugs that cause "sleepiness" as a side effect),
-because we only have the term "drowsiness" in the database, we would expect the following sequence of
-events:
+For the example mentioned earlier -- where the user asks for drugs that cause "sleepiness" as a side effect --
+because we have the term "drowsiness" in the database, we would expect the following sequence of
+events when the vector search tool is made available:
 
 <Img src="/img/enhancing-graph-rag-with-vector-search/rag-text2cypher-3.png" width="700" alt="Example agent routing workflow" />
 
+This time, the LLM router picks the `VectorSearchSymptoms` tool, which returns the most similar term to "sleepiness",
+i.e., "drowsiness". The LLM then uses this additional context to write a better Cypher query, which is then run on the Kuzu database.
 Hopefully, this approach makes sense at a conceptual level. Let's architect a router agent-based Graph
 RAG system and test it, end-to-end!
 
-### Architecture
+### Logical flow
 
 The logical flow of the application is described in the figure below. All deterministic steps
 are shown as grey circles, and the LLM-driven steps are clearly marked as such.
 
 <Img src="/img/enhancing-graph-rag-with-vector-search/agent-rag-2.png" alt="Agent router workflow for Graph RAG using BAML and Kuzu" />
 
-The control flow starts with a user's question in natural language. This is translated into a Cypher query via an LLM that can interpret
+The workflow starts with a user's question in natural language. This is translated into a Cypher query via an LLM that can interpret
 the graph schema. The query is run on the Kuzu database, after which the following sequence of steps occurs:
 - If the response is non-empty, end the workflow.
 - If the response is empty, the routing agent (`PickTool`) kicks in. One of three tools is selected based
@@ -407,6 +411,8 @@ another Cypher query using the additional context.
   - If the response is non-empty, end the workflow.
   - If the response is still empty, the router agent workflow is run in a while loop until the maximum number of retries is reached,
 after which the workflow ends.
+
+### Architecture
 
 From an architectural standpoint, the system is structured as shown below. BAML sits at the lowest level, closest to the LLM prompts,
 and the client code generated by BAML's runtime is utilized by Python helper functions and classes. These are then exposed as
@@ -440,13 +446,12 @@ as much custom functionality as required, in languages other than Python.
 ## Evaluation
 
 Having put in all this work to build an end-to-end application, an important next step is to evaluate the performance
-of the agentic workflow in comparison to vanilla Graph RAG over a range of queries. That's exactly what I'll do
-in this section!
+of the agentic workflow in comparison to vanilla Graph RAG over a range of queries. That's exactly what this section is about!
 
 ### Test suite
 
-First, a test suite of 10 queries that ask path-like questions is created based
-on a deeper understanding of the data. These are listed below.
+First, we'll define a test suite of 10 path-like queries, based
+on an understanding of the data. These are listed below.
 
 | # | Question | Expected terms in answer |
 | :---: | --- | --- |
@@ -468,10 +473,10 @@ LLM must then correctly translate the given context into a natural language answ
 Note that some queries in the test suite are objectively hard (and borderline impossible) to answer with naive Text2Cypher -- they
 would require some sort of agentic loop. For instance, Q6 and Q7 ask about the side effects "sleepiness" and "vomiting",
 but upon inspecting the data, the actual side effects that exist in the Kuzu database are "drowsiness" and "upset stomach". These
-types of queries require some form of semantic search to compliment the graph retrieval. Using an agentic router
+types of queries require some form of semantic search to compliment the graph retrieval. Using a router agent with tool-calling
 can help with this!
 
-To keep things more controlled in the experiments, the `PickTool` and `AnswerGeneration` LLMs are fixed to be the **same**
+To keep the experiments more controlled, the `PickTool` and `AnswerGeneration` LLMs are fixed to be the **same**
 across all experiments: `openai/gpt-4o`. Only the Text2Cypher LLM is varied in each experiment. This tells us the following:
 - How good is the LLM at generating syntactically correct Cypher?
 - How well does the LLM reason about the graph schema and the terms mentioned in the user's question, to include
@@ -486,18 +491,19 @@ below indicate whether the tests passed or failed.
 
 #### Vanilla Graph RAG
 
-When running vanilla Graph RAG (i.e., a single pass at Text2Cypher), OpenAI's `gpt-4.1` passes the most tests.
+When running vanilla Graph RAG (i.e., a single pass at Text2Cypher), OpenAI's `gpt-4.1` passes the most tests (4/10).
 Google's `gemini-2.0-flash` is the next best model for Text2Cypher in these experiments. A lot of the smaller, cheaper and open source LLMs,
 like `phi4`, `qwen3-30b` and `mistral-medium` perform markedly worse across all the queries. Certain queries like
-Q6 and Q7 are not expected to pass, regardless of the LLM used -- a single pass at Text2Cypher
-is bound to fail because an exact match is not found in the database.
+Q6 and Q7 are not expected to pass, regardless of the LLM used, because these queries reference terms that
+do not have an exact match in the database (vector search is needed to find similar terms). Under these conditions,
+`gpt-4.1` and `gemini-2.0-flash` still perform admirably well.
 
 <Img src="/img/enhancing-graph-rag-with-vector-search/vanilla_graph_rag_heatmap.png" alt="Evaluation results for vanilla Graph RAG" />
 
 #### Router-Agent Graph RAG
 
-Now that we have an idea of the baseline case for vanilla Graph RAG, we can get a better sense for the agentic
-router's performance. Two models: `openai/gpt-4.1` and `google/gemini-2.0-flash` pass all 10 tests!
+Now that we have an idea of the baseline case for vanilla Graph RAG, we can get a better sense for the router agent's
+performance. The same two models: `openai/gpt-4.1` and `google/gemini-2.0-flash` pass all 10 tests!
 The next best model is `google/gemini-2.5-flash`, which passes 9/10 tests. The remaining
 models perform better than in the vanilla Graph RAG case, but still do not always produce the expected answer,
 meaning that somewhere in the intermediate stages, the Cypher queries they generated weren't good enough.
@@ -506,8 +512,8 @@ meaning that somewhere in the intermediate stages, the Cypher queries they gener
 
 One interesting observation is regarding the only failing test for the `google/gemini-2.5-flash` model, which several other LLMs pass.
 Inpecting the BAML logs for this test, the Cypher query generated by `google/gemini-2.5-flash`
-is totally wrong -- it fails to even write syntactically correct Cypher, as per the `RETURN` clause shown below. The
-syntax error happens repeatedly, even on multiple runs, and only on this query (Q3). Interestingly,
+is totally wrong -- the query is syntactically incorrect, as per the `RETURN` clause shown below. The
+syntax error happens repeatedly, even on multiple runs, and only on this query (Q3) with this model. Interestingly,
 `google/gemini-2.0-flash` does not suffer from this problem.
 
 ```cypher
