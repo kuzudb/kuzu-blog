@@ -8,9 +8,12 @@ export async function GET(context) {
     title: config.site.title,
     description: config.site.description,
     site: context.site,
-    items: posts.map((post) => ({
-      ...post.data,
-      link: `/post/${post.slug}/`,
-    })),
+    items: posts
+      .slice()
+      .sort((a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate))
+      .map((post) => ({
+        ...post.data,
+        link: `/post/${post.slug}/`,
+      })),
   });
 }

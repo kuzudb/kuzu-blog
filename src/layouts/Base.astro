@@ -7,8 +7,6 @@ import config from "@config/config.json";
 
 import "@styles/global.css";
 
-import { ViewTransitions } from "astro:transitions";
-
 export interface Props {
   title?: string;
   meta_title?: string;
@@ -23,6 +21,11 @@ const { title, meta_title, description, noindex, blogpost, image } = Astro.props
 
 // Default og image path
 const ogImage = image ? image : `${config.site.base_url}/og.png`;
+
+let finalTitle = meta_title ? meta_title : title ? title : config.site.title;
+if (!finalTitle.includes("Kuzu")) {
+  finalTitle = finalTitle + " | Kuzu";
+}
 ---
 
 <!doctype html>
@@ -46,16 +49,15 @@ const ogImage = image ? image : `${config.site.base_url}/og.png`;
       content="width=device-width, initial-scale=1, maximum-scale=5"
     />
 
-    <title>{meta_title ? meta_title : title ? title : config.site.title}</title>
-    <meta
-      name="title"
-      content={meta_title ? meta_title : title ? title : config.site.title}
-    />
+    <title>{finalTitle}</title>
+    <meta name="title" content={finalTitle} />
     <link
       rel="canonical"
       href={`${config.site.base_url}/${Astro.url.pathname.replace("/", "")}`}
       item-prop="url"
     />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href={`${config.site.base_url}/rss.xml`} />
+    <link rel="sitemap" href={`${config.site.base_url}/sitemap-index.xml`} />
     {noindex && <meta name="robots" content="noindex,nofollow" />}
     <meta
       name="description"
@@ -66,7 +68,7 @@ const ogImage = image ? image : `${config.site.base_url}/og.png`;
     <!-- og-title -->
     <meta
       property="og:title"
-      content={meta_title ? meta_title : title ? title : config.site.title}
+      content={finalTitle}
     />
     <!-- og-description -->
     <meta
@@ -85,17 +87,13 @@ const ogImage = image ? image : `${config.site.base_url}/og.png`;
     <!-- twitter-image -->
     <meta name="twitter:image" content={ogImage} />
     <!-- twitter-title -->
-    <meta
-      name="twitter:title"
-      content={meta_title ? meta_title : title ? title : config.site.title}
-    />
+    <meta name="twitter:title" content={finalTitle} />
     <!-- twitter-description -->
     <meta
       name="twitter:description"
       content={description ? description : config.metadata.meta_description}
     />
     <meta name="twitter:card" content="summary_large_image" />
-    <ViewTransitions />
     <script src="/reb2b.js" is:inline></script>
   </head>
   <body class="bg-white dark:bg-zinc-900/95">
