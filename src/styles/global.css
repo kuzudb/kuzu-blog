@@ -40,7 +40,7 @@
   }
 
   th {
-    @apply p-1 bg-zinc-100 bg-zinc-200 dark:bg-zinc-300 !important;
+    @apply p-1 bg-zinc-100 bg-zinc-200 dark:bg-zinc-300 text-zinc-800 dark:text-zinc-200 !important;
   }
 
   kbd {
