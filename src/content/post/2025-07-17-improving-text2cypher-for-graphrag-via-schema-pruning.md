@@ -229,7 +229,7 @@ the direction of the relationship between the `Person` and `Forum` nodes is inve
 semantically correct.
 
 ```cypher
-// What is the total number of forums moderated by employees of "Air_Tanzania"?.
+// What are the distinct IDs of persons born after 1 January 1990 who are moderators of Forums containing the term "Emilio Fernandez"?
 MATCH (p1:Person)-[:hasModerator]->(f1:Forum)  // !! Should be (p1:Person)<-[:hasModerator]-(f1:Forum)
 WHERE p1.birthday > date('1990-01-01')
 AND toLower(f1.title) CONTAINS toLower('Emilio Fernandez')
@@ -270,7 +270,7 @@ in every other way.
 
 ```cypher
 // Did any person from Toronto create a comment with the tag "Winston_Churchill"?
-MATCH (p:Person)-[:commentHasCreator]->(c:Comment)-[:commentHasTag]->(t:Tag),  // !! The direction of the commentHasCreator relationship is incorrect
+MATCH (p:Person)-[:commentHasCreator]->(c:Comment)-[:commentHasTag]->(t:Tag),  // !! Should be (p:Person)<-[:commentHasCreator]-(c:Comment)
       (p)-[:personIsLocatedIn]->(pl:Place)
 WHERE toLower(t.name) CONTAINS 'winston_churchill'
 AND toLower(pl.name) CONTAINS 'toronto'
@@ -291,19 +291,19 @@ Because LLMs are trained on a lot of natural language data, they tend to capture
 when the paths read like a sentence in natural language. It's worthwhile spending time carefully choosing the node
 and relationship labels to help _both_ humans and LLMs. Chances are, the LLM will correctly interpret the `from`/`to` directions
 of the relationships more often than not, allowing them to reason more effectively on the user's question
-(based on multiple failure modes we observed in the LDBC experiments above).
+(based on several similar-looking failures we observed in the LDBC experiments).
 
 The following table shows some examples of how the schema can be deliberately designed to help the LLM.
-Because LLMs process text left-to-right, if the path makes sense when read this way (semantically
-speaking), it's more likely that the LLM picks up on it without getting confused about the direction
-of the relationships.
+Because LLMs generate in a left-to-right fashion, and they are primed to produce semantically meaningful
+tokens during training, the schema is much more likely to align with the LLM's generation abilities when designed
+this way.
 
 | Example | How it may look to the LLM | Recommendation |
 |------------|---------|:-------:|
 | `(:Person)<-[:commentHasCreator]-(:Comment)` | "person _commentHasCreator_ comment" | ❌ |
 | `(:Person)-[:creates]->(:Comment)` | "person _creates_ comment" | ✅ |
 | `(:Forum)<-[:hasModerator]-(:Person)` | "forum _hasModerator_ person" | ❌ |
-| `(:Forum)-[:moderated_by]->(:Person)` | "forum _moderated_by_ person" | ✅ |
+| `(:Forum)-[:isModeratedBy]->(:Person)` | "forum _isModeratedBy_ person" | ✅ |
 
 ### Start with a large, capable model
 
