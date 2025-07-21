@@ -119,7 +119,7 @@ Kd trees are balanced trees that organize vectors by recursively dividing the
 space into two equal-sized parts along one of the dimensions.
 Let's suppose we have the following 2D vectors on the left.
 
-<Img width=900px src="/img/vector-indices/kd-tree.png" alt="Example set of 2D vectors and Kd tree." />
+<img width=900px src="/img/vector-indices/kd-tree.png" alt="Example set of 2D vectors and Kd tree." />
 
 We first split along one dimension, say the x dimension. That is, we sort the vectors according to their
 x-axis values and then find the median vector.
@@ -218,7 +218,7 @@ less effective. Therefore, in the framework the FES theorem,
 kd trees are "Fast" and "Exact", but not "Scalable".
 
 
-[^4]: Note that for the subtree rooted at (2, 2), which contains all vectors with x-value , we cannot put a meaningful lower bound,
+[^4]: Note that for the subtree rooted at (2, 2), which contains all vectors with x-value $\le 5$, we cannot put a meaningful lower bound,
 since q is on the same side of the $x=5$ line, so the vectors in this subtree vectors can be
 arbitrarily close to $q$.
 
@@ -268,7 +268,7 @@ Below is an example sa tree that could be formed if (5,3) is picked as the initi
 a slightly modified version of our running example above (I'm adding two new vectors (0,2) and (0,0)).
 
 
-<Img width=500px src="/img/vector-indices/sa-tree.png" alt="An example sa tree." />
+<img width=500px src="/img/vector-indices/sa-tree.png" alt="An example sa tree." />
 
 The picture shows the clusters in the first level of the tree in red ovals. It also shows one of the
 second level clusters in a blue oval containing 3 points: (1,1), (0,0), and (0,2). The search algorithm is exactly the same as before, 
@@ -305,7 +305,7 @@ Finally, let's cover our main index: the HNSW index. An HNSW index changes the s
 First, the construction algorithm is different. Instead of a tree, HNSW indices are graphs.
 So they may look as below in our modified running example[^6]:
 
-<Img width=500px src="/img/vector-indices/hnsw.png" alt="Example HNSW index." />
+<img width=500px src="/img/vector-indices/hnsw.png" alt="Example HNSW index." />
 
 I will omit the pseudocode of the construction algorithm but it works as follows. We first pick a value $M$, which sets the maximum degree of 
 nodes in the index.
@@ -360,17 +360,27 @@ kNNSearch(q, k, entry):
 14.          candidates.put(child, dist(q, child))
 ```
 
+<figure style="float: right; width: 200px; margin: 0 0 1em 1em;">
+  <img src="/img/vector-indices/hnsw-original.png" alt="Original HNSW figure from the original HNSW paper." style="width: 100%;" />
+  <figcaption style="text-align: center; font-size: 0.9em;">
+    Original HNSW figure from the <a href="https://arxiv.org/abs/1603.09320">original paper</a>.
+  </figcaption>
+</figure>
+
 There are several other technical but minor modifications we need to do to the original kNN search
 algorithm. For example, previously the search started from the root
 of a tree. Since HNSW indices are graphs, there is no root. You can start the search 
 from a random node but the original HNSW paper describes a different approach, which is widely
 adopted in practice. Specifically, the original HNSW index is a multi-layered index, where each
 layer $k$ contains a fraction, e.g., 5%, of the vectors  in layer $k-1$ and the lowest layer
-contains all the vectors. The purpose of the upper layers is really to find a good entry point
+contains all the vectors. On the right, I'm showing the original HNSW figure from the 
+original HNSW paper. The purpose of the upper layers is really to find a good entry point
 into the lowest layer, where the real search is performed. There is growing evidence that you don't need
 many layers (see [this paper](https://arxiv.org/abs/2412.01940)), so I will omit a detailed discussion of it.
 Kuzu's implementation is also based on only 2 layers and [our experiments](https://arxiv.org/abs/2506.23397) demonstrate
 that this works great in practice.
+
+
 
 OK, but how well does HNSW work in practice?
 So well that they established themselves as the state of the art indices to index large numbers of
@@ -415,7 +425,7 @@ However, there are no deeper explanation about it.
 It would be very exciting if someone eventually explains why HNSW indices
 work so well at a more foundational level.
 Maybe, something akin to the [smooth analyses paper](https://en.wikipedia.org/wiki/Smoothed_analysis)
-is possible here. Smoothed anlayses was an explanation to
+is possible here. Smoothed analyses was an explanation to
 why the simplex method for solving linear programs work so well in practice
 although the algorithm can in principle run very slowly.
 
