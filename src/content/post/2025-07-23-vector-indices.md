@@ -67,7 +67,7 @@ each possible 2 combinations of these three properties as summarized below:
 |-----|---|----|----|
 | kd trees | ✅ | ✅ | ❌ |
 | sa trees | ❌ | ✅ | ✅ |
-| HNSW      | ✅ | ❌ | ✅ |
+| HNSW      | ✅ | ❌ | ✅✅ |
 
 You'll notice that my choice of the term "FES theorem" intentionally echoes the
 the famous [CAP 
