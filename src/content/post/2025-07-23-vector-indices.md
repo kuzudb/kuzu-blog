@@ -2,11 +2,11 @@
 slug: "vector-indices"
 title: "Vector Indices Explained Through the FES Theorem"
 description: "Explains the Foundation of HNSW Indices"
-pubDate: "July 15 2025"
+pubDate: "July 23 2025"
 heroImage: "/img/vector-indices/fez-wiki.png"
 categories: ["release"]
 authors: ["semih"]
-tags: ["vector indices", "hnsw"]
+tags: ["vector-index", "hnsw", "vector"]
 ---
 [Vectors](https://en.wikipedia.org/wiki/Vector_(mathematics_and_physics)), which are high-dimensional embeddings of objects, such as text documents or images,
 are used in a wide range of modern LLM-based/agentic applications.
@@ -19,7 +19,7 @@ Our design
 allows users to do arbitrary hybrid graph and vector search, a capability
 many applications need to bring context and precision
 to their vector retrievals.
-Soon, my [amazing student Gaurav](https://www.linkedin.com/in/gaurav-sehgal-79abb9112/) and I will write about Kuzu's vector index
+Soon, my amazing student [Gaurav](https://www.linkedin.com/in/gaurav-sehgal-79abb9112/) and I will write about Kuzu's vector index
 design, which is based on an upcoming [VLDB 2025 paper](https://arxiv.org/abs/2506.23397).
 Today, as a precursor to that post, I will write about
 the foundations of a particular vector index design called *hierarchical navigable small worlds* (HNSW) indices ([1](https://arxiv.org/abs/1603.09320), [2](https://en.wikipedia.org/wiki/Hierarchical_navigable_small_world)). 
@@ -63,16 +63,16 @@ to $q$ (instead of "approximate" indices that can make some mistakes); and
 The indices I cover capture
 each possible 2 combinations of these three properties as summarized below:
 
-| Index     | F | E | S |  
+| Index     | F | E | S |
 |-----|---|----|----|
-| kd trees | ✔ | ✔ | X | 
-| sa trees | X | ✔ | ✔ |   
-| HNSW      | ✔ | X | ✔✔ |
+| kd trees | ✅ | ✅ | ❌ |
+| sa trees | ❌ | ✅ | ✅ |
+| HNSW      | ✅ | ❌ | ✅ |
 
 You'll notice that my choice of the term "FES theorem" intentionally echoes the
 the famous [CAP 
 theorem](https://en.wikipedia.org/wiki/CAP_theorem) of distributed systems that "states
-that any distributed data store can provide at most two of the following three guarantees: 
+that any distributed data store can provide _at most_ two of the following three guarantees: 
 **C**onsistency, **A**vailability, and **P**artition tolerance." Some of you will also notice
 that just like cap, fes (Turkish) or [fez](https://en.wikipedia.org/wiki/Fez_(hat)) (English) is a type of headdress. Now you see why I had to pick the term.[^2] 
 
@@ -213,10 +213,10 @@ subtrees can contain very large numbers of vectors, especially at the higher lev
 Therefore, skipping subtrees can skip very large numbers of vectors.
 
 For these reasons, kd trees are a great
-solution for searching geo-spatial data, such as longitudes and lattitudes of places, which 
+solution for searching geo-spatial data, such as longitudes and latitudes of places, which 
 are represented by small-dimensional vectors. But as soon as your vectors have 
 say 10 dimensions or more, the curse-of-dimensionality kicks in and the lower bounds become
-less effective. Therefore, in the framework the FES theorem,
+less effective. Therefore, in the framework of the FES theorem,
 kd trees are "Fast" and "Exact", but not "Scalable".
 
 
@@ -301,7 +301,7 @@ Although sa trees are faster than kd trees during search in larger dimensional s
 they're still not very fast in those larger dimensions. For example,
 there are many experiments in the sa-tree papers ([1](https://dl.acm.org/doi/10.1007/s007780200060), [2](https://dl.acm.org/doi/10.1145/1227161.1322337))
 that still explore half of the vectors in $V$.
-Therefore, in the framework the FES theorem,
+Therefore, in the framework of the FES theorem,
 sa trees are "Exact" and "Scalable", but not "Fast".
 
 
@@ -332,7 +332,7 @@ sa tree construction algorithm.[^7]
 
 
 
-Let's next coer the HNSW search algorithm, which is a very natural relaxation and an approximate 
+Let's next cover the HNSW search algorithm, which is a very natural relaxation and an approximate 
 version of the same algorithm used 
 in kd and sa trees. We need a relaxation now because there are no subtrees/clusters of nodes
 to which we can establish lower bounds. HNSW indices are general graphs and in graphs 
