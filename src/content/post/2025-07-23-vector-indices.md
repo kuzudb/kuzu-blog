@@ -1,7 +1,7 @@
 ---
 slug: "vector-indices"
 title: "Vector Indices Explained Through the FES Theorem"
-description: "Explains the Foundation of HNSW Indices"
+description: "This is the first of two blog posts explaining the foundation of HNSW vector indices and how they are implemented in Kuzu."
 pubDate: "July 23 2025"
 heroImage: "/img/vector-indices/fez-wiki.png"
 categories: ["release"]
