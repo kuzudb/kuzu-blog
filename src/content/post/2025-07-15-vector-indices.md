@@ -3,7 +3,7 @@ slug: "vector-indices"
 title: "Vector Indices Explained Through the FES Theorem"
 description: "Explains the Foundation of HNSW Indices"
 pubDate: "July 15 2025"
-heroImage: "/img/vector-indices/fez-wiki.jpg"
+heroImage: "/img/vector-indices/fez-wiki.png"
 categories: ["release"]
 authors: ["semih"]
 tags: ["vector indices", "hnsw"]
@@ -34,9 +34,9 @@ of nodes/vectors that are connected to other vectors.
 There are three core ideas behind HNSW indices: 
 
 <ol type="i">
-  <li>connecting pairs of close vectors with each other in the index;</li>
-  <li>neighborhood pruning optimization; and</li>
-  <li>kNN search algorithm;</li>
+  <li>Connecting pairs of close vectors with each other in the index;</li>
+  <li>Neighborhood pruning optimization; and</li>
+  <li>KNN search algorithm;</li>
 </ol>
 
 As I will explain, these ideas exist in kd trees and sa trees. My goal is that
@@ -54,7 +54,8 @@ To help position the capabilities of these three indices, I will also use a
 framework that I refer to as the "*FES theorem*"[^1], which is the observation
 that any vector index can provide at most two of the following three properties:
 
-- **F**ast, i.e., given a query vector $q$, returns vectors that are similar to $q$ quickly; 
+- **F**ast, i.e., given a query vector $q$, returns vectors that are similar to $q$ quickly, e.g., 
+in ms latency; 
 - **E**xact results, i.e., given $q$, correctly returns the most similar vectors 
 to $q$ (instead of "approximate" indices that can make some mistakes); and
 - **S**calable, i.e., the index can store and search high-dimensional vectors, say 100s or 1000s of dimensions instead or 2D or 3D vectors.
@@ -106,7 +107,7 @@ to answer the kNN or range query.
 [^100]: Technically, the space does not have to be a Euclidean space with fixed dimensions. It can be an arbitrary metric space,
 e.g., where vectors are arbitrary strings and the distance is the edit distance between the strings.
 
-[^3]: I remember this not-particularly intuitive phenomenon by thinking of the analogous [cosmic homogeneity phenomenon](https://en.wikipedia.org/wiki/Cosmological_principle)
+[^3]: I like remembering this phenomenon by thinking of the analogous [cosmic homogeneity phenomenon](https://en.wikipedia.org/wiki/Cosmological_principle)
 in astronomy, which states that at large enough scales, matter looks homogeneously distributed in the universe.
 
 I'll focus 
@@ -116,7 +117,7 @@ to organize the vectors in some data structure so that answering queries is fast
 
 ### Kd Tree
 Kd trees are balanced trees that organize vectors by recursively dividing the 
-space into two equal-sized parts along one of the dimensions.
+space into two equal-sized partitions along one of the dimensions.
 Let's suppose we have the following 2D vectors on the left.
 
 <img width=900px src="/img/vector-indices/kd-tree.png" alt="Example set of 2D vectors and Kd tree." />
@@ -192,8 +193,8 @@ smallest lower bound to $q$. This optimization captures the intuition that subtr
 values are likely to contain vectors that are far from q, so less likely to contain the k nearest neighbors of $q$.
 This is implemented in the `(c, lb) = candidates.popMin()` code on line 6.
 
-Perhaps the more interesting question is how can we compute the lower bound of $q$ to all the
-nodes in the subtree rooted at a node $c$. This is also quite intuitive. Take for example the
+Perhaps the more interesting question is: how can we compute the lower bound of $q$ to all the
+nodes in the subtree rooted at a node $c$? This is also quite intuitive. Take for example the
 query (3, 6) shown as a green dot in the figure above. Consider further the subtree rooted 
 at (9, 5) in the kd tree. This subtree was created when we were splitting the vectors
 along the $x=5$ line using the (5, 3) median point. Further, this subtree contained all the 
@@ -202,17 +203,18 @@ assuming our $\texttt{dist}$ function is the Euclidean distance, the minimum dis
 to any vector in this subtree is 5-3=2 (since the x value of $q$ is 3)[^4]. That's all.
 
 By construction of the kd tree and the brute-force nature of the search algorithm, kd trees are
-exact. Further on small-dimensional vectors, 2D or 3D, they are also fast because the lower bounds they put
+exact. Further, on small-dimensional vectors, 2D or 3D, they are also fast because the lower bounds they put
 can be quite effective. This is because, each dimension has a significant contribution 
 to the overall distances between vectors. So even a lower bound obtained by using the distance
 along a single dimension can be effective.
 Therefore, the "subtree skipping optimization" works well
-and ends up skipping many subtrees. Since the tree is balanced,
-this effectively translates to skipping large numbers of vectors. 
+and ends up skipping many subtrees. Since the tree is balanced and each node has only 2 children,
+subtrees can contain very large numbers of vectors, especially at the higher levels of the tree.
+Therefore, skipping subtrees can skip very large numbers of vectors.
 
 For these reasons, kd trees are a great
 solution for searching geo-spatial data, such as longitudes and lattitudes of places, which 
-have are represented by small-dimensional vectors. But as soon as your vectors have 
+are represented by small-dimensional vectors. But as soon as your vectors have 
 say 10 dimensions or more, the curse-of-dimensionality kicks in and the lower bounds become
 less effective. Therefore, in the framework the FES theorem,
 kd trees are "Fast" and "Exact", but not "Scalable".
@@ -228,16 +230,16 @@ arbitrarily close to $q$.
 The next index I'll cover is the [sa tree](https://dl.acm.org/doi/10.1007/s007780200060). 
 Even though sa trees are not used in practice,
 it is important to cover them for two reasons.
-First, sa tree contains the core idea behind "neighborhood pruning" optimization 
+First, the sa tree contains the core idea behind "neighborhood pruning" optimization 
 that is used in HNSW indices.
 Second, if you're in research, the [sa tree paper](https://dl.acm.org/doi/10.1007/s007780200060) 
 is an excellent read! This is the kind of paper that makes me say "I wish I wrote this one".
 
-Sa tree tries to address two limitations of the kd tree. First is that kd trees work only 
+Sa trees try to address two limitations of kd trees. First is that kd trees work only 
 for the Euclidean distance metric. In contrast, sa trees work with arbitrary distance functions,
 such as L2 or cosine or even arbitrary metric spaces.
 Second, sa trees are designed to support vectors with higher number of dimensions.
-When the dimensions of a space is high, dividing it into two parts
+When the dimensions of a space is high, dividing it into two partitions
 along a median vector in one dimension will not
 be very effective in putting meaningful 
 lower-bounds on the subtrees.
@@ -256,7 +258,7 @@ To address this problem, the sa tree partitions the vectors recursively into man
 1. Start with an arbitrary vector $r$ as the root of the tree.
 2. Find a maximal set of vectors $C=\{c_1,...,c_t\}$ with the following ``neighbor diversity property``: *Each $c_i$ is closer to $r$ than to any other $c_j$.*
 3. Partition the remaining vectors into $P_1$, ..., $P_t$, such that each vector $v_i \in P_i$ is closer to $c_i$
-   than to any other $c_j$. Note that $v_i$ must also be closer to $c_i$ than $r$ as well because otherwise,
+   than to any other $c_j$. Note that $v_i$ must also be closer to $c_i$ than $r$. This is because, otherwise,
    it would have been in the set $C$.
 4. Recursively, use steps 1-3 to construct the subtree rooted at $c_i$ using the vectors in $P_i$.
 
@@ -270,24 +272,27 @@ a slightly modified version of our running example above (I'm adding two new vec
 
 <img width=500px src="/img/vector-indices/sa-tree.png" alt="An example sa tree." />
 
-The picture shows the clusters in the first level of the tree in red ovals. It also shows one of the
+The picture shows the clusters in the first level of the tree with red ovals. It also shows one of the
 second level clusters in a blue oval containing 3 points: (1,1), (0,0), and (0,2). The search algorithm is exactly the same as before, 
 except we need to change how we compute lower bounds to each subtree (so lines 16-20 are different). 
-There are several ways to do this. One way is this: As we construct the sa tree, for each subtree, we record the maximum distance from any vector in the subtree to the root/centroid of the subtree.
+
+There are several ways to compute lower bounds. One way is this: As we construct the sa tree, for each subtree, we 
+record the maximum distance from any vector in the subtree to the root/centroid of the subtree, i.e.,
+the maximum distance of $c_i$ to vectors in $P_i$.
 For example, consider the cluster shown in the blue oval. 
 The maximum distance of root (1,1) to (0, 0) and (0, 2)
-is $\sqrt{2}$ (I'm assuming Euclidean distance). Therefore, every vector in the subtree under (1,1) is contained
-within the green perfect circle with diameter $\sqrt{2}$ around (1,1). Suppose the query vector
-$q$ is (3, 6) as before. Therefore the lower bound distance of (3,6) to any vector in this subtree
+is $\sqrt{2}$. Therefore, every vector in the subtree under (1,1) is guaranteed to be
+within a radius of $\sqrt{2}$ around (1,1) (shown as the green circle). Therefore,
+the lower bound distance of $q$=(3,6) to any vector in this subtree
 is the distance of (3, 6) to the periphery of this circle, which is  $\texttt{dist}$((3, 6), (1, 1)) minus $\sqrt{2}$.[^5]
 Therefore, the lower bound is $\sqrt{(3-1)^2 + (6-1)^2} - \sqrt{2}$=$\sqrt{29} - \sqrt{2}$.
 
 [^5]: You can more formally show this by the [triangle inequality](https://en.wikipedia.org/wiki/Triangle_inequality).
 
-In some sense, by relaxing the balance requirement of kd trees, which is obtained by
-partitioning the space in one dimension into two equal partitions, sa trees can work
+In some sense, by relaxing the balance requirement of kd trees, which is based on
+recursively constructing equal-sized partitions, sa trees can work
 on higher dimensional spaces.
-This is because we can now choose centroids that are arbitrarily positioned in space to cluster vectors that are close to each other. 
+This is because we can now choose centroids that are arbitrarily positioned in space to cluster vectors. 
 Therefore, during search, we can put more effective lower bounds between $q$ and all the vectors in a
 subtree/cluster. The original [sa tree paper](https://dl.acm.org/doi/10.1007/s007780200060) shows
 experiments up to 20 dimensions and a [follow up paper](https://dl.acm.org/doi/10.1145/1227161.1322337) shows experiments
@@ -295,43 +300,47 @@ with up to 112 dimensions.
 Although sa trees are faster than kd trees during search in larger dimensional spaces, 
 they're still not very fast in those larger dimensions. For example,
 there are many experiments in the sa-tree papers ([1](https://dl.acm.org/doi/10.1007/s007780200060), [2](https://dl.acm.org/doi/10.1145/1227161.1322337))
-that still explore half or more than half of the vectors.
+that still explore half of the vectors in $V$.
 Therefore, in the framework the FES theorem,
 sa trees are "Exact" and "Scalable", but not "Fast".
 
 
 ### HNSW Indices
-Finally, let's cover our main index: the HNSW index. An HNSW index changes the sa trees in two main ways. 
+Finally, let's cover our main index: the HNSW index. An HNSW index changes the sa tree in two main ways. 
 First, the construction algorithm is different. Instead of a tree, HNSW indices are graphs.
-So they may look as below in our modified running example[^6]:
+They may look as below in our modified running example[^6]:
 
 <img width=500px src="/img/vector-indices/hnsw.png" alt="Example HNSW index." />
 
 I will omit the pseudocode of the construction algorithm but it works as follows. We first pick a value $M$, which sets the maximum degree of 
 nodes in the index.
-Then, we take the vectors in $V$, say $v_1, ..., v_n$, 
-one at a time in some order. Before step $i$, we have constructed a partial graph $G_{i-1}$
-that has indexed vectors $v_1, .., v_{i-1}$. We find the (approximate) $M$ NN's of $v_i$ in 
-$G_{i-1}$, say $u_1, ..., u_M$. Then, we add an edge from $v_i$ to $u_j$ and a backward edge
+Then, we take the vectors in $V$=$\{v_1, ..., v_n\}$ 
+one at a time in some order. Before each step $i$, we have a partial graph $G_{i-1}$
+that has indexed vectors $v_1, ..., v_{i-1}$. We find the (approximate) $M$ NN's of $v_i$ in 
+$G_{i-1}$, say $u_1, ..., u_M$, using a modified version of the brute-force kNN search algorithm.
+I'll cover this search algorithm momentarily below.
+Then, we add an edge from $v_i$ to $u_j$ and a backward edge
 from $u_j$ to $v_i$. If $u_j$'s maximum 
 degree has increased over $M$ by adding the $u_j$ $\rightarrow$ $v_i$ edge, then the algorithm *prunes* $u_j$'s edges back to $M$
-as follows. We order $u_j$ neighbors
-from those closest to $u_j$ to furthest, suppose this order is $c_1, ..., c_k$. 
-Then starting from $c_1$, one by one, we remove any edge $u_j$ $\rightarrow$ $c_{y}$ if $c_{y}$ is closer to
-one of the neighbors $c_{x<y}$ that came before it. Note that this
+as follows. We order $u_j$ neighbors, say $c_1, ..., c_k$,
+where $c_1$ is the closest neighbor to $u_j$ and $c_k$ is the furthest neighbor.
+Then we take each $c_y$ in this order and remove any edge $u_j$ $\rightarrow$ $c_{y}$ if $c_{y}$ is closer to
+one of the neighbors $c_{x<y}$ that came before it that it is to $u_j$, i.e.,
+if $dist(c_y, c_x) < dist(c_y, u_j)$. Note that this
 procedure captures exactly the same ``neighbor diversity property`` in step 2 of the
 sa tree construction algorithm.[^7]
 
 
 
-The HNSW search algorithm is a very natural relaxation of the same algorithm used 
+Let's next coer the HNSW search algorithm, which is a very natural relaxation and an approximate 
+version of the same algorithm used 
 in kd and sa trees. We need a relaxation now because there are no subtrees/clusters of nodes
 to which we can establish lower bounds. HNSW indices are general graphs and in graphs 
 every node can typically reach every other node. The most natural relaxation is
 to use the distance of $q$ to a candidate $c$ to both pick the next candidate to visit 
 and also to stop the search. That is,
 the search now stops when the next-closest-candidate's distance is already larger than
-the k'th best result we already have. That is the `lb < results.peekMax().d` line in
+the k'th best result we already have. That is the `lb < results.peekMax().d` condition on line 7 of
 the original kNN search algorithm changes
 to `dist_q_c < results.peekMax().d`.  Below is the pseudocode of the HNSW search algorithm:
 
@@ -385,11 +394,12 @@ that this works great in practice.
 OK, but how well does HNSW work in practice?
 So well that they established themselves as the state of the art indices to index large numbers of
 really high-dimensional (say 1000s of dimensions) vectors with excellent search time.
-Except for a few exceptions, many implementations of vector indices in DBMSs
-(vector, relational, or graph DBMSs) adopt HNSW indices.
-We have experimented a ton with them over the last few years and you can easily expect
-an HNSW index to explore much less than 1%, say 0.1%,of the vectors on many queries,
-and return highly accurate results.
+Except for a few exceptions, many implementations of vector indices in existing DBMSs
+adopt HNSW indices.
+We have experimented a lot with them over the last few years and you can easily expect
+an HNSW index to explore much less than 1%, say 0.1%, of the vectors on many queries,
+and return highly accurate results. So, many queries millions of high-dimensional
+vectors can take only a few or tens of milliseconds only.
 Therefore, in the framework the FES theorem, they are "Fast", and "Scalable",
 but they not "Exact".[^200]  In fact they're not even approximate the way computer scientists
 use the word approximate. Specifically, they provide no real approximation guarantees on
@@ -405,7 +415,7 @@ for HNSW. That is because HNSW indices scale to vectors with much more dimension
 ### Conclusions
 One of the key takeaways from this post is that a good way to understand HNSW indices is 
 through a sequence of relaxation of kd trees. Sa trees relax kd trees by giving up balance
-and allowing nodes to have more than 2 children. HNSW indices further relax the "treeness"
+and allowing nodes to have more than 2 children. HNSW indices further relax the "tree-ness"
 by allowing each node to connect to any other node to form a graph, while still maintaining that nodes
 that are close to each other form clusters. Importantly, the search algorithm used in all these
 indices are almost identical. In addition, a good way to position the capabilities of these indices
@@ -419,15 +429,16 @@ on HNSW converge so quickly and with such high recall.
 There are strong intuitions in literature connecting the HNSW's structure to the
 "small world" phenomenon in social network graphs where people are curiously
 able to find random other people in the world through a few steps[^300]. Specifically,
-the HNSW graph is constructed in such a way that from any vector in the graph,
+the HNSW graph is constructed in such a way that starting from any entry vector in the graph,
 we can find regions of the graph that are close to any query $q$ in a few steps.
-However, there are no deeper explanation about it.
+However, there is no deeper explanation than this  .
 It would be very exciting if someone eventually explains why HNSW indices
 work so well at a more foundational level.
 Maybe, something akin to the [smooth analyses paper](https://en.wikipedia.org/wiki/Smoothed_analysis)
 is possible here. Smoothed analyses was an explanation to
 why the simplex method for solving linear programs work so well in practice
-although the algorithm can in principle run very slowly.
+although the algorithm can in principle run very slowly. 
+Let's see if a similar explanation emerges here.
 
 That's it for this post! In the next post, Gaurav and I will discuss Kuzu's HNSW index implementation and some of
 its unique capabilities. So stay tuned for another very technical post!
