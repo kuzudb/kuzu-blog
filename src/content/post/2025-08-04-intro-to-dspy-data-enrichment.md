@@ -509,6 +509,9 @@ RETURN DISTINCT s.knownName, city.name, country.name, i.name
 | Emmanuelle Charpentier  | Berlin    | Germany          | Max Planck Unit for the Science of Pathogens |
 | Marie Curie             | Paris     | France           | Sorbonne University                     |
 
+There were four female laureates in Chemistry who were affiliated with non-US institutions -- this is
+a question that required the enriched data to answer appropriately.
+
 A lot more queries that combine insights from scholars, prizes and the institutions, cities, and countries
 they are affiliated with can be run in this manner. We'll leave a more detailed exploration that uses
 graph algorithms and more, for a future post.
@@ -538,8 +541,8 @@ you curious to learn more.
 
 You can check out the code and data to reproduce this entire workflow
 [here](https://github.com/kuzudb/dspy-kuzu-demo). Stay tuned for more,
-star [Kuzu](https://github.com/kuzudb/kuzu) on GitHub, and reach out to us on [Discord](https://kuzudb.com/chat)
-, or on [X](https://x.com/kuzudb), to share your thoughts! 🚀
+star [Kuzu](https://github.com/kuzudb/kuzu) on GitHub, and reach out to us on [Discord](https://kuzudb.com/chat),
+or on [X](https://x.com/kuzudb), to share your thoughts! 🚀
 
 ---
 
