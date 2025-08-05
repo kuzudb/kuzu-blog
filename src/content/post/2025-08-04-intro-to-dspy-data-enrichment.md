@@ -20,7 +20,7 @@ In this post, we'll showcase a two-part workflow involving vector embeddings and
 to disambiguate entities so that we can enrich one dataset with information from another. The LLM
 part of the workflow uses [DSPy](https://dspy.ai/learn/), a declarative framework for building
 compound AI pipelines. The goal of this post is to give a gentle introduction to DSPy and the powerful
-primitives it provides, so that you can repurpose these ideas, and be more productive applying
+primitives it provides, so that you can repurpose these ideas and be more productive applying
 LLMs in your own domains.
 
 ## Motivation
@@ -155,15 +155,15 @@ It's natural to wonder: why use LLMs at all? Why not _**only**_ use vector simil
 if two laureates are the same? In practice, this doesn't work well,
 because there are several cases where the names of the same laureates are spelled drastically differently
 ("John Strutt" vs. "Lord Rayleigh"[^3]), or where multiple unrelated laureates have very similar names
-("George E. Smith" vs. "George P. Smith"). When given sufficiently good context, for e.g., combining the
+("George E. Smith" vs. "George P. Smith"). When given sufficiently good context, for e.g., by combining the
 full name with the Nobel prize category and the award year, LLMs are _very_ good at
-acting as judges to disambiguate the entities.
+acting as judges to disambiguate between entities.
 
 Let's summarize the key parts of our methodology:
 
 1. **Vector search**: Use vector embeddings to find the top$_k$ most-similar laureates in the secondary data for each
    laureate in the primary data.
-2. **LLM-as-a-judge**: Use an "LLM-as-a-judge" to determine which of the $k$ most similar laureates is the exact same person
+2. **LLM-as-a-judge**: Use an LLM to judge which of the top$k$ most-similar laureates is the exact same person
    as the primary data laureate.
 
 At the end of the second stage, we get a mapping of IDs between the two datasets, which is sufficient to
@@ -199,7 +199,7 @@ the language model weights to produce a new, improved module that can perform be
 same language model.
 
 To sum up, DSPy does away with the traditional notion of "writing prompts by hand" -- instead, you declare your
-_intent_ via the program itself, via signatures and modules.
+_intent_ via the program itself, using signatures and modules that define the behaviour and strategy for interacting with the LLM.
 Using optimizers is totally optional -- for this introductory post, we'll not be using them, instead just
 sticking with DSPy's automatically generated base prompts.
 
@@ -252,7 +252,6 @@ lm = dspy.LM(
     api_key=OPENROUTER_API_KEY,
 )
 dspy.configure(lm=lm)
-
 ```
 
 #### Types
@@ -314,8 +313,8 @@ context provided to the LLM is insufficient, we'd expect the LLM to return a "lo
 #### Modules
 
 DSPy allows you to define custom [modules](https://dspy.ai/learn/programming/modules/) with ease, but
-for this case, the simple `Predict` built-in module is sufficient[^5]. This is defined as an async function
-in Python that takes in a single sample record (primary dataset) and a list of reference records
+for this case, the built-in `Predict` module is sufficient[^5]. This is defined as an async function
+in Python that takes in a single sample record (from the primary dataset) and a list of reference records
 (secondary dataset), and returns the output as defined in the `EntityHandler` signature.
 
 ```py
@@ -464,7 +463,7 @@ As LLMs continue to improve and
 become faster and cheaper at the same time, it's increasingly feasible to use them for
 tasks like this that may have previously required combining supervised machine learning and
 rule-based approaches. Of course, the more widespread the use of LLMs becomes, the more important
-the evaluation governance and safety aspects also become, but that's a topic for another day.
+the evaluation, governance and safety aspects also become, but that's a topic for another day.
 
 ## Analyze the graph
 
@@ -573,9 +572,9 @@ due diligence, testing and evals before deploying any LLM-based pipeline in prod
 the task is slightly more complex. Allowing the model to reason over its chain of thought can
 significantly improve the quality of the output, but it also takes longer and requires more tokens.
 
-[^6]: All graphs visualizations in this post are done using G.V(), a visualization tool for graphs
+[^6]: All graph visualizations in this post are done using G.V(), a visualization tool for graphs
 that seamlessly connects to Kuzu databases. The nice thing about using G.V() is that you
-can easily display _the entire graph_ in one go -- it can easily handle up to thousands
+can display _the entire graph_ in one go -- it can easily handle up to thousands
 of nodes and tens of thousands of edges without any performance issues.
 This is thanks to its [WebGL-powered](https://gdotv.com/blog/neo4j-graph-database-browser-vs-gdotv/) rendering engine,
 which makes much more efficient use of your device's computing power than traditional graph
