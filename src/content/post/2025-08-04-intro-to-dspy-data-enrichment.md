@@ -18,7 +18,7 @@ you've come to the right place!
 
 In this post, we'll showcase a two-part workflow involving vector embeddings and an "LLM-as-a-judge"
 to disambiguate entities so that we can enrich one dataset with information from another. The LLM
-part of the workflow uses [DSPy](https://dspy.ai/learn/), a declarative framework for building
+part of the workflow uses [DSPy](https://dspy.ai/), a declarative framework for building
 compound AI pipelines. The goal of this post is to give a gentle introduction to DSPy and the powerful
 primitives it provides, so that you can repurpose these ideas and be more productive applying
 LLMs in your own domains.
